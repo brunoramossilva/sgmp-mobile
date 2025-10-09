@@ -1,4 +1,4 @@
-# 🏢 SGMP - Sistema Geral de Manutenção Predial
+# 🏢 SGMP - Sistema Geral de Manutenção Predial (Front-end Mobile)
 
 > **Sistema moderno e intuitivo para gestão de manutenção predial em condomínios e edifícios**
 
