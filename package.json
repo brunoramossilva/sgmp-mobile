@@ -9,13 +9,16 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "axios": "^1.12.2",
     "expo": "~54.0.12",
     "expo-status-bar": "~3.0.8",
+    "nativewind": "^4.2.1",
     "react": "19.1.0",
     "react-native": "0.81.4"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "tailwindcss": "^3.3.2",
     "typescript": "~5.9.2"
   },
   "private": true
