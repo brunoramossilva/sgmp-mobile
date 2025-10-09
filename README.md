@@ -1,1 +1,0 @@
-# sgmp-mobile
