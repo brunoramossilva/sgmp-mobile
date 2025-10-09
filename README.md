@@ -41,8 +41,8 @@ A versão **mobile** do sistema visa ampliar a acessibilidade e a praticidade, p
 
 - **Linguagem:** TypeScript;
 - **Front-end:** React Native + NativeWind;
-- **Back-end:** Node.js;
-- **Banco de Dados:** PostgreSQL;
+- **Back-end:** Node.js + Express.js;
+- **Banco de Dados:** PostgreSQL + Prisma ORM;
 - **Ferramentas:** GitHub, Discord, Docker e Expo.
 
 ---
