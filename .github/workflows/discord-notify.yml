@@ -2,22 +2,25 @@ name: Discord Notification
 
 on:
   pull_request:
-    types: [opened, closed, reopened, merged]
+    types: [opened, reopened, closed]
   push:
     branches:
       - develop
       - main
+  create: {}
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
       - name: Send message to Discord
-        uses: Ilshidur/action-discord@v2
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          message: |
-            ${{ github.event_name }} triggered by @${{ github.actor }}
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Event: ${{ github.event.action }}
+          args: |
+            ${{ github.event_name == 'create' && github.ref_type == 'branch' && format('🌱 **Nova branch criada:** `{0}` por @{1}', github.ref_name, github.actor) ||
+            github.event_name == 'push' && format('📦 Push na branch `{0}` por @{1}', github.ref_name, github.actor) ||
+            github.event_name == 'pull_request' && format('🔀 PR {0} por @{1}', github.event.action, github.actor) ||
+            format('⚙️ Evento: {0}', github.event_name) }}
+            
