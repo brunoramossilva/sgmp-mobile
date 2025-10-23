@@ -17,9 +17,10 @@ jobs:
     steps:
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          message: |
+          args: |
             🚀 **GitHub Notification**
 
             🧩 **Repositório:** [${{ github.repository }}](https://github.com/${{ github.repository }})
