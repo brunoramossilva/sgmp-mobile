@@ -44,6 +44,7 @@
 5. Faça login e clique no botão "Sair" no canto superior direito.
 
 ## ✅ Checklist
+- [ ] Meu pull request está sendo enviado para a branch `develop` como base, e não para a `main`;
 - [ ] Meu código segue as diretrizes de estilo deste projeto;
 - [ ] Realizei uma revisão do meu próprio código;
 - [ ] Comentei meu código, particularmente em áreas difíceis de entender;
