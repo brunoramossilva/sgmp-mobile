@@ -1,4 +1,4 @@
-name: Discord Notification
+name: Discord Notifications
 
 on:
   pull_request:
@@ -7,19 +7,26 @@ on:
     branches:
       - develop
       - main
-  create: {}
+  create:
+    branches:
+      - "*"
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send message to Discord
+      - name: Send Discord Notification
         uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          args: |
-            ${{ github.event_name == 'create' && github.ref_type == 'branch' && format('🌱 **Nova branch criada:** `{0}` por @{1}', github.ref_name, github.actor) ||
-            github.event_name == 'push' && format('📦 Push na branch `{0}` por @{1}', github.ref_name, github.actor) ||
-            github.event_name == 'pull_request' && format('🔀 PR {0} por @{1}', github.event.action, github.actor) ||
-            format('⚙️ Evento: {0}', github.event_name) }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            🚀 **GitHub Notification**
+
+            🧩 **Repositório:** [${{ github.repository }}](https://github.com/${{ github.repository }})
+            👤 **Usuário:** @${{ github.actor }}
+            ⚙️ **Evento:** ${{ github.event_name }}
+            🌿 **Branch:** ${{ github.ref_name || github.head_ref }}
+
+            ${{ github.event_name == 'pull_request' && format('📥 **Pull Request:** [{0}]({1})', github.event.pull_request.title, github.event.pull_request.html_url) || '' }}
+            ${{ github.event_name == 'push' && format('🧾 **Push realizado!** Veja os commits [aqui]({0}/compare/{1})', format('https://github.com/{0}', github.repository), github.ref_name) || '' }}
+            ${{ github.event_name == 'create' && format('✨ **Nova branch criada:** `{0}`', github.ref) || '' }}
