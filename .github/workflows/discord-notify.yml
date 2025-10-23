@@ -22,11 +22,12 @@ jobs:
         with:
           args: |
             🚀 **GitHub Notification**
-
             🧩 **Repositório:** [${{ github.repository }}](https://github.com/${{ github.repository }})
             👤 **Usuário:** @${{ github.actor }}
             ⚙️ **Evento:** ${{ github.event_name }}
             🌿 **Branch:** ${{ github.ref_name || github.head_ref }}
+
+            ---  
 
             ${{ github.event_name == 'pull_request' && format('📥 **Pull Request:** [{0}]({1})', github.event.pull_request.title, github.event.pull_request.html_url) || '' }}
             ${{ github.event_name == 'push' && format('🧾 **Push realizado!** Veja os commits [aqui]({0}/compare/{1})', format('https://github.com/{0}', github.repository), github.ref_name) || '' }}
