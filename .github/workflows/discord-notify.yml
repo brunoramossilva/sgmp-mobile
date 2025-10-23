@@ -23,4 +23,7 @@ jobs:
             github.event_name == 'push' && format('📦 Push na branch `{0}` por @{1}', github.ref_name, github.actor) ||
             github.event_name == 'pull_request' && format('🔀 PR {0} por @{1}', github.event.action, github.actor) ||
             format('⚙️ Evento: {0}', github.event_name) }}
+<<<<<<< HEAD
             
+=======
+>>>>>>> f52460bbb4f789f8b20b828bb90486e0f7578279
