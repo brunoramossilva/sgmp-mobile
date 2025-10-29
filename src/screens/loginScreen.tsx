@@ -22,13 +22,12 @@ export default function LoginScreen() {
       <StatusBar style="dark" />
 
       <Image
-        source={{
-          uri: "https://cdn-icons-png.flaticon.com/512/295/295128.png",
-        }}
-        className="w-20 h-20 mb-6"
+        source={require("../../assets/sgmp-sem-fundo.png")}
+        className="w-72 h-72"
+        accessibilityLabel="Logo SGMP"
       />
 
-      <Text className="text-center text-3xl font-bold text-blue-700 mb-2">
+      <Text className="text-center text-3xl font-bold text-red-700 mb-2">
         Bem-vindo(a) ao SGMP Mobile
       </Text>
       <Text className="text-slate-500 mb-8 text-center">
@@ -41,7 +40,7 @@ export default function LoginScreen() {
           onPress={() => setPerfil("morador")}
           className={`flex-1 p-3 mr-2 rounded-2xl border ${
             perfil === "morador"
-              ? "bg-blue-600 border-blue-600"
+              ? "bg-red-600 border-red-600"
               : "bg-white border-slate-300"
           }`}
         >
@@ -58,7 +57,7 @@ export default function LoginScreen() {
           onPress={() => setPerfil("funcionario")}
           className={`flex-1 p-3 ml-2 rounded-2xl border ${
             perfil === "funcionario"
-              ? "bg-blue-600 border-blue-600"
+              ? "bg-red-600 border-red-600"
               : "bg-white border-slate-300"
           }`}
         >
@@ -68,6 +67,23 @@ export default function LoginScreen() {
             }`}
           >
             Funcionário
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setPerfil("funcionario")}
+          className={`flex-1 p-3 ml-2 rounded-2xl border ${
+            perfil === "funcionario"
+              ? "bg-red-600 border-red-600"
+              : "bg-white border-slate-300"
+          }`}
+        >
+          <Text
+            className={`text-center font-semibold ${
+              perfil === "funcionario" ? "text-white" : "text-slate-600"
+            }`}
+          >
+            Síndico
           </Text>
         </TouchableOpacity>
       </View>
@@ -97,7 +113,7 @@ export default function LoginScreen() {
       {/* Botão Entrar */}
       <TouchableOpacity
         onPress={handleLogin}
-        className="bg-blue-600 w-full p-4 rounded-2xl shadow-md active:bg-blue-700"
+        className="bg-red-600 w-full p-4 rounded-2xl shadow-md active:bg-red -700"
       >
         <Text className="text-center text-white text-lg font-semibold">
           Entrar
