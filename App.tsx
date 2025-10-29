@@ -2,6 +2,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./src/screens/loginScreen";
 import HomeScreen from "./src/screens/homeScreen";
+import InicialMorador from "./src/screens/telaInicialMorador";
+import InicialTecnico from "./src/screens/telaInicialTecnico";
+import InicialSindico from "./src/screens/telaInicialSindico";
+import CriacaoOsMorador from "./src/screens/criacaoOsMorador";
+import OsAceitaPeloTecnico from "./src/screens/osAceitarPorMimTecnico";
+import DetalhesOs from "./src/screens/visualizarDetalhesOs";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +24,33 @@ export default function App() {
           name="Home"
           component={HomeScreen}
           options={{ title: "Página Inicial" }}
+        />
+        <Stack.Screen
+          name="InicialMorador"
+          component={InicialMorador}
+          options={{ title: "Morador" }}
+        />
+        <Stack.Screen
+          name="InicialTecnico"
+          component={InicialTecnico}
+          options={{ title: "Técnico" }}
+        />
+        <Stack.Screen
+          name="InicialSindico"
+          component={InicialSindico}
+          options={{ title: "Síndico" }}
+        />
+        <Stack.Screen
+          name="CriacaoOsMorador"
+          component={CriacaoOsMorador}
+        />
+        <Stack.Screen
+          name="OsAceitaPeloTecnico"
+          component={OsAceitaPeloTecnico}
+        />
+        <Stack.Screen
+          name="DetalhesOs"
+          component={DetalhesOs}
         />
       </Stack.Navigator>
     </NavigationContainer>
