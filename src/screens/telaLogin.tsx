@@ -3,8 +3,10 @@ import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-export default function LoginScreen() {
-  const [perfil, setPerfil] = useState<"morador" | "funcionario" | "sindico">("morador");
+export default function TelaLogin() {
+  const [perfil, setPerfil] = useState<"morador" | "funcionario" | "sindico">(
+    "morador"
+  );
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -15,7 +17,7 @@ export default function LoginScreen() {
       alert("Por favor, preencha todos os campos");
       return;
     }
-    navigation.navigate("Home" as never);
+    navigation.navigate("Inicial" as never);
   };
   return (
     <View className="flex-1 bg-slate-100 items-center justify-center px-8">
