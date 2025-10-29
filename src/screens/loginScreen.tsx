@@ -4,7 +4,7 @@ import { Text, TextInput, TouchableOpacity, View, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function LoginScreen() {
-  const [perfil, setPerfil] = useState<"morador" | "funcionario">("morador");
+  const [perfil, setPerfil] = useState<"morador" | "funcionario" | "sindico">("morador");
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -71,16 +71,16 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => setPerfil("funcionario")}
+          onPress={() => setPerfil("sindico")}
           className={`flex-1 p-3 ml-2 rounded-2xl border ${
-            perfil === "funcionario"
+            perfil === "sindico"
               ? "bg-red-600 border-red-600"
               : "bg-white border-slate-300"
           }`}
         >
           <Text
             className={`text-center font-semibold ${
-              perfil === "funcionario" ? "text-white" : "text-slate-600"
+              perfil === "sindico" ? "text-white" : "text-slate-600"
             }`}
           >
             Síndico
@@ -113,7 +113,7 @@ export default function LoginScreen() {
       {/* Botão Entrar */}
       <TouchableOpacity
         onPress={handleLogin}
-        className="bg-red-600 w-full p-4 rounded-2xl shadow-md active:bg-red -700"
+        className="bg-red-600 w-full p-4 rounded-2xl shadow-md active:bg-red-700"
       >
         <Text className="text-center text-white text-lg font-semibold">
           Entrar
