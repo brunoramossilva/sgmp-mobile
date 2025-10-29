@@ -1,13 +1,13 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./src/screens/loginScreen";
-import HomeScreen from "./src/screens/homeScreen";
-import InicialMorador from "./src/screens/morador/telaInicialMorador";
-import InicialTecnico from "./src/screens/tecnico/telaInicialTecnico";
-import InicialSindico from "./src/screens/sindico/telaInicialSindico";
-import CriacaoOsMorador from "./src/screens/morador/criacaoOsMorador";
-import OsAceitaPeloTecnico from "./src/screens/tecnico/osAceitarPorMimTecnico";
-import DetalhesOs from "./src/screens/visualizarDetalhesOs";
+import HomeScreen from "./src/screens/telaInicial";
+import InicialMorador from "./src/screens/morador/telaInicial";
+import InicialTecnico from "./src/screens/tecnico/telaInicial";
+import InicialSindico from "./src/screens/sindico/telaInicial";
+import CriacaoOsMorador from "./src/screens/morador/criacaoOs";
+import OsAceitaPeloTecnico from "./src/screens/tecnico/osAceitas";
+import DetalhesOs from "./src/screens/detalhesOs";
 
 const Stack = createNativeStackNavigator();
 
