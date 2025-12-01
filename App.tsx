@@ -5,9 +5,9 @@ import TelaInicial from "./src/screens/telaInicial";
 import InicialMorador from "./src/screens/morador/telaInicial";
 import InicialTecnico from "./src/screens/tecnico/telaInicial";
 import InicialSindico from "./src/screens/sindico/telaInicial";
-import CriacaoOS from "./src/screens/morador/criacaoOS";
-import OsAceitaPeloTecnico from "./src/screens/tecnico/OSAceitas";
-import DetalhesOs from "./src/screens/detalhesOS";
+import CriacaoOS from "./src/screens/morador/criacaoOs";
+import OsAceitaPeloTecnico from "./src/screens/tecnico/osAceitas";
+import DetalhesOs from "./src/screens/detalhesOs";
 
 const Stack = createNativeStackNavigator();
 
