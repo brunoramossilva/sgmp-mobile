@@ -100,9 +100,7 @@ export default function DetalhesOS() {
           </View>
           <View className="flex-row space-x-2">
             <View
-              className={`px-3 py-1 rounded-full ${corPrioridade(
-                ordem.prioridade
-              )}`}
+              className={`px-3 py-1 rounded-full ${corPrioridade(ordem.prioridade)}`}
             >
               <Text className="text-sm font-medium">
                 Prioridade: {ordem.prioridade}
@@ -143,9 +141,7 @@ export default function DetalhesOS() {
             <Text className="text-sm font-semibold text-slate-500 mb-1">
               👤 Solicitante
             </Text>
-            <Text className="text-base text-slate-700">
-              {ordem.solicitante}
-            </Text>
+            <Text className="text-base text-slate-700">{ordem.solicitante}</Text>
           </View>
 
           <View className="mb-3">

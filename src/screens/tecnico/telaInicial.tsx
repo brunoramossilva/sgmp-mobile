@@ -164,9 +164,7 @@ export default function TelaInicial() {
                     {ordem.titulo}
                   </Text>
                   <View
-                    className={`px-2 py-1 rounded-full ${corPrioridade(
-                      ordem.prioridade
-                    )}`}
+                    className={`px-2 py-1 rounded-full ${corPrioridade(ordem.prioridade)}`}
                   >
                     <Text className="text-xs font-medium">
                       {ordem.prioridade}
@@ -177,12 +175,8 @@ export default function TelaInicial() {
                   {ordem.descricao}
                 </Text>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">
-                    📍 {ordem.local}
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    📅 {ordem.data}
-                  </Text>
+                  <Text className="text-slate-500 text-xs">📍 {ordem.local}</Text>
+                  <Text className="text-slate-500 text-xs">📅 {ordem.data}</Text>
                 </View>
                 <View className="flex-row mt-3 space-x-2">
                   <TouchableOpacity
@@ -229,9 +223,7 @@ export default function TelaInicial() {
                     {ordem.titulo}
                   </Text>
                   <View
-                    className={`px-2 py-1 rounded-full ${corStatus(
-                      ordem.status
-                    )}`}
+                    className={`px-2 py-1 rounded-full ${corStatus(ordem.status)}`}
                   >
                     <Text className="text-xs font-medium">{ordem.status}</Text>
                   </View>
@@ -240,12 +232,8 @@ export default function TelaInicial() {
                   {ordem.descricao}
                 </Text>
                 <View className="flex-row justify-between items-center mb-3">
-                  <Text className="text-slate-500 text-xs">
-                    📍 {ordem.local}
-                  </Text>
-                  <Text className="text-slate-500 text-xs">
-                    📅 {ordem.data}
-                  </Text>
+                  <Text className="text-slate-500 text-xs">📍 {ordem.local}</Text>
+                  <Text className="text-slate-500 text-xs">📅 {ordem.data}</Text>
                 </View>
                 <View className="flex-row space-x-2">
                   <TouchableOpacity
@@ -341,9 +329,7 @@ export default function TelaInicial() {
                       Prioridade
                     </Text>
                     <View
-                      className={`px-3 py-1 rounded-full self-start ${corPrioridade(
-                        ordemSelecionada.prioridade
-                      )}`}
+                      className={`px-3 py-1 rounded-full self-start ${corPrioridade(ordemSelecionada.prioridade)}`}
                     >
                       <Text className="text-sm font-medium">
                         {ordemSelecionada.prioridade}
@@ -356,9 +342,7 @@ export default function TelaInicial() {
                     Status
                   </Text>
                   <View
-                    className={`px-3 py-1 rounded-full self-start ${corStatus(
-                      ordemSelecionada.status
-                    )}`}
+                    className={`px-3 py-1 rounded-full self-start ${corStatus(ordemSelecionada.status)}`}
                   >
                     <Text className="text-sm font-medium">
                       {ordemSelecionada.status}
