@@ -26,18 +26,14 @@ export const mapApiToUI = (o: OrdemServicoApi): OrdemServicoUI => {
   let uiStatus: OrdemServicoUI["status"] = "Pendente";
 
   if (
-    statusRaw.includes("ACEITA") ||
-    statusRaw.includes("ACEITO") ||
-    statusRaw.includes("IN_PROGRESS")
+    statusRaw.includes("APROVADA")
   ) {
     uiStatus = "Aceita";
   } else if (
-    statusRaw.includes("FINAL") ||
-    statusRaw.includes("DONE") ||
-    statusRaw.includes("CONCL")
+    statusRaw.includes("CONCLUIDA")
   ) {
     uiStatus = "Finalizada";
-  } else if (statusRaw.includes("RECUS") || statusRaw.includes("REJEIT")) {
+  } else if (statusRaw.includes("RECUSADA") || statusRaw.includes("REJEITADA")) {
     uiStatus = "Recusada";
   }
 
