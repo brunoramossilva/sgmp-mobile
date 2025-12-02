@@ -141,8 +141,8 @@ export default function TelaInicial() {
         }
       >
         <View className="mb-6">
-          <Text className="text-xl font-bold text-red-700 mb-3">
-            Notificações de Ordens de Serviço
+          <Text className="text-xl font-bold text-red-700 mb-3 text-center">
+            Ordens de Serviço em Aberto
           </Text>
 
           {loading ? (
