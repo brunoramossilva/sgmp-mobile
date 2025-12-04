@@ -26,7 +26,7 @@ export const mapApiToUI = (o: OrdemServicoApi): OrdemServicoUI => {
   let uiStatus: OrdemServicoUI["status"] = "Pendente";
 
   if (
-    statusRaw.includes("APROVADA")
+    statusRaw.includes("EM_EXECUCAO")
   ) {
     uiStatus = "Aceita";
   } else if (
@@ -35,6 +35,8 @@ export const mapApiToUI = (o: OrdemServicoApi): OrdemServicoUI => {
     uiStatus = "Finalizada";
   } else if (statusRaw.includes("RECUSADA") || statusRaw.includes("REJEITADA")) {
     uiStatus = "Recusada";
+  } else if (statusRaw.includes("APROVADA")) {
+    uiStatus = "Pendente";
   }
 
   const prioridade = o.aprovado ? "Alta" : "Baixa";

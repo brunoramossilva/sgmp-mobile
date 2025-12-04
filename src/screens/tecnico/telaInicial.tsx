@@ -50,12 +50,13 @@ export default function TelaInicial() {
       }
 
       // Filtra apenas ordens aprovadas pelo síndico (aprovado = true)
-      // e exclui ordens com status EM_EXECUCAO
+      // Exclui ordens finalizadas ou recusadas
       const ordensAprovadas = lista.filter(
         (o) =>
           o.aprovado === true &&
-          o.status?.toUpperCase() !== "EM_EXECUCAO" &&
-          o.status?.toUpperCase() !== "IN_PROGRESS"
+          o.status?.toUpperCase() !== "FINALIZADA" &&
+          o.status?.toUpperCase() !== "CONCLUIDA" &&
+          o.status?.toUpperCase() !== "RECUSADA"
       );
 
       const mapped = ordensAprovadas.map(mapApiToUI);
