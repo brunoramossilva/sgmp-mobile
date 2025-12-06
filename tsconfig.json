@@ -1,6 +1,12 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "jsx": "react-native",
+    "moduleResolution": "node16",  // Configuração de resolução de módulos para Node16
+    "module": "Node16",            // Configuração do tipo de módulo para Node16
+    "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["react", "react-native"]
   }
 }
