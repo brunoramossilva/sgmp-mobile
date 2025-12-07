@@ -29,3 +29,31 @@ export const updateOrdem = async (
   );
   return data;
 };
+
+/**
+ * Cria uma nova Ordem de Serviço
+ * 
+ * TODO: INTEGRAÇÃO COM API
+ * Descomente e implemente quando integrar com backend:
+ * 
+ * Payload esperado:
+ * {
+ *   descricao: string (obrigatório, min 10, max 500 caracteres)
+ *   cpf_morador: string (obrigatório)
+ * }
+ * 
+ * Campos preenchidos automaticamente no backend:
+ * - dataAbertura: DateTime @default(now())
+ * - status: String @default("ABERTA")
+ * - aprovado: Boolean @default(false)
+ * 
+ * @param payload - Dados para criação da OS
+ * @returns Ordem de serviço criada
+ */
+// export const criarOrdemServico = async (payload: {
+//   descricao: string;
+//   cpf_morador: string;
+// }): Promise<OrdemServicoApi> => {
+//   const { data } = await api.post<OrdemServicoApi>("/ordens-servico", payload);
+//   return data;
+// };
