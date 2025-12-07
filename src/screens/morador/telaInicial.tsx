@@ -103,32 +103,23 @@ const TelaInicial = () => {
 
   return (
     <View style={styles.screenContainer} className="bg-orange-50">
-      {/* Header - Topo com logo, nome e ícone de engrenagem */}
       <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
-        {/* Ícone da Casa (Mantido à Esquerda) */}
         <View className="w-10">
-          {" "}
-          {/* Definindo uma largura para a coluna */}
           <Text className="text-white text-3xl font-bold">🏠</Text>
         </View>
 
-        {/* Nome CINOVA (Centralizado) */}
         <View className="flex-1 items-center justify-center">
-          {" "}
-          {/* Usando flex-1 para ocupar espaço e centralizar */}
           <Text className="text-white text-xl font-bold">CINOVA</Text>
         </View>
 
-        {/* Ícone de Configurações (Mantido à Direita) */}
         <TouchableOpacity
           onPress={() => Alert.alert("Configurações", "Abrir configurações")}
-          className="w-10 items-end" // Definindo a mesma largura da coluna da esquerda e alinhando à direita
+          className="w-10 items-end"
         >
           <Text className="text-white text-2xl font-bold">⚙️</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Seção de Olá, Ana Clara */}
       <View className="bg-red-600 px-4 pb-4 flex-row items-center">
         <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
           <Text className="text-red-600 text-3xl">👤</Text>
@@ -141,12 +132,10 @@ const TelaInicial = () => {
         </View>
       </View>
 
-      {/* ScrollView para o conteúdo principal */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         className="bg-orange-50 pt-4"
       >
-        {/* Comunicados Section */}
         <View className="px-4 mb-4">
           <View className="flex-row justify-between items-center mb-2">
             <Text className="text-xl font-bold text-gray-800">Comunicados</Text>
@@ -174,7 +163,6 @@ const TelaInicial = () => {
           </View>
         </View>
 
-        {/* Faturas Recentes Section */}
         <View className="px-4 mb-4">
           <View className="flex-row justify-between items-center mb-2">
             <Text className="text-xl font-bold text-gray-800">
@@ -189,13 +177,11 @@ const TelaInicial = () => {
               textStyle={styles.whiteText}
             />
           </View>
-          {/* ScrollView Horizontal para os cartões de fatura */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             className="py-2"
           >
-            {/* Cartão de Fatura 1 */}
             <View className="bg-white p-4 rounded-lg shadow-sm w-64 mr-4">
               <View className="flex-row justify-between items-center mb-2">
                 <View className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -220,7 +206,6 @@ const TelaInicial = () => {
               </Text>
             </View>
 
-            {/* Cartão de Fatura 2 (Exemplo, para mostrar o scroll) */}
             <View className="bg-white p-4 rounded-lg shadow-sm w-64 mr-4">
               <View className="flex-row justify-between items-center mb-2">
                 <View className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -245,7 +230,6 @@ const TelaInicial = () => {
         <View className="h-10"></View>
       </ScrollView>
 
-      {/* Footer - Barra de Navegação Fixa */}
       <View className="absolute bottom-6 inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl">
         <View className="flex-row justify-around items-center">
           <NavItem

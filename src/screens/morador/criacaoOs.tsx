@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -9,25 +9,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useAutenticacao } from '../../contexto/ContextoAutenticacao';
-import { CriacaoOSFormulario, schemaCriacaoOS } from '../../types/ordemServico';
+import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
+import { CriacaoOSFormulario, schemaCriacaoOS } from "../../types/ordemServico";
 import {
   ContainerFormulario,
   CampoTextoArea,
   BotaoCriar,
   MensagemErro,
-} from '../../components/formulario';
-import { useCriacaoOS } from './useCriacaoOS';
+} from "../../components/formulario";
+import { useCriacaoOS } from "../../../docs/morador/useCriacaoOS";
 
 /**
  * Tela de Criação de Ordem de Serviço
- * 
+ *
  * MELHORIAS IMPLEMENTADAS:
  * - ✅ SafeAreaView para evitar notches
  * - ✅ KeyboardAvoidingView para melhor UX
@@ -36,7 +36,7 @@ import { useCriacaoOS } from './useCriacaoOS';
  * - ✅ Melhor acessibilidade
  * - ✅ Estados de erro melhorados
  * - ✅ Loading states mais intuitivos
- * 
+ *
  * Schema Prisma considerado:
  * - descricao: String (obrigatório) ✓
  * - cpf_morador: String (obtido de contexto) ✓
@@ -48,15 +48,16 @@ export default function CriacaoOS() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { usuario } = useAutenticacao();
-  const { carregando, erro, sucesso, executarCriacao, resetar } = useCriacaoOS();
+  const { carregando, erro, sucesso, executarCriacao, resetar } =
+    useCriacaoOS();
   const descricaoInputRef = useRef<TextInput>(null);
-  const { width, height } = Dimensions.get('window');
+  const { width, height } = Dimensions.get("window");
 
   // Valores responsivos calculados uma única vez
   const responsividade = useMemo(() => {
     const isSmallScreen = width < 375;
     const isSmallHeight = height < 667;
-    
+
     return {
       isSmallScreen,
       isSmallHeight,
@@ -86,14 +87,14 @@ export default function CriacaoOS() {
     formState: { isSubmitting, isValid },
   } = useForm<CriacaoOSFormulario>({
     resolver: zodResolver(schemaCriacaoOS),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
-      descricao: '',
+      descricao: "",
     },
   });
 
   // Observar mudanças no campo de descrição para o contador
-  const descricaoValue = watch('descricao');
+  const descricaoValue = watch("descricao");
 
   /**
    * Validar autenticação na entrada da tela
@@ -102,18 +103,18 @@ export default function CriacaoOS() {
     React.useCallback(() => {
       if (!usuario || !usuario.autenticado) {
         Alert.alert(
-          'Acesso Negado',
-          'Você precisa estar autenticado para criar uma Ordem de Serviço',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
+          "Acesso Negado",
+          "Você precisa estar autenticado para criar uma Ordem de Serviço",
+          [{ text: "OK", onPress: () => navigation.goBack() }]
         );
         return;
       }
 
-      if (usuario.papel !== 'MORADOR') {
+      if (usuario.papel !== "MORADOR") {
         Alert.alert(
-          'Acesso Negado',
-          'Apenas moradores podem criar Ordens de Serviço',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
+          "Acesso Negado",
+          "Apenas moradores podem criar Ordens de Serviço",
+          [{ text: "OK", onPress: () => navigation.goBack() }]
         );
         return;
       }
@@ -126,11 +127,11 @@ export default function CriacaoOS() {
   useEffect(() => {
     if (sucesso) {
       Alert.alert(
-        'Sucesso! ✓',
-        'Sua Ordem de Serviço foi criada e aguarda aprovação do síndico.',
+        "Sucesso! ✓",
+        "Sua Ordem de Serviço foi criada e aguarda aprovação do síndico.",
         [
           {
-            text: 'Retornar',
+            text: "Retornar",
             onPress: () => {
               reset();
               resetar();
@@ -147,21 +148,21 @@ export default function CriacaoOS() {
    */
   const aoSubmeter = async (dados: CriacaoOSFormulario) => {
     if (!usuario) {
-      Alert.alert('Erro', 'Usuário não autenticado. Faça login novamente.');
+      Alert.alert("Erro", "Usuário não autenticado. Faça login novamente.");
       return;
     }
 
     await executarCriacao(dados.descricao, usuario.cpf);
   };
 
-  if (!usuario || usuario.papel !== 'MORADOR') {
+  if (!usuario || usuario.papel !== "MORADOR") {
     return null;
   }
 
   return (
     <SafeAreaView className="flex-1 bg-slate-100">
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
         <ScrollView
@@ -194,8 +195,8 @@ export default function CriacaoOS() {
                 className="text-blue-700 font-medium"
                 style={{ fontSize: responsividade.fontSize.corpo - 1 }}
               >
-                💡 Dica: Quanto mais detalhada sua descrição, mais rápido o síndico
-                poderá aprovar sua solicitação.
+                💡 Dica: Quanto mais detalhada sua descrição, mais rápido o
+                síndico poderá aprovar sua solicitação.
               </Text>
             </View>
 
@@ -258,17 +259,17 @@ export default function CriacaoOS() {
             {/* Botão de Submissão */}
             <View style={{ marginBottom: responsividade.margens.mb6 }}>
               <BotaoCriar
-                titulo={carregando ? 'Criando...' : 'Criar Ordem de Serviço'}
+                titulo={carregando ? "Criando..." : "Criar Ordem de Serviço"}
                 aoPresionar={handleSubmit(aoSubmeter)}
                 carregando={carregando || isSubmitting}
                 desabilitado={
-                  carregando || 
-                  isSubmitting || 
-                  !isValid || 
-                  !descricaoValue || 
+                  carregando ||
+                  isSubmitting ||
+                  !isValid ||
+                  !descricaoValue ||
                   descricaoValue.length < 10
                 }
-                tamanho={responsividade.isSmallScreen ? 'medio' : 'grande'}
+                tamanho={responsividade.isSmallScreen ? "medio" : "grande"}
               />
             </View>
           </ContainerFormulario>
