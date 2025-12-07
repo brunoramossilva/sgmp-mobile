@@ -3,10 +3,15 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-native",
-    "moduleResolution": "node16",  // Configuração de resolução de módulos para Node16
-    "module": "Node16",            // Configuração do tipo de módulo para Node16
+    "moduleResolution": "bundler",
+    "module": "ESNext",
     "target": "esnext",
-    "lib": ["esnext"],
-    "types": ["react", "react-native"]
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "react",
+      "react-native"
+    ]
   }
 }
