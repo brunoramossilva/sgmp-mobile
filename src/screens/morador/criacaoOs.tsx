@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -51,7 +53,9 @@ export default function CriacaoOS() {
   const { carregando, erro, sucesso, executarCriacao, resetar } =
     useCriacaoOS();
   const descricaoInputRef = useRef<TextInput>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const { width, height } = Dimensions.get("window");
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   // Valores responsivos calculados uma única vez
   const responsividade = useMemo(() => {
@@ -95,6 +99,33 @@ export default function CriacaoOS() {
 
   // Observar mudanças no campo de descrição para o contador
   const descricaoValue = watch("descricao");
+
+  /**
+   * Gerenciar teclado para scroll automático
+   */
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true);
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   /**
    * Validar autenticação na entrada da tela
@@ -160,22 +191,42 @@ export default function CriacaoOS() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100">
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Header com botão voltar */}
+      <View
+        className="bg-red-600 px-4 py-3 flex-row items-center"
+        style={{ paddingTop: (insets.top || 0) + 12 }}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="flex-row items-center"
+          style={{ gap: 8 }}
+        >
+          <Text
+            className="text-white text-base font-semibold"
+            style={{ lineHeight: 20 }}
+          >
+            Voltar
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
         <ScrollView
-          className="flex-1"
+          ref={scrollViewRef}
+          className="flex-1 bg-white"
           scrollEnabled={true}
-          showsVerticalScrollIndicator={true}
+          showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <ContainerFormulario padronizarPadding={false}>
+          <View className="px-4 py-6">
             {/* Cabeçalho */}
             <View style={{ marginBottom: responsividade.margens.mb8 }}>
               <Text
-                className="font-bold text-red-600"
+                className="font-bold text-red-600 text-center"
                 style={{ fontSize: responsividade.fontSize.titulo }}
               >
                 Criar Ordem de Serviço
@@ -239,7 +290,7 @@ export default function CriacaoOS() {
               controle={control}
               rotulo="Descrição do Problema *"
               placeholder="Descreva detalhadamente o problema que precisa ser resolvido..."
-              numeroLinhas={6}
+              numeroLinhas={12}
               maxCaracteres={500}
               mostrarContador={true}
             />
@@ -272,7 +323,7 @@ export default function CriacaoOS() {
                 tamanho={responsividade.isSmallScreen ? "medio" : "grande"}
               />
             </View>
-          </ContainerFormulario>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

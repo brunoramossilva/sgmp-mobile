@@ -1,69 +1,61 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, BackHandler, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAutenticacao } from "../contexto/ContextoAutenticacao";
+import { useEffect } from "react";
 
+/**
+ * Tela Inicial - Redirecionamento automático baseado no papel do usuário
+ * - MORADOR -> Tela Inicial do Morador
+ * - FUNCIONARIO -> Tela Inicial do Técnico
+ * - SINDICO -> Tela Inicial do Síndico
+ */
 export default function TelaInicial() {
   const navigation = useNavigation();
-  return (
-    <View className="flex-1 items-center justify-center bg-white px-6">
-      <Text className="text-2xl font-bold text-red-600 mb-6 text-center">
-        Bem-vindo ao SGMP! Escolha a tela que você deseja programar:
-      </Text>
+  const { usuario, desautenticar } = useAutenticacao();
 
-      <View className="w-full space-y-4">
-        <TouchableOpacity
-          onPress={() => navigation.navigate("InicialMorador" as never)}
-          className="bg-red-600 p-4 rounded-2xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tela Inicial do Morador
-          </Text>
-        </TouchableOpacity>
+  useEffect(() => {
+    if (!usuario) {
+      // Se não houver usuário autenticado, redirecionar para login
+      navigation.navigate("Login" as never);
+      return;
+    }
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("InicialTecnico" as never)}
-          className="bg-red-600 p-4 rounded-2xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tela Inicial do Técnico
-          </Text>
-        </TouchableOpacity>
+    // Redirecionar baseado no papel do usuário
+    switch (usuario.papel) {
+      case "MORADOR":
+        navigation.navigate("InicialMorador" as never);
+        break;
+      case "FUNCIONARIO":
+        navigation.navigate("InicialTecnico" as never);
+        break;
+      case "SINDICO":
+        navigation.navigate("InicialSindico" as never);
+        break;
+      default:
+        navigation.navigate("Login" as never);
+    }
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("InicialSindico" as never)}
-          className="bg-red-600 p-4 rounded-2xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tela Inicial do Síndico
-          </Text>
-        </TouchableOpacity>
+    // Interceptar botão voltar
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        Alert.alert("Sair", "Deseja fazer logout?", [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Sair",
+            style: "destructive",
+            onPress: () => {
+              desautenticar();
+              navigation.navigate("Login" as never);
+            },
+          },
+        ]);
+        return true;
+      }
+    );
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("CriacaoOsMorador" as never)}
-          className="bg-red-600 p-4 rounded-2xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tela de Criação de OS do Morador
-          </Text>
-        </TouchableOpacity>
+    return () => backHandler.remove();
+  }, [usuario, navigation]);
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate("OsAceitaPeloTecnico" as never)}
-          className="bg-red-600 p-4 rounded-2xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tela de OS Aceitas pelo Técnico
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate("DetalhesOs" as never)}
-          className="bg-red-600 p-4 rounded-2xl"
-        >
-          <Text className="text-white text-center font-semibold">
-            Tela de Detalhes da OS
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  return <View className="flex-1 bg-white" />;
 }

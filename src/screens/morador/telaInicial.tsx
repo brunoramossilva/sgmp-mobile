@@ -9,7 +9,12 @@ import {
   StyleProp,
   ViewStyle,
   TextStyle,
+  Platform,
+  BackHandler,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 
 // --- DEFINIÇÃO DAS INTERFACES (TIPOS) ---
 
@@ -75,9 +80,38 @@ const NavItem: React.FC<NavItemProps> = ({
 // --- COMPONENTE PRINCIPAL ---
 
 const TelaInicial = () => {
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const { usuario, desautenticar } = useAutenticacao();
+
   useEffect(() => {
     console.log("TelaInicial do Morador renderizada");
+
+    // Interceptar botão voltar do Android
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        handleLogout();
+        return true; // Previne o comportamento padrão
+      }
+    );
+
+    return () => backHandler.remove();
   }, []);
+
+  const handleLogout = () => {
+    Alert.alert("Sair", "Deseja realmente fazer logout?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Sair",
+        style: "destructive",
+        onPress: () => {
+          desautenticar();
+          navigation.navigate("Login" as never);
+        },
+      },
+    ]);
+  };
 
   // Definição de estilos usando StyleSheet para melhor performance e tipagem
   const styles = StyleSheet.create({
@@ -86,7 +120,7 @@ const TelaInicial = () => {
       backgroundColor: "#FDF7F5",
     },
     scrollContent: {
-      paddingBottom: 120,
+      paddingBottom: 120 + insets.bottom, // Adiciona espaço extra baseado na área segura
       backgroundColor: "#FDF7F5",
     },
     redButton: {
@@ -103,32 +137,39 @@ const TelaInicial = () => {
 
   return (
     <View style={styles.screenContainer} className="bg-orange-50">
-      <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
-        <View className="w-10">
-          <Text className="text-white text-3xl font-bold">🏠</Text>
-        </View>
-
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-white text-xl font-bold">CINOVA</Text>
-        </View>
-
-        <TouchableOpacity
-          onPress={() => Alert.alert("Configurações", "Abrir configurações")}
-          className="w-10 items-end"
+      {/* Header */}
+      <View className="bg-red-600">
+        <View
+          className="px-4 flex-row items-center justify-between"
+          style={{ paddingTop: (insets.top || 0) + 8, paddingBottom: 12 }}
         >
-          <Text className="text-white text-2xl font-bold">⚙️</Text>
-        </TouchableOpacity>
+          <View className="flex-1">
+            <Text className="text-white text-xl font-bold">CINOVA SGMP</Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="bg-red-700 px-3 py-2 rounded-lg"
+          >
+            <Text className="text-white text-sm font-semibold">Sair</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View className="bg-red-600 px-4 pb-4 flex-row items-center">
-        <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
-          <Text className="text-red-600 text-3xl">👤</Text>
-        </View>
-        <View>
-          <Text className="text-white text-xl font-semibold">
-            Olá, Ana Clara
-          </Text>
-          <Text className="text-sm text-white">Condomínio</Text>
+      {/* Seção de informações do usuário com fundo mais claro */}
+      <View className="bg-red-700 px-4 pb-4 pt-6">
+        <View className="flex-row items-center">
+          <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4 shadow-md">
+            <Text className="text-red-600 text-2xl font-bold">
+              {usuario?.nome?.charAt(0).toUpperCase() || "M"}
+            </Text>
+          </View>
+          <View>
+            <Text className="text-white text-xl font-semibold">
+              Olá, {usuario?.nome || "Morador"}
+            </Text>
+            <Text className="text-sm text-white opacity-90">Morador</Text>
+          </View>
         </View>
       </View>
 
@@ -230,7 +271,12 @@ const TelaInicial = () => {
         <View className="h-10"></View>
       </ScrollView>
 
-      <View className="absolute bottom-6 inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl">
+      <View
+        className="absolute inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl"
+        style={{
+          bottom: Math.max(insets.bottom + 8, 24), // Garante que fique acima dos botões do sistema
+        }}
+      >
         <View className="flex-row justify-around items-center">
           <NavItem
             iconName="home"
@@ -242,7 +288,7 @@ const TelaInicial = () => {
             iconName="services"
             label="Serviços"
             isFocused={false}
-            onPress={() => Alert.alert("Navegação", "Serviços!")}
+            onPress={() => navigation.navigate("CriacaoOsMorador" as never)}
           />
           <NavItem
             iconName="financial"

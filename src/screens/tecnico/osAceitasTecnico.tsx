@@ -7,7 +7,6 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  BackHandler,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,14 +17,14 @@ import {
   OrdemServicoApi,
 } from "../../services/ordemServico";
 import { OrdemServicoUI, mapApiToUI } from "./types";
-import CardOrdemPendente from "./CardOrdemPendente";
+import CardOrdemAceita from "./CardOrdemAceita";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
 
-export default function TelaInicial() {
+export default function OsAceitasTecnico() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { usuario, desautenticar } = useAutenticacao();
+  const { desautenticar } = useAutenticacao();
 
   const [ordens, setOrdens] = useState<OrdemServicoUI[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,32 +38,7 @@ export default function TelaInicial() {
 
   useEffect(() => {
     fetchOrdens();
-
-    // Interceptar botão voltar do Android
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        handleLogout();
-        return true;
-      }
-    );
-
-    return () => backHandler.remove();
   }, []);
-
-  const handleLogout = () => {
-    Alert.alert("Sair", "Deseja realmente fazer logout?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Sair",
-        style: "destructive",
-        onPress: () => {
-          desautenticar();
-          navigation.navigate("Login" as never);
-        },
-      },
-    ]);
-  };
 
   const fetchOrdens = async () => {
     try {
@@ -78,19 +52,15 @@ export default function TelaInicial() {
         return;
       }
 
-      // Filtra apenas ordens aprovadas pelo síndico e PENDENTES (não aceitas ainda)
-      // Exclui ordens finalizadas, aceitas, em execução ou recusadas
-      const ordensPendentes = lista.filter(
+      // Filtra ordens aceitas pelo técnico ou em execução
+      const ordensAceitas = lista.filter(
         (o) =>
           o.aprovado === true &&
-          o.status?.toUpperCase() !== "FINALIZADA" &&
-          o.status?.toUpperCase() !== "CONCLUIDA" &&
-          o.status?.toUpperCase() !== "RECUSADA" &&
-          o.status?.toUpperCase() !== "ACEITA" &&
-          o.status?.toUpperCase() !== "EM_EXECUCAO"
+          (o.status?.toUpperCase() === "ACEITA" ||
+            o.status?.toUpperCase() === "EM_EXECUCAO")
       );
 
-      const mapped = ordensPendentes.map(mapApiToUI);
+      const mapped = ordensAceitas.map(mapApiToUI);
       setOrdens(mapped);
     } catch (err) {
       console.error(err);
@@ -125,16 +95,6 @@ export default function TelaInicial() {
     }
   };
 
-  const aceitarOS = (ordem: OrdemServicoUI) => {
-    atualizarStatus(ordem, { status: "ACEITA" }, "Aceita");
-    setModalDetalhesVisivel(false);
-  };
-
-  const recusarOS = (ordem: OrdemServicoUI) => {
-    atualizarStatus(ordem, { status: "RECUSADA" }, "Recusada");
-    setModalDetalhesVisivel(false);
-  };
-
   const abrirDetalhes = (ordem: OrdemServicoUI) => {
     setOrdemSelecionada(ordem);
     setModalDetalhesVisivel(true);
@@ -163,50 +123,41 @@ export default function TelaInicial() {
 
   return (
     <View className="flex-1 bg-slate-100">
-      {/* Header */}
-      <View className="bg-red-600">
-        <View
-          className="px-4 flex-row items-center justify-between"
-          style={{ paddingTop: (insets.top || 0) + 8, paddingBottom: 12 }}
+      {/* Header simples com logout */}
+      <View
+        className="bg-red-600 px-4 py-3 flex-row items-center justify-between"
+        style={{ paddingTop: (insets.top || 0) + 12 }}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="flex-row items-center"
+          style={{ gap: 8 }}
         >
-          <View className="flex-1">
-            <Text className="text-white text-xl font-bold">Técnico Condominial</Text>
-          </View>
-
-          <View className="flex-row items-center gap-2">
-            <TouchableOpacity
-              onPress={() => navigation.navigate("OsAceitasTecnico" as never)}
-              className="bg-white px-4 py-2 rounded-lg"
-            >
-              <Text className="text-red-600 text-sm font-semibold">
-                Aceitas
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleLogout}
-              className="bg-red-700 px-3 py-2 rounded-lg"
-            >
-              <Text className="text-white text-sm font-semibold">Sair</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
-      {/* Seção de informações do usuário com fundo mais claro */}
-      <View className="bg-red-700 px-4 pb-4 pt-6">
-        <View className="flex-row items-center">
-          <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4 shadow-md">
-            <Text className="text-red-600 text-2xl font-bold">
-              {usuario?.nome?.charAt(0).toUpperCase() || "T"}
-            </Text>
-          </View>
-          <View>
-            <Text className="text-white text-xl font-semibold">
-              Olá, {usuario?.nome || "Técnico"}
-            </Text>
-            <Text className="text-sm text-white opacity-90">Funcionário</Text>
-          </View>
-        </View>
+          <Text
+            className="text-white text-base font-semibold"
+            style={{ lineHeight: 10 }}
+          >
+            Voltar
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            Alert.alert("Sair", "Deseja fazer logout?", [
+              { text: "Cancelar", style: "cancel" },
+              {
+                text: "Sair",
+                style: "destructive",
+                onPress: () => {
+                  desautenticar();
+                  navigation.navigate("Login" as never);
+                },
+              },
+            ]);
+          }}
+          className="bg-red-700 px-3 py-2 rounded-lg"
+        >
+          <Text className="text-white text-sm font-semibold">Sair</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -217,7 +168,7 @@ export default function TelaInicial() {
       >
         <View className="mb-6">
           <Text className="text-xl font-bold text-red-700 mb-3 text-center">
-            Ordens de Serviço Pendentes
+            Ordens de Serviço Aceitas
           </Text>
 
           {loading ? (
@@ -227,17 +178,16 @@ export default function TelaInicial() {
           ) : ordens.length === 0 ? (
             <View className="bg-white p-4 rounded-2xl border border-slate-200">
               <Text className="text-slate-500 text-center">
-                Nenhuma ordem pendente.
+                Nenhuma ordem aceita
               </Text>
             </View>
           ) : (
             ordens.map((ordem) => (
-              <CardOrdemPendente
+              <CardOrdemAceita
                 key={ordem.id}
                 ordem={ordem}
                 onDetalhes={() => abrirDetalhes(ordem)}
-                onAceitar={() => aceitarOS(ordem)}
-                onRecusar={() => recusarOS(ordem)}
+                onFinalizar={() => abrirFinalizacao(ordem)}
               />
             ))
           )}
@@ -249,8 +199,8 @@ export default function TelaInicial() {
         visible={modalDetalhesVisivel}
         ordem={ordemSelecionada}
         onClose={() => setModalDetalhesVisivel(false)}
-        onAceitar={() => ordemSelecionada && aceitarOS(ordemSelecionada)}
-        onRecusar={() => ordemSelecionada && recusarOS(ordemSelecionada)}
+        onAceitar={() => {}}
+        onRecusar={() => {}}
         onFinalizar={() => {
           setModalDetalhesVisivel(false);
           ordemSelecionada && abrirFinalizacao(ordemSelecionada);

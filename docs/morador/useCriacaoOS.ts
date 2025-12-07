@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CriacaoOsDados } from "../../src/types/ordemServico";
+import { criarOrdemServico } from "../../src/services/ordemServico";
 
 interface ResultadoCriacaoOS {
   sucesso: boolean;
@@ -68,32 +69,20 @@ export const useCriacaoOS = () => {
     try {
       const payload = prepararPayload(descricao, cpfMorador);
 
-      // ========== TODO: INTEGRAÇÃO COM API ==========
-      // Descomente e implemente quando integrar com backend:
-      //
-      // import { criarOrdemServico } from '../services/ordemServico';
-      // const resposta = await criarOrdemServico(payload);
-      //
-      // if (!resposta || !resposta.id) {
-      //   throw new Error('Resposta inválida do servidor');
-      // }
-      //
-      // setSucesso(true);
-      // return {
-      //   sucesso: true,
-      //   mensagem: 'Ordem de Serviço criada com sucesso!',
-      //   payload: resposta,
-      // };
-      // ============================================
+      // Integração com API
+      const resposta = await criarOrdemServico(payload);
 
-      // Por enquanto, simula sucesso para testes
-      console.log("Payload pronto para integração:", payload);
+      if (!resposta || !resposta.id) {
+        throw new Error("Resposta inválida do servidor");
+      }
+
+      console.log("Ordem de Serviço criada com sucesso:", resposta.id);
 
       setSucesso(true);
       return {
         sucesso: true,
         mensagem: "Ordem de Serviço criada com sucesso!",
-        payload,
+        payload: resposta as any,
       };
     } catch (erro: any) {
       const mensagemErro =
