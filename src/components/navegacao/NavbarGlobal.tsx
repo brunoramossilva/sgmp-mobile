@@ -199,7 +199,7 @@ const NavbarGlobal: React.FC<NavbarGlobalProps> = React.memo(
     }
 
     return (
-      <View className="absolute bottom-16 inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl">
+      <View className="absolute bottom-4 inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl">
         <View className="flex-row justify-around items-center">
           {navItems.map((item) => {
             // Verifica se está focado comparando a rota atual com a rota do item

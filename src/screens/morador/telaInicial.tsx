@@ -212,7 +212,7 @@ const TelaInicial = () => {
       </View>
 
       {/* Seção de informações do usuário */}
-      <View className="bg-red-700 px-4 py-6 flex-row items-center">
+      <View className="bg-red-700 px-4 py-4 flex-row items-center">
         <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
           <Text className="text-red-600 text-2xl font-bold">
             {usuario?.nome
