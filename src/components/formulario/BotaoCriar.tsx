@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   TouchableOpacity,
   Text,
@@ -7,7 +7,7 @@ import {
   Dimensions,
   Animated,
   useAnimatedValue,
-} from 'react-native';
+} from "react-native";
 
 interface PropriedadesBotaoCriar {
   titulo: string;
@@ -15,12 +15,12 @@ interface PropriedadesBotaoCriar {
   carregando?: boolean;
   desabilitado?: boolean;
   ícone?: React.ReactNode;
-  tamanho?: 'pequeno' | 'medio' | 'grande';
+  tamanho?: "pequeno" | "medio" | "grande";
 }
 
 /**
  * Botão de submissão do formulário
- * 
+ *
  * Features:
  * - Responsivo (adapta tamanho ao tela)
  * - Feedback visual (ícone loading)
@@ -28,7 +28,7 @@ interface PropriedadesBotaoCriar {
  * - Animação de pressão
  * - Acessibilidade (opacidade reduzida)
  * - Design system: red-600 com hover/active states
- * 
+ *
  * @param tamanho - Tamanho do botão (default: 'medio')
  */
 export const BotaoCriar: React.FC<PropriedadesBotaoCriar> = ({
@@ -37,9 +37,9 @@ export const BotaoCriar: React.FC<PropriedadesBotaoCriar> = ({
   carregando = false,
   desabilitado = false,
   ícone,
-  tamanho = 'medio',
+  tamanho = "medio",
 }) => {
-  const { width } = Dimensions.get('window');
+  const { width } = Dimensions.get("window");
   const isSmallScreen = width < 375;
 
   // Valores responsivos
@@ -67,7 +67,7 @@ export const BotaoCriar: React.FC<PropriedadesBotaoCriar> = ({
       disabled={isDisabledOrLoading}
       activeOpacity={isDisabledOrLoading ? 1 : 0.85}
       className={`rounded-2xl shadow-md overflow-hidden ${
-        isDisabledOrLoading ? 'bg-slate-400' : 'bg-red-600 active:bg-red-700'
+        isDisabledOrLoading ? "bg-slate-400" : "bg-red-600 active:bg-red-700"
       }`}
       style={{
         padding: tamanhoCurrent.padding,
@@ -91,11 +91,7 @@ export const BotaoCriar: React.FC<PropriedadesBotaoCriar> = ({
           </>
         ) : (
           <>
-            {ícone && (
-              <View style={{ marginRight: 8 }}>
-                {ícone}
-              </View>
-            )}
+            {ícone && <View style={{ marginRight: 8 }}>{ícone}</View>}
             <Text
               className="text-white text-center font-semibold flex-1"
               style={{ fontSize: tamanhoCurrent.fontSize }}

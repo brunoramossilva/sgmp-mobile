@@ -81,12 +81,19 @@ export default function DetalhesOS() {
   };
 
   // Mapper para enviar para API (quando técnico/síndico atualizar status)
-  const prepararPayloadAtualizacao = (novoStatus: OrdemServicoUI["status"]): Partial<OrdemServicoUI> => {
+  const prepararPayloadAtualizacao = (
+    novoStatus: OrdemServicoUI["status"]
+  ): Partial<OrdemServicoUI> => {
     return {
       status: novoStatus,
-      statusApi: novoStatus === "Finalizada" ? "FINALIZADA" : 
-                 novoStatus === "Aceita" ? "ACEITA" : 
-                 novoStatus === "Recusada" ? "REJEITADA" : "PENDENTE",
+      statusApi:
+        novoStatus === "Finalizada"
+          ? "FINALIZADA"
+          : novoStatus === "Aceita"
+          ? "ACEITA"
+          : novoStatus === "Recusada"
+          ? "REJEITADA"
+          : "PENDENTE",
       aprovado: novoStatus === "Aceita" || novoStatus === "Finalizada",
     };
   };
@@ -156,25 +163,46 @@ export default function DetalhesOS() {
             >
               <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
             </TouchableOpacity>
-            <Text className="text-white text-xl font-bold">Detalhes da Ordem</Text>
+            <Text className="text-white text-xl font-bold">
+              Detalhes da Ordem
+            </Text>
             <View className="w-10" />
           </View>
         </View>
 
-        <ScrollView className="flex-1 px-4 pt-4" contentContainerStyle={{ paddingBottom: 24 }}>
+        <ScrollView
+          className="flex-1 px-4 pt-4"
+          contentContainerStyle={{ paddingBottom: 24 }}
+        >
           {/* Cabeçalho com Prioridade e Status */}
           <View className="bg-white p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm">
             <Text className="text-2xl font-bold text-red-700 mb-3 flex-1">
               {ordem.titulo}
             </Text>
             <View className="flex-row gap-2 flex-wrap">
-              <View className={`px-3 py-1.5 rounded-full ${corPrioridade(ordem.prioridade).bg}`}>
-                <Text className={`text-xs font-bold ${corPrioridade(ordem.prioridade).text}`}>
+              <View
+                className={`px-3 py-1.5 rounded-full ${
+                  corPrioridade(ordem.prioridade).bg
+                }`}
+              >
+                <Text
+                  className={`text-xs font-bold ${
+                    corPrioridade(ordem.prioridade).text
+                  }`}
+                >
                   Prioridade: {ordem.prioridade}
                 </Text>
               </View>
-              <View className={`px-3 py-1.5 rounded-full ${corStatus(ordem.status).bg}`}>
-                <Text className={`text-xs font-bold ${corStatus(ordem.status).text}`}>
+              <View
+                className={`px-3 py-1.5 rounded-full ${
+                  corStatus(ordem.status).bg
+                }`}
+              >
+                <Text
+                  className={`text-xs font-bold ${
+                    corStatus(ordem.status).text
+                  }`}
+                >
                   {ordem.status}
                 </Text>
               </View>

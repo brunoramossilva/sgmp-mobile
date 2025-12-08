@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
   Dimensions,
   Modal,
   Animated,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SlideIntroducao } from '../../utils/conteudoIntroducao';
-import { IconeLucide } from '../icones';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SlideIntroducao } from "../../utils/conteudoIntroducao";
+import { IconeLucide } from "../icones";
 
 interface PropriedadesCarrosselIntroducao {
   slides: SlideIntroducao[];
@@ -22,7 +22,7 @@ interface PropriedadesCarrosselIntroducao {
 
 /**
  * Componente de carrossel de introdução
- * 
+ *
  * Features:
  * - FlatList para navegação suave entre slides
  * - Pagination dots indicando progresso
@@ -31,7 +31,7 @@ interface PropriedadesCarrosselIntroducao {
  * - Design system: cores red-600, slate-100, animações suaves
  * - Fullscreen modal com overlay semi-transparente
  * - TypeScript com tipagem completa
- * 
+ *
  * @param slides - Array de slides a exibir
  * @param aoConcluir - Callback executado ao clicar "Começar"
  * @param nomePapel - Nome do papel (MORADOR, FUNCIONARIO, SINDICO) para personalização
@@ -42,8 +42,8 @@ export const CarrosselIntroducao: React.FC<PropriedadesCarrosselIntroducao> = ({
   nomePapel,
 }) => {
   const insets = useSafeAreaInsets();
-  const { width, height } = Dimensions.get('window');
-  
+  const { width, height } = Dimensions.get("window");
+
   const [indexAtual, setIndexAtual] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -176,7 +176,9 @@ export const CarrosselIntroducao: React.FC<PropriedadesCarrosselIntroducao> = ({
                 key={indice}
                 onPress={() => irParaSlide(indice)}
                 className={`rounded-full transition-all ${
-                  indice === indexAtual ? 'bg-red-600 w-8 h-2' : 'bg-slate-300 w-2 h-2'
+                  indice === indexAtual
+                    ? "bg-red-600 w-8 h-2"
+                    : "bg-slate-300 w-2 h-2"
                 }`}
               />
             ))}
@@ -211,7 +213,7 @@ export const CarrosselIntroducao: React.FC<PropriedadesCarrosselIntroducao> = ({
               className="py-3 bg-red-600 rounded-xl items-center justify-center"
             >
               <Text className="text-white font-semibold text-base">
-                {éUltimoSlide ? 'Começar' : 'Próximo'}
+                {éUltimoSlide ? "Começar" : "Próximo"}
               </Text>
             </TouchableOpacity>
           </View>

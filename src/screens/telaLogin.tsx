@@ -62,19 +62,24 @@ export default function TelaLogin() {
   const formatarCpf = (valor: string): string => {
     // Remove tudo que não é número
     const apenasNumeros = valor.replace(/\D/g, "");
-    
+
     // Limita a 11 dígitos
     const limitado = apenasNumeros.slice(0, 11);
-    
+
     // Formata para o padrão xxx.xxx.xxx-xx
     if (limitado.length <= 3) {
       return limitado;
     } else if (limitado.length <= 6) {
       return `${limitado.slice(0, 3)}.${limitado.slice(3)}`;
     } else if (limitado.length <= 9) {
-      return `${limitado.slice(0, 3)}.${limitado.slice(3, 6)}.${limitado.slice(6)}`;
+      return `${limitado.slice(0, 3)}.${limitado.slice(3, 6)}.${limitado.slice(
+        6
+      )}`;
     } else {
-      return `${limitado.slice(0, 3)}.${limitado.slice(3, 6)}.${limitado.slice(6, 9)}-${limitado.slice(9)}`;
+      return `${limitado.slice(0, 3)}.${limitado.slice(3, 6)}.${limitado.slice(
+        6,
+        9
+      )}-${limitado.slice(9)}`;
     }
   };
 
@@ -115,8 +120,9 @@ export default function TelaLogin() {
         FUNCIONARIO: "InicialTecnico",
         SINDICO: "InicialSindico",
       };
-      
-      const rotaInicial = rotasIniciais[loginResponse.usuario.papel] || "Inicial";
+
+      const rotaInicial =
+        rotasIniciais[loginResponse.usuario.papel] || "Inicial";
       navigation.navigate(rotaInicial as never);
     } catch (erro: any) {
       console.error("Erro ao realizar login:", erro);

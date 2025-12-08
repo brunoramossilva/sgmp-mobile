@@ -105,9 +105,7 @@ export default function ModalDetalhes({
                   className="flex-1 bg-green-600 p-3 rounded-xl mr-2 flex-row items-center justify-center"
                 >
                   <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
-                  <Text className="text-white font-semibold ml-2">
-                    Aceitar
-                  </Text>
+                  <Text className="text-white font-semibold ml-2">Aceitar</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -115,9 +113,7 @@ export default function ModalDetalhes({
                   className="flex-1 bg-red-600 p-3 rounded-xl flex-row items-center justify-center"
                 >
                   <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
-                  <Text className="text-white font-semibold ml-2">
-                    Recusar
-                  </Text>
+                  <Text className="text-white font-semibold ml-2">Recusar</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -139,9 +135,7 @@ export default function ModalDetalhes({
               className="bg-slate-500 p-3 rounded-xl mt-3 flex-row items-center justify-center"
             >
               <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
-              <Text className="text-white font-semibold ml-2">
-                Fechar
-              </Text>
+              <Text className="text-white font-semibold ml-2">Fechar</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>

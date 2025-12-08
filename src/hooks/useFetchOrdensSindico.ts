@@ -5,7 +5,11 @@
 
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { getOrdens, updateOrdem, type OrdemServicoApi } from "../services/ordemServico";
+import {
+  getOrdens,
+  updateOrdem,
+  type OrdemServicoApi,
+} from "../services/ordemServico";
 import { mapApiToUI, type OrdemServicoUI } from "../utils/mapeadores";
 
 export interface FetchOrdensSindicoResult {
@@ -19,7 +23,10 @@ export interface FetchOrdensSindicoResult {
 
   // Funções
   refetch: () => Promise<void>;
-  atualizar: (ordemId: number, dados: Partial<OrdemServicoApi>) => Promise<void>;
+  atualizar: (
+    ordemId: number,
+    dados: Partial<OrdemServicoApi>
+  ) => Promise<void>;
   limparErro: () => void;
 }
 
@@ -29,7 +36,9 @@ export interface FetchOrdensSindicoResult {
  */
 export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
   const [ordensPendentes, setOrdensPendentes] = useState<OrdemServicoUI[]>([]);
-  const [ordensEmExecucao, setOrdensEmExecucao] = useState<OrdemServicoUI[]>([]);
+  const [ordensEmExecucao, setOrdensEmExecucao] = useState<OrdemServicoUI[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,12 +114,15 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
             const ordemAtualizada = {
               ...ordensPendentes[index],
               aprovado: dados.aprovado,
-              cpf_sindico: dados.cpf_sindico || ordensPendentes[index].cpf_sindico,
+              cpf_sindico:
+                dados.cpf_sindico || ordensPendentes[index].cpf_sindico,
             };
 
             if (dados.aprovado) {
               // Move para execução
-              const novasPendentes = ordensPendentes.filter((o) => o.id !== ordemId);
+              const novasPendentes = ordensPendentes.filter(
+                (o) => o.id !== ordemId
+              );
               setOrdensPendentes(novasPendentes);
               setOrdensEmExecucao([...ordensEmExecucao, ordemAtualizada]);
             } else {
@@ -138,12 +150,8 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
         if (!isMountedRef.current) return;
 
         // Erro - restaura estados anteriores
-        setOrdensPendentes((prev) =>
-          prev.length === 0 ? [] : prev
-        );
-        setOrdensEmExecucao((prev) =>
-          prev.length === 0 ? [] : prev
-        );
+        setOrdensPendentes((prev) => (prev.length === 0 ? [] : prev));
+        setOrdensEmExecucao((prev) => (prev.length === 0 ? [] : prev));
 
         // Força refetch para sincronizar com servidor
         setTimeout(() => {

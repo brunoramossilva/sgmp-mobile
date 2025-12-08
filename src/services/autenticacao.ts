@@ -54,21 +54,14 @@ export const buscarDadosUsuario = async (
   }
 
   const response = await api.get<any>(endpoint);
-  
+
   // Normalizar resposta: o backend retorna cpf_sindico para síndico
   const dados = response.data;
 
-  let nome =
-    dados.usuario?.nome ||
-    dados.nome ||
-    dados.morador?.nome ||
-    "";
+  let nome = dados.usuario?.nome || dados.nome || dados.morador?.nome || "";
 
   let telefone =
-    dados.usuario?.telefone ||
-    dados.telefone ||
-    dados.morador?.telefone ||
-    "";
+    dados.usuario?.telefone || dados.telefone || dados.morador?.telefone || "";
 
   // Fallback extra: síndico sem nome/telefone -> busca em /moradores/{cpf}
   if (papel === "SINDICO" && (!nome || !telefone)) {

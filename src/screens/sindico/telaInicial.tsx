@@ -1,5 +1,11 @@
 // React
-import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 
 // React Native
 import {
@@ -74,7 +80,12 @@ const CARD_WIDTH = 176; // largura do card (160) + espaçamento (16)
 
 // --- Componentes auxiliares tipados ---
 
-const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, style, textStyle }) => (
+const CustomButton: React.FC<CustomButtonProps> = ({
+  title,
+  onPress,
+  style,
+  textStyle,
+}) => (
   <TouchableOpacity onPress={onPress} style={style} className="p-2 rounded-lg">
     <Text style={textStyle} className="text-white font-semibold">
       {title}
@@ -82,14 +93,14 @@ const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, style, text
   </TouchableOpacity>
 );
 
-const StatusCard: React.FC<StatusCardProps> = ({ 
-  title, 
-  value, 
-  iconId, 
-  iconColor, 
-  bgColorClass, 
-  valueColorClass, 
-  onPress 
+const StatusCard: React.FC<StatusCardProps> = ({
+  title,
+  value,
+  iconId,
+  iconColor,
+  bgColorClass,
+  valueColorClass,
+  onPress,
 }) => (
   <TouchableOpacity
     onPress={onPress}
@@ -98,7 +109,9 @@ const StatusCard: React.FC<StatusCardProps> = ({
     accessibilityLabel={`${title}: ${value}`}
   >
     <View className="flex-row justify-between w-full items-center mb-2">
-      <View className={`w-10 h-10 ${bgColorClass} rounded-full flex items-center justify-center`}>
+      <View
+        className={`w-10 h-10 ${bgColorClass} rounded-full flex items-center justify-center`}
+      >
         <IconeLucide id={iconId} tamanho={20} cor={iconColor} />
       </View>
     </View>
@@ -123,9 +136,10 @@ const useDashboardData = () => {
 
       // Calcular métricas do dashboard
       const ocorrenciasPendentes = ordens.filter((o) => !o.aprovado).length;
-      
+
       const ordensEmExecucao = ordens.filter(
-        (o) => o.aprovado && !STATUS_FINALIZADA.includes(o.status?.toUpperCase())
+        (o) =>
+          o.aprovado && !STATUS_FINALIZADA.includes(o.status?.toUpperCase())
       ).length;
 
       const moradoresAtivos = new Set(ordens.map((o) => o.cpf_morador)).size;
@@ -202,7 +216,7 @@ const TelaInicial = () => {
       backgroundColor: "#ffffff",
     },
     scrollContent: {
-      paddingBottom: NAVBAR_HEIGHT,
+      paddingBottom: NAVBAR_HEIGHT + 20,
       backgroundColor: "#ffffff",
     },
     redButton: {
@@ -222,7 +236,9 @@ const TelaInicial = () => {
     return (
       <View style={styles.screenContainer} className="bg-white">
         <View className="bg-red-600 p-4 pt-16">
-          <Text className="text-white text-xl font-bold text-center">CINOVA</Text>
+          <Text className="text-white text-xl font-bold text-center">
+            CINOVA
+          </Text>
         </View>
         <View className="p-4 pt-8">
           {[1, 2, 3].map((i) => (
@@ -239,7 +255,9 @@ const TelaInicial = () => {
     return (
       <View style={styles.screenContainer} className="bg-white">
         <View className="bg-red-600 p-4 pt-16">
-          <Text className="text-white text-xl font-bold text-center">CINOVA</Text>
+          <Text className="text-white text-xl font-bold text-center">
+            CINOVA
+          </Text>
         </View>
         <View className="flex-1 items-center justify-center px-4">
           <IconeLucide id="alerta" tamanho={56} cor="#ef4444" />
@@ -264,33 +282,29 @@ const TelaInicial = () => {
   }
 
   const handleLogout = () => {
-    Alert.alert(
-      "Desconectar",
-      "Tem certeza que deseja sair?",
-      [
-        {
-          text: "Cancelar",
-          onPress: () => {},
-          style: "cancel",
+    Alert.alert("Desconectar", "Tem certeza que deseja sair?", [
+      {
+        text: "Cancelar",
+        onPress: () => {},
+        style: "cancel",
+      },
+      {
+        text: "Sair",
+        onPress: () => {
+          desautenticar();
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" as never }],
+          });
         },
-        {
-          text: "Sair",
-          onPress: () => {
-            desautenticar();
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Login" as never }],
-            });
-          },
-          style: "destructive",
-        },
-      ]
-    );
+        style: "destructive",
+      },
+    ]);
   };
 
   return (
     <View style={styles.screenContainer} className="bg-white">
-      {/* Header */}
+      {/* Header - Parte Superior */}
       <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
         <View className="w-10">
           <IconeLucide id="predio" tamanho={32} cor="#ffffff" />
@@ -309,21 +323,30 @@ const TelaInicial = () => {
       </View>
 
       {/* Seção de Olá, Síndico(a) */}
-      <View className="bg-red-600 px-4 pb-4 flex-row items-center">
+      <View className="bg-red-700 px-4 py-6 flex-row items-center">
         <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
           <Text className="text-red-600 text-2xl font-bold">
-            {sindicoName ? sindicoName.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : 'SD'}
+            {sindicoName
+              ? sindicoName
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+              : "SD"}
           </Text>
         </View>
         <View>
-          <Text className="text-white text-xl font-semibold">Olá, {sindicoName}</Text>
+          <Text className="text-white text-xl font-semibold">
+            Olá, {sindicoName}
+          </Text>
           <Text className="text-sm text-white font-bold">Síndico(a)</Text>
         </View>
       </View>
 
       {/* ScrollView para o conteúdo principal */}
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         className="bg-white pt-4"
         refreshControl={
           <RefreshControl
@@ -338,10 +361,14 @@ const TelaInicial = () => {
         {/* Status Gerenciais Section */}
         <View className="px-4 mb-6">
           <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-xl font-bold text-gray-800">Visão Geral da Gestão</Text>
+            <Text className="text-xl font-bold text-gray-800">
+              Visão Geral da Gestão
+            </Text>
             <CustomButton
               title="Ver Relatórios"
-              onPress={() => Alert.alert("Gestão", "Navegar para Relatórios Gerenciais")}
+              onPress={() =>
+                Alert.alert("Gestão", "Navegar para Relatórios Gerenciais")
+              }
               style={styles.redButton}
               textStyle={styles.whiteText}
             />
@@ -351,22 +378,28 @@ const TelaInicial = () => {
           <View className="relative">
             {/* Fades condicionais */}
             {!nearStart && (
-              <View className="absolute left-0 top-0 bottom-0 w-10 z-10 pointer-events-none" style={{
-                backgroundColor: "rgba(255,255,255,0)",
-                shadowColor: "#000",
-                shadowOpacity: 0.12,
-                shadowRadius: 8,
-                shadowOffset: { width: 6, height: 0 },
-              }} />
+              <View
+                className="absolute left-0 top-0 bottom-0 w-10 z-10 pointer-events-none"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0)",
+                  shadowColor: "#000",
+                  shadowOpacity: 0.12,
+                  shadowRadius: 8,
+                  shadowOffset: { width: 6, height: 0 },
+                }}
+              />
             )}
             {!nearEnd && (
-              <View className="absolute right-0 top-0 bottom-0 w-10 z-10 pointer-events-none" style={{
-                backgroundColor: "rgba(255,255,255,0)",
-                shadowColor: "#000",
-                shadowOpacity: 0.12,
-                shadowRadius: 8,
-                shadowOffset: { width: -6, height: 0 },
-              }} />
+              <View
+                className="absolute right-0 top-0 bottom-0 w-10 z-10 pointer-events-none"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0)",
+                  shadowColor: "#000",
+                  shadowOpacity: 0.12,
+                  shadowRadius: 8,
+                  shadowOffset: { width: -6, height: 0 },
+                }}
+              />
             )}
 
             <ScrollView
@@ -418,17 +451,26 @@ const TelaInicial = () => {
                 iconColor="#3b82f6"
                 bgColorClass="bg-blue-100"
                 valueColorClass="text-blue-600"
-                onPress={() => navigation.navigate("OrdensSindicoExecucao" as never)}
+                onPress={() =>
+                  navigation.navigate("OrdensSindicoExecucao" as never)
+                }
               />
 
               <StatusCard
                 title="Faturas em Atraso"
-                value={`R$ ${data.faturasAtrasadasTotal.toFixed(2).replace(".", ",")}`}
+                value={`R$ ${data.faturasAtrasadasTotal
+                  .toFixed(2)
+                  .replace(".", ",")}`}
                 iconId="financeiro"
                 iconColor="#eab308"
                 bgColorClass="bg-yellow-100"
                 valueColorClass="text-yellow-700"
-                onPress={() => Alert.alert("Status", "Ver Faturas em Atraso e emitir segunda via")}
+                onPress={() =>
+                  Alert.alert(
+                    "Status",
+                    "Ver Faturas em Atraso e emitir segunda via"
+                  )
+                }
               />
 
               <StatusCard
@@ -438,7 +480,9 @@ const TelaInicial = () => {
                 iconColor="#10b981"
                 bgColorClass="bg-green-100"
                 valueColorClass="text-green-600"
-                onPress={() => Alert.alert("Status", "Ver lista completa de Moradores")}
+                onPress={() =>
+                  Alert.alert("Status", "Ver lista completa de Moradores")
+                }
               />
             </ScrollView>
             {hasScroll && !nearEnd && (
@@ -468,10 +512,14 @@ const TelaInicial = () => {
         {/* Ações Rápidas */}
         <View className="px-4 mb-4">
           <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-xl font-bold text-gray-800">Ações de Gestão Rápida</Text>
+            <Text className="text-xl font-bold text-gray-800">
+              Ações de Gestão Rápida
+            </Text>
             <CustomButton
               title="Ver Tudo"
-              onPress={() => Alert.alert("Ações", "Abrir menu de ações completas")}
+              onPress={() =>
+                Alert.alert("Ações", "Abrir menu de ações completas")
+              }
               style={styles.redButton}
               textStyle={styles.whiteText}
             />
@@ -487,7 +535,9 @@ const TelaInicial = () => {
               <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
                 <IconeLucide id="comunicacao" tamanho={20} cor="#a855f7" />
               </View>
-              <Text className="text-base text-gray-800 font-medium flex-1">Publicar Novo Comunicado</Text>
+              <Text className="text-base text-gray-800 font-medium flex-1">
+                Publicar Novo Comunicado
+              </Text>
               <IconeLucide id="proximo" tamanho={20} cor="#9ca3af" />
             </TouchableOpacity>
 
@@ -509,7 +559,9 @@ const TelaInicial = () => {
 
             {/* Ação 3: Relatório Financeiro */}
             <TouchableOpacity
-              onPress={() => Alert.alert("Ação", "Visualizar Prestação de Contas")}
+              onPress={() =>
+                Alert.alert("Ação", "Visualizar Prestação de Contas")
+              }
               className="flex-row items-center p-2"
               accessibilityRole="button"
               accessibilityLabel="Prestação de Contas Mensal"
@@ -517,7 +569,9 @@ const TelaInicial = () => {
               <View className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center mr-3">
                 <IconeLucide id="historico" tamanho={20} cor="#3b82f6" />
               </View>
-              <Text className="text-base text-gray-800 font-medium flex-1">Prestação de Contas (Mensal)</Text>
+              <Text className="text-base text-gray-800 font-medium flex-1">
+                Prestação de Contas (Mensal)
+              </Text>
               <IconeLucide id="proximo" tamanho={20} cor="#9ca3af" />
             </TouchableOpacity>
           </View>

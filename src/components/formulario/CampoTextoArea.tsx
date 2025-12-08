@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { View, TextInput, Text, Dimensions } from 'react-native';
-import { Controller, Control, FieldValues, Path } from 'react-hook-form';
+import React, { useMemo } from "react";
+import { View, TextInput, Text, Dimensions } from "react-native";
+import { Controller, Control, FieldValues, Path } from "react-hook-form";
 
 interface PropriedadesCampoTextoArea<T extends FieldValues> {
   nome: Path<T>;
@@ -14,7 +14,7 @@ interface PropriedadesCampoTextoArea<T extends FieldValues> {
 
 /**
  * Componente reutilizável para campo de texto área (descrição)
- * 
+ *
  * Features:
  * - Integrado com React Hook Form via Controller
  * - Validação visual com cores
@@ -22,7 +22,7 @@ interface PropriedadesCampoTextoArea<T extends FieldValues> {
  * - Contador de caracteres opcional
  * - Erro message contextualizado
  * - Suporta diferentes tamanhos de tela
- * 
+ *
  * @param mostrarContador - Exibir contador de caracteres (default: false)
  * @param maxCaracteres - Máximo de caracteres para o contador (opcional)
  */
@@ -42,17 +42,19 @@ export const CampoTextoArea = React.forwardRef<
     },
     ref
   ) => {
-    const { width } = Dimensions.get('window');
-    
+    const { width } = Dimensions.get("window");
+
     // Valores responsivos
     const isSmallScreen = width < 375;
     const alturaMinima = useMemo(() => {
       const lineHeight = 20;
       const padding = 16;
       const border = 2;
-      
+
       // Reduz altura mínima em telas pequenas
-      const numLinhas = isSmallScreen ? Math.max(3, numeroLinhas - 1) : numeroLinhas;
+      const numLinhas = isSmallScreen
+        ? Math.max(3, numeroLinhas - 1)
+        : numeroLinhas;
       return numLinhas * lineHeight + padding + border;
     }, [numeroLinhas, isSmallScreen]);
 
@@ -65,9 +67,12 @@ export const CampoTextoArea = React.forwardRef<
       <Controller
         name={nome}
         control={controle}
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => {
+        render={({
+          field: { value, onChange, onBlur },
+          fieldState: { error },
+        }) => {
           const caracteresUsados = value?.length || 0;
-          const percentualPreenchimento = maxCaracteres 
+          const percentualPreenchimento = maxCaracteres
             ? Math.round((caracteresUsados / maxCaracteres) * 100)
             : 0;
 
@@ -98,7 +103,9 @@ export const CampoTextoArea = React.forwardRef<
                 onBlur={onBlur}
                 placeholder={placeholder}
                 multiline
-                numberOfLines={isSmallScreen ? Math.max(3, numeroLinhas - 1) : numeroLinhas}
+                numberOfLines={
+                  isSmallScreen ? Math.max(3, numeroLinhas - 1) : numeroLinhas
+                }
                 placeholderTextColor="#cbd5e1"
                 editable={true}
                 selectTextOnFocus={false}
@@ -106,8 +113,8 @@ export const CampoTextoArea = React.forwardRef<
                 maxLength={maxCaracteres}
                 className={`border-2 rounded-xl p-4 font-normal ${
                   error
-                    ? 'border-red-600 bg-red-50'
-                    : 'border-slate-200 bg-white'
+                    ? "border-red-600 bg-red-50"
+                    : "border-slate-200 bg-white"
                 }`}
                 style={{
                   minHeight: alturaMinima,
@@ -122,8 +129,8 @@ export const CampoTextoArea = React.forwardRef<
                   <Text
                     className={`font-medium ${
                       percentualPreenchimento > 90
-                        ? 'text-orange-600'
-                        : 'text-slate-500'
+                        ? "text-orange-600"
+                        : "text-slate-500"
                     }`}
                     style={{ fontSize: fontSizeContador }}
                   >
@@ -134,8 +141,8 @@ export const CampoTextoArea = React.forwardRef<
                     <View
                       className={`h-full rounded-full ${
                         percentualPreenchimento > 90
-                          ? 'bg-orange-500'
-                          : 'bg-slate-400'
+                          ? "bg-orange-500"
+                          : "bg-slate-400"
                       }`}
                       style={{
                         width: `${percentualPreenchimento}%`,
@@ -172,4 +179,4 @@ export const CampoTextoArea = React.forwardRef<
   }
 );
 
-CampoTextoArea.displayName = 'CampoTextoArea';
+CampoTextoArea.displayName = "CampoTextoArea";

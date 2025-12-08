@@ -1,1 +1,1 @@
-export { IconeLucide } from './IconeLucide';
+export { IconeLucide } from "./IconeLucide";

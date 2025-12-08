@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
  * Hook customizado para gerenciar o estado de visualização de onboarding por usuário
- * 
+ *
  * Armazena no AsyncStorage uma chave unique por CPF + papel do usuário
  * para controlar se o carrossel de introdução já foi visualizado
- * 
+ *
  * @param cpf - CPF do usuário autenticado
  * @param papel - Papel do usuário (MORADOR, FUNCIONARIO, SINDICO)
  * @returns {{ deveExibirIntroducao, marcarComoVisto, carregando }}
  */
-export const useIntroducaoUsuario = (cpf: string, papel: 'MORADOR' | 'FUNCIONARIO' | 'SINDICO') => {
+export const useIntroducaoUsuario = (
+  cpf: string,
+  papel: "MORADOR" | "FUNCIONARIO" | "SINDICO"
+) => {
   const [deveExibirIntroducao, setDeveExibirIntroducao] = useState(false);
   const [carregando, setCarregando] = useState(true);
 
@@ -39,7 +42,7 @@ export const useIntroducaoUsuario = (cpf: string, papel: 'MORADOR' | 'FUNCIONARI
   // Marcar introdução como visualizada
   const marcarComoVisto = async () => {
     try {
-      await AsyncStorage.setItem(chaveArmazenamento, 'true');
+      await AsyncStorage.setItem(chaveArmazenamento, "true");
       setDeveExibirIntroducao(false);
     } catch (erro) {
       console.error(`Erro ao marcar introdução como visto: ${erro}`);

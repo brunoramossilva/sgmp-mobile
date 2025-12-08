@@ -19,10 +19,9 @@ export default function App() {
   return (
     <ProvedorAutenticacao>
       <NavigationContainer>
-        <Stack.Navigator 
+        <Stack.Navigator
           initialRouteName="Login"
           screenOptions={{
-            animationEnabled: false,
             animation: "none",
             gestureEnabled: false,
             headerShown: false,

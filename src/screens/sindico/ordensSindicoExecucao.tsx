@@ -37,7 +37,8 @@ const CardOrdemAceita = ({
     Recusada: { bg: "bg-red-100", text: "text-red-700" },
   } as const;
 
-  const cores = statusMap[ordem.status as keyof typeof statusMap] ?? statusMap.Aceita;
+  const cores =
+    statusMap[ordem.status as keyof typeof statusMap] ?? statusMap.Aceita;
 
   return (
     <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 shadow-sm">
@@ -47,7 +48,9 @@ const CardOrdemAceita = ({
           {ordem.solicitante}
         </Text>
         <View className={`px-2.5 py-1 rounded-full ${cores.bg}`}>
-          <Text className={`text-xs font-bold ${cores.text}`}>{ordem.status}</Text>
+          <Text className={`text-xs font-bold ${cores.text}`}>
+            {ordem.status}
+          </Text>
         </View>
       </View>
 
@@ -67,7 +70,9 @@ const CardOrdemAceita = ({
         </View>
         <View className="flex-row items-center gap-1">
           <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
-          <Text className="text-xs text-slate-600">{ordem.diasEmAberto}d em execução</Text>
+          <Text className="text-xs text-slate-600">
+            {ordem.diasEmAberto}d em execução
+          </Text>
         </View>
       </View>
 
@@ -147,17 +152,27 @@ export default function OrdensSindicoExecucao({
             >
               <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
             </TouchableOpacity>
-            <Text className="text-white text-xl font-bold">Ordens em Execução</Text>
+            <Text className="text-white text-xl font-bold">
+              Ordens em Execução
+            </Text>
             <View className="w-10" />
           </View>
           <View className="flex-row gap-3 mt-3 justify-center">
             <View className="bg-white/10 rounded-lg px-3 py-2 min-w-[110] items-center">
-              <Text className="text-[11px] text-white/80 font-semibold">EM EXECUÇÃO</Text>
-              <Text className="text-lg font-bold text-white">{stats.emExecucao}</Text>
+              <Text className="text-[11px] text-white/80 font-semibold">
+                EM EXECUÇÃO
+              </Text>
+              <Text className="text-lg font-bold text-white">
+                {stats.emExecucao}
+              </Text>
             </View>
             <View className="bg-white/10 rounded-lg px-3 py-2 min-w-[110] items-center">
-              <Text className="text-[11px] text-white/80 font-semibold">FINALIZADAS</Text>
-              <Text className="text-lg font-bold text-white">{stats.finalizadas}</Text>
+              <Text className="text-[11px] text-white/80 font-semibold">
+                FINALIZADAS
+              </Text>
+              <Text className="text-lg font-bold text-white">
+                {stats.finalizadas}
+              </Text>
             </View>
           </View>
         </View>

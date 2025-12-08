@@ -38,7 +38,7 @@ const CardOrdemPendente = ({
 }) => {
   const prioridadeCores = {
     Alta: { bg: "bg-red-100", text: "text-red-700" },
-    "Média": { bg: "bg-yellow-100", text: "text-yellow-700" },
+    Média: { bg: "bg-yellow-100", text: "text-yellow-700" },
     Baixa: { bg: "bg-green-100", text: "text-green-700" },
   } as const;
 
@@ -52,7 +52,9 @@ const CardOrdemPendente = ({
           {ordem.solicitante}
         </Text>
         <View className={`px-2.5 py-1 rounded-full ${cores.bg}`}>
-          <Text className={`text-xs font-bold ${cores.text}`}>{ordem.prioridade}</Text>
+          <Text className={`text-xs font-bold ${cores.text}`}>
+            {ordem.prioridade}
+          </Text>
         </View>
       </View>
 
@@ -72,7 +74,9 @@ const CardOrdemPendente = ({
         </View>
         <View className="flex-row items-center gap-1">
           <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
-          <Text className="text-xs text-slate-600">{ordem.diasEmAberto}d em aberto</Text>
+          <Text className="text-xs text-slate-600">
+            {ordem.diasEmAberto}d em aberto
+          </Text>
         </View>
       </View>
 
@@ -97,7 +101,9 @@ const CardOrdemPendente = ({
             onPress={onDetalhes}
             className="py-3 rounded-xl bg-blue-600 justify-center items-center"
           >
-            <Text className="text-white font-semibold text-sm">Ver Detalhes</Text>
+            <Text className="text-white font-semibold text-sm">
+              Ver Detalhes
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -113,8 +119,11 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
     useFetchOrdensSindico();
 
   // Estados locais para modal
-  const [ordemSelecionada, setOrdemSelecionada] = useState<OrdemServicoUI | null>(null);
-  const [acaoModal, setAcaoModal] = useState<"aprovar" | "recusar" | null>(null);
+  const [ordemSelecionada, setOrdemSelecionada] =
+    useState<OrdemServicoUI | null>(null);
+  const [acaoModal, setAcaoModal] = useState<"aprovar" | "recusar" | null>(
+    null
+  );
   const [carregandoModal, setCarregandoModal] = useState(false);
   const [erroModal, setErroModal] = useState<string | null>(null);
 
@@ -237,12 +246,16 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
             >
               <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
             </TouchableOpacity>
-            <Text className="text-white text-xl font-bold">Aprovação de Ordens</Text>
+            <Text className="text-white text-xl font-bold">
+              Aprovação de Ordens
+            </Text>
             <View className="w-10" />
           </View>
           <View className="flex-row justify-center mt-3">
             <View className="bg-white/10 rounded-lg px-3 py-2 min-w-[120] items-center">
-              <Text className="text-[11px] text-white/80 font-semibold">PENDENTES</Text>
+              <Text className="text-[11px] text-white/80 font-semibold">
+                PENDENTES
+              </Text>
               <Text className="text-lg font-bold text-white">
                 {ordensPendentes.length}
               </Text>

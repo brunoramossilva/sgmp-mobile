@@ -210,11 +210,9 @@ export default function CriacaoOS() {
         >
           Criar Ordem de Serviço
         </Text>
-        <Text
-          className="text-white/90 text-xs mt-1"
-          style={{ lineHeight: 18 }}
-        >
-          Descreva o problema que precisa ser resolvido. Será enviado para aprovação do síndico.
+        <Text className="text-white/90 text-xs mt-1" style={{ lineHeight: 18 }}>
+          Descreva o problema que precisa ser resolvido. Será enviado para
+          aprovação do síndico.
         </Text>
       </View>
 
@@ -339,11 +337,20 @@ export default function CriacaoOS() {
           <View
             pointerEvents="none"
             className="absolute"
-            style={{ right: 4, top: 8, bottom: 8, justifyContent: 'flex-start' }}
+            style={{
+              right: 4,
+              top: 8,
+              bottom: 8,
+              justifyContent: "flex-start",
+            }}
           >
             <View
               className="rounded-full"
-              style={{ width: 4, backgroundColor: 'rgba(220,38,38,0.10)', height: '100%' }}
+              style={{
+                width: 4,
+                backgroundColor: "rgba(220,38,38,0.10)",
+                height: "100%",
+              }}
             />
             {(() => {
               const { contentHeight, visibleHeight, offset } = scrollInfo;
@@ -353,14 +360,20 @@ export default function CriacaoOS() {
               );
               const maxThumbTop = visibleHeight - thumbHeight;
               const scrollable = contentHeight - visibleHeight;
-              const thumbTop = scrollable <= 0
-                ? 0
-                : Math.min(maxThumbTop, (offset / scrollable) * maxThumbTop);
+              const thumbTop =
+                scrollable <= 0
+                  ? 0
+                  : Math.min(maxThumbTop, (offset / scrollable) * maxThumbTop);
 
               return (
                 <View
                   className="absolute right-0 rounded-full"
-                  style={{ width: 4, backgroundColor: '#dc2626', height: thumbHeight, top: thumbTop }}
+                  style={{
+                    width: 4,
+                    backgroundColor: "#dc2626",
+                    height: thumbHeight,
+                    top: thumbTop,
+                  }}
                 />
               );
             })()}
@@ -391,13 +404,13 @@ export default function CriacaoOS() {
               idIcone="financeiro"
               label="Financeiro"
               isFocused={false}
-              onPress={() => Alert.alert('Navegação', 'Financeiro!')}
+              onPress={() => Alert.alert("Navegação", "Financeiro!")}
             />
             <NavItemServicos
               idIcone="reservas"
               label="Reservas"
               isFocused={false}
-              onPress={() => Alert.alert('Navegação', 'Reservas!')}
+              onPress={() => Alert.alert("Navegação", "Reservas!")}
             />
           </View>
         </View>
@@ -432,10 +445,10 @@ const NavItemServicos: React.FC<NavItemServicosProps> = ({
     <IconeLucide
       id={idIcone}
       tamanho={24}
-      cor={isFocused ? '#ffffff' : '#d1d5db'}
+      cor={isFocused ? "#ffffff" : "#d1d5db"}
     />
     <Text
-      className={`text-xs ${isFocused ? 'text-white' : 'text-gray-300'} mt-1`}
+      className={`text-xs ${isFocused ? "text-white" : "text-gray-300"} mt-1`}
     >
       {label}
     </Text>

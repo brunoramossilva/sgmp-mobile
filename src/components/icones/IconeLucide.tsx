@@ -1,5 +1,9 @@
-import React, { useMemo } from 'react';
-import { IdIcone, obterConfigIcone, obterComponenteIcone } from '../../utils/iconesLucide';
+import React, { useMemo } from "react";
+import {
+  IdIcone,
+  obterConfigIcone,
+  obterComponenteIcone,
+} from "../../utils/iconesLucide";
 
 interface PropriedadesIconeLucide {
   id: IdIcone;
@@ -11,10 +15,10 @@ interface PropriedadesIconeLucide {
 
 /**
  * Componente wrapper para ícones Lucide
- * 
+ *
  * Encapsula Lucide com props padrão, Tailwind e acessibilidade
  * Centraliza customizações visuais
- * 
+ *
  * @param id - ID do ícone (mapeado em iconesLucide.ts)
  * @param tamanho - Tamanho customizado (default: configuração padrão)
  * @param cor - Cor customizada (default: configuração padrão)
@@ -25,7 +29,7 @@ export const IconeLucide: React.FC<PropriedadesIconeLucide> = ({
   id,
   tamanho,
   cor,
-  className = '',
+  className = "",
   testID,
 }) => {
   const config = obterConfigIcone(id);

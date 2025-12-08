@@ -42,7 +42,13 @@ interface CustomButtonProps {
 interface StatusCardProps {
   title: string;
   value: string;
-  iconId: "servicos" | "confirmar" | "alerta";
+  iconId:
+    | "servicos"
+    | "confirmar"
+    | "alerta"
+    | "comunicacao"
+    | "progresso"
+    | "verificado";
   iconColor: string;
   bgColorClass: string;
   valueColorClass: string;
@@ -57,7 +63,12 @@ interface DashboardData {
 
 // --- COMPONENTES AUXILIARES ---
 
-const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, style, textStyle }) => (
+const CustomButton: React.FC<CustomButtonProps> = ({
+  title,
+  onPress,
+  style,
+  textStyle,
+}) => (
   <TouchableOpacity onPress={onPress} style={style} className="p-2 rounded-lg">
     <Text style={textStyle} className="text-white font-semibold">
       {title}
@@ -82,8 +93,12 @@ const StatusCard: React.FC<StatusCardProps> = ({
       <View className="w-10 h-10 items-center justify-center mb-2">
         <IconeLucide id={iconId} tamanho={24} cor={iconColor} />
       </View>
-      <Text className={`text-2xl font-bold ${valueColorClass} mb-1`}>{value}</Text>
-      <Text className="text-xs text-gray-600 font-medium text-center">{title}</Text>
+      <Text className={`text-2xl font-bold ${valueColorClass} mb-1`}>
+        {value}
+      </Text>
+      <Text className="text-xs text-gray-600 font-medium text-center">
+        {title}
+      </Text>
     </View>
   </TouchableOpacity>
 );
@@ -107,9 +122,11 @@ const useDashboardData = () => {
       const ordensUI = response.map(mapApiToUI);
 
       setData({
-        ordensAguardando: ordensUI.filter((o) => o.status === "Pendente").length,
+        ordensAguardando: ordensUI.filter((o) => o.status === "Pendente")
+          .length,
         ordensAceitas: ordensUI.filter((o) => o.status === "Aceita").length,
-        ordensFinalizadas: ordensUI.filter((o) => o.status === "Finalizada").length,
+        ordensFinalizadas: ordensUI.filter((o) => o.status === "Finalizada")
+          .length,
       });
     } catch (err: any) {
       setError(err.message || "Erro ao carregar dashboard");
@@ -138,7 +155,13 @@ export default function TelaInicial() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
-  const { data, loading: dashboardLoading, error, refreshing, refetch } = useDashboardData();
+  const {
+    data,
+    loading: dashboardLoading,
+    error,
+    refreshing,
+    refetch,
+  } = useDashboardData();
 
   const [ordens, setOrdens] = useState<OrdemServicoUI[]>([]);
   const [loading, setLoading] = useState(false);
@@ -147,8 +170,11 @@ export default function TelaInicial() {
   const [carregandoIntroducao, setCarregandoIntroducao] = useState(true);
   const [modalDetalhesVisivel, setModalDetalhesVisivel] = useState(false);
   const [modalFinalizacaoVisivel, setModalFinalizacaoVisivel] = useState(false);
-  const [ordemSelecionada, setOrdemSelecionada] = useState<OrdemServicoUI | null>(null);
-  const [abaSelecionada, setAbaSelecionada] = useState<"pendentes" | "aceitas" | "finalizadas">("pendentes");
+  const [ordemSelecionada, setOrdemSelecionada] =
+    useState<OrdemServicoUI | null>(null);
+  const [abaSelecionada, setAbaSelecionada] = useState<
+    "pendentes" | "aceitas" | "finalizadas"
+  >("pendentes");
 
   // Refetch ao focar na tela
   useFocusEffect(
@@ -175,24 +201,20 @@ export default function TelaInicial() {
   }, [carregarOrdens]);
 
   const handleLogout = () => {
-    Alert.alert(
-      "Desconectar",
-      "Tem certeza que deseja sair?",
-      [
-        { text: "Cancelar", onPress: () => {}, style: "cancel" },
-        {
-          text: "Sair",
-          onPress: () => {
-            desautenticar();
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Login" as never }],
-            });
-          },
-          style: "destructive",
+    Alert.alert("Desconectar", "Tem certeza que deseja sair?", [
+      { text: "Cancelar", onPress: () => {}, style: "cancel" },
+      {
+        text: "Sair",
+        onPress: () => {
+          desautenticar();
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" as never }],
+          });
         },
-      ]
-    );
+        style: "destructive",
+      },
+    ]);
   };
 
   const abrirDetalhes = (ordem: OrdemServicoUI) => {
@@ -202,10 +224,10 @@ export default function TelaInicial() {
 
   const aceitarOS = async (ordem: OrdemServicoUI) => {
     try {
-      await updateOrdem(ordem.id, { 
+      await updateOrdem(ordem.id, {
         status: "EM_EXECUCAO",
         aprovado: true,
-        cpf_funcionario: usuario?.cpf || null
+        cpf_funcionario: usuario?.cpf || null,
       });
       await carregarOrdens();
       refetch();
@@ -249,9 +271,9 @@ export default function TelaInicial() {
   const finalizarOS = async () => {
     if (!ordemSelecionada) return;
     try {
-      await updateOrdem(ordemSelecionada.id, { 
+      await updateOrdem(ordemSelecionada.id, {
         status: "FINALIZADA",
-        dataConclusao: new Date().toISOString()
+        dataConclusao: new Date().toISOString(),
       });
       await carregarOrdens();
       refetch();
@@ -383,7 +405,7 @@ export default function TelaInicial() {
 
   return (
     <View style={styles.screenContainer} className="bg-white">
-      {/* Header Fixo */}
+      {/* Header - Parte Superior */}
       <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
         <View className="w-10">
           <IconeLucide id="predio" tamanho={32} cor="#ffffff" />
@@ -401,22 +423,35 @@ export default function TelaInicial() {
         </TouchableOpacity>
       </View>
 
-      {/* Seção de Informações do Usuário - Fixo */}
-      <View className="bg-red-600 px-4 pb-4 flex-row items-center">
+      {/* Header - Parte Inferior */}
+      <View className="bg-red-700 px-4 py-3 flex-row items-center">
         <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
           <Text className="text-red-600 text-2xl font-bold">
-            {usuario?.nome ? usuario.nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : 'TC'}
+            {usuario?.nome
+              ? usuario.nome
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+              : "TC"}
           </Text>
         </View>
         <View>
-          <Text className="text-white text-xl font-semibold">Olá, {usuario?.nome || "Técnico"}</Text>
-          <Text className="text-sm text-white font-bold">Técnico Condominial</Text>
+          <Text className="text-white text-xl font-semibold">
+            Olá, {usuario?.nome || "Técnico"}
+          </Text>
+          <Text className="text-sm text-white font-bold">
+            Técnico Condominial
+          </Text>
         </View>
       </View>
 
       {/* Cards de Status - Fixo */}
       <View className="bg-white px-4 py-4 border-b border-slate-200">
-        <Text className="text-lg font-bold text-gray-800 mb-3">Visão Geral</Text>
+        <Text className="text-lg font-bold text-gray-800 mb-3">
+          Visão Geral
+        </Text>
         <View className="flex-row">
           <StatusCard
             title="Aguardando"
@@ -454,7 +489,11 @@ export default function TelaInicial() {
       <View className="bg-white flex-row border-b border-slate-200">
         <TouchableOpacity
           onPress={() => setAbaSelecionada("pendentes")}
-          style={[abaSelecionada === "pendentes" ? styles.abaSelecionada : styles.abaInativa]}
+          style={[
+            abaSelecionada === "pendentes"
+              ? styles.abaSelecionada
+              : styles.abaInativa,
+          ]}
           className="flex-1 py-3 items-center"
         >
           <Text
@@ -468,7 +507,11 @@ export default function TelaInicial() {
 
         <TouchableOpacity
           onPress={() => setAbaSelecionada("aceitas")}
-          style={[abaSelecionada === "aceitas" ? styles.abaSelecionada : styles.abaInativa]}
+          style={[
+            abaSelecionada === "aceitas"
+              ? styles.abaSelecionada
+              : styles.abaInativa,
+          ]}
           className="flex-1 py-3 items-center"
         >
           <Text
@@ -482,12 +525,18 @@ export default function TelaInicial() {
 
         <TouchableOpacity
           onPress={() => setAbaSelecionada("finalizadas")}
-          style={[abaSelecionada === "finalizadas" ? styles.abaSelecionada : styles.abaInativa]}
+          style={[
+            abaSelecionada === "finalizadas"
+              ? styles.abaSelecionada
+              : styles.abaInativa,
+          ]}
           className="flex-1 py-3 items-center"
         >
           <Text
             className={`font-semibold text-sm ${
-              abaSelecionada === "finalizadas" ? "text-red-600" : "text-gray-600"
+              abaSelecionada === "finalizadas"
+                ? "text-red-600"
+                : "text-gray-600"
             }`}
           >
             Finalizadas ({ordensAgrupadas.finalizadas.length})
@@ -498,6 +547,7 @@ export default function TelaInicial() {
       {/* ScrollView apenas para Lista de Ordens */}
       <ScrollView
         className="flex-1 bg-white"
+        contentContainerStyle={{ paddingBottom: 20 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

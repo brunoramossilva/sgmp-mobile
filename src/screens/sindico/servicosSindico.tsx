@@ -34,38 +34,43 @@ const CardOrdemServico = ({
 }) => {
   // Mapeamento de status para estilo visual
   const statusMap = {
-    "Pendente": { 
-      bg: "bg-yellow-100", 
-      text: "text-yellow-700"
+    Pendente: {
+      bg: "bg-yellow-100",
+      text: "text-yellow-700",
     },
-    "Aceita": { 
-      bg: "bg-blue-100", 
-      text: "text-blue-700"
+    Aceita: {
+      bg: "bg-blue-100",
+      text: "text-blue-700",
     },
-    "Finalizada": { 
-      bg: "bg-green-100", 
-      text: "text-green-700"
+    Finalizada: {
+      bg: "bg-green-100",
+      text: "text-green-700",
     },
-    "Recusada": { 
-      bg: "bg-red-100", 
-      text: "text-red-700"
+    Recusada: {
+      bg: "bg-red-100",
+      text: "text-red-700",
     },
   };
 
   const cores = statusMap[ordem.status as keyof typeof statusMap] ?? {
     bg: "bg-gray-100",
-    text: "text-gray-700"
+    text: "text-gray-700",
   };
 
   return (
     <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 shadow-sm">
       {/* Header: Status + Badge */}
       <View className="flex-row justify-between items-start mb-2">
-        <Text className="text-base font-semibold text-slate-900 flex-1 mr-3" numberOfLines={1}>
+        <Text
+          className="text-base font-semibold text-slate-900 flex-1 mr-3"
+          numberOfLines={1}
+        >
           {ordem.solicitante}
         </Text>
         <View className={`px-2.5 py-1 rounded-full ${cores.bg}`}>
-          <Text className={`text-xs font-bold ${cores.text}`}>{ordem.status}</Text>
+          <Text className={`text-xs font-bold ${cores.text}`}>
+            {ordem.status}
+          </Text>
         </View>
       </View>
 
@@ -84,7 +89,11 @@ const CardOrdemServico = ({
           <Text className="text-xs text-slate-600">{ordem.dataAbertura}</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <IconeLucide id="alerta" tamanho={14} cor={ordem.prioridade === "Alta" ? "#ef4444" : "#64748b"} />
+          <IconeLucide
+            id="alerta"
+            tamanho={14}
+            cor={ordem.prioridade === "Alta" ? "#ef4444" : "#64748b"}
+          />
           <Text className="text-xs text-slate-600">{ordem.prioridade}</Text>
         </View>
         <View className="flex-row items-center gap-1">
@@ -108,14 +117,9 @@ type ServicosSindicoProps = NativeStackScreenProps<any>;
 
 export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
   const [filtroAtivo, setFiltroAtivo] = useState<FiltroStatus>("TODAS");
-  
-  const { 
-    ordensPendentes, 
-    ordensEmExecucao, 
-    loading, 
-    error, 
-    refetch 
-  } = useFetchOrdensSindico();
+
+  const { ordensPendentes, ordensEmExecucao, loading, error, refetch } =
+    useFetchOrdensSindico();
 
   useFocusEffect(
     useCallback(() => {
@@ -134,9 +138,11 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       case "PENDENTES":
         return ordensPendentes;
       case "EM_EXECUCAO":
-        return ordensEmExecucao.filter(o => o.status === "Aceita");
+        return ordensEmExecucao.filter((o) => o.status === "Aceita");
       case "FINALIZADAS":
-        return ordensEmExecucao.filter(o => o.status === "Finalizada" || o.status === "Recusada");
+        return ordensEmExecucao.filter(
+          (o) => o.status === "Finalizada" || o.status === "Recusada"
+        );
       case "TODAS":
       default:
         return todasOrdens;
@@ -164,33 +170,44 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
   const keyExtractor = useCallback((item: OrdemServicoUI) => `${item.id}`, []);
 
   // Estatísticas
-  const stats = useMemo(() => ({
-    total: todasOrdens.length,
-    pendentes: ordensPendentes.length,
-    emExecucao: ordensEmExecucao.filter(o => o.status === "Aceita").length,
-    finalizadas: ordensEmExecucao.filter(o => o.status === "Finalizada" || o.status === "Recusada").length,
-  }), [ordensPendentes, ordensEmExecucao, todasOrdens]);
+  const stats = useMemo(
+    () => ({
+      total: todasOrdens.length,
+      pendentes: ordensPendentes.length,
+      emExecucao: ordensEmExecucao.filter((o) => o.status === "Aceita").length,
+      finalizadas: ordensEmExecucao.filter(
+        (o) => o.status === "Finalizada" || o.status === "Recusada"
+      ).length,
+    }),
+    [ordensPendentes, ordensEmExecucao, todasOrdens]
+  );
 
   // Botão de filtro - padrão do design system
-  const FiltroButton = ({ 
-    label, 
-    valor, 
-    count 
-  }: { 
-    label: string; 
-    valor: FiltroStatus; 
+  const FiltroButton = ({
+    label,
+    valor,
+    count,
+  }: {
+    label: string;
+    valor: FiltroStatus;
     count: number;
   }) => {
     const ativo = filtroAtivo === valor;
     return (
       <TouchableOpacity
         onPress={() => setFiltroAtivo(valor)}
-        className={`px-4 py-2.5 rounded-lg ${ativo ? "bg-red-600" : "bg-slate-100"}`}
-        style={!ativo ? { borderWidth: 1, borderColor: '#e2e8f0' } : undefined}
+        className={`px-4 py-2.5 rounded-lg ${
+          ativo ? "bg-red-600" : "bg-slate-100"
+        }`}
+        style={!ativo ? { borderWidth: 1, borderColor: "#e2e8f0" } : undefined}
         accessibilityRole="button"
         accessibilityLabel={`Filtrar por ${label}`}
       >
-        <Text className={`text-sm font-semibold text-center ${ativo ? "text-white" : "text-slate-700"}`}>
+        <Text
+          className={`text-sm font-semibold text-center ${
+            ativo ? "text-white" : "text-slate-700"
+          }`}
+        >
           {label} ({count})
         </Text>
       </TouchableOpacity>
@@ -205,42 +222,82 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       <View className="bg-red-600 px-4 pb-4 pt-16">
         <View className="flex-row items-center justify-between mb-4">
           <View className="w-10" />
-          <Text className="text-white text-xl font-bold">Todos os Serviços</Text>
+          <Text className="text-white text-xl font-bold">
+            Todos os Serviços
+          </Text>
           <View className="w-10" />
         </View>
-        
+
         {/* Estatísticas em linha - todas visíveis */}
         <View className="flex-row justify-between gap-2">
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
             <Text className="text-white text-2xl font-bold">{stats.total}</Text>
-            <Text className="text-[9px] text-white/90 font-semibold uppercase" numberOfLines={1}>Total</Text>
+            <Text
+              className="text-[9px] text-white/90 font-semibold uppercase"
+              numberOfLines={1}
+            >
+              Total
+            </Text>
           </View>
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
-            <Text className="text-yellow-300 text-2xl font-bold">{stats.pendentes}</Text>
-            <Text className="text-[9px] text-white/90 font-semibold uppercase" numberOfLines={1}>Pendente</Text>
+            <Text className="text-yellow-300 text-2xl font-bold">
+              {stats.pendentes}
+            </Text>
+            <Text
+              className="text-[9px] text-white/90 font-semibold uppercase"
+              numberOfLines={1}
+            >
+              Pendente
+            </Text>
           </View>
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
-            <Text className="text-blue-300 text-2xl font-bold">{stats.emExecucao}</Text>
-            <Text className="text-[9px] text-white/90 font-semibold uppercase" numberOfLines={1}>Aceitas</Text>
+            <Text className="text-blue-300 text-2xl font-bold">
+              {stats.emExecucao}
+            </Text>
+            <Text
+              className="text-[9px] text-white/90 font-semibold uppercase"
+              numberOfLines={1}
+            >
+              Aceitas
+            </Text>
           </View>
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
-            <Text className="text-green-300 text-2xl font-bold">{stats.finalizadas}</Text>
-            <Text className="text-[9px] text-white/90 font-semibold uppercase" numberOfLines={1}>Finalizada</Text>
+            <Text className="text-green-300 text-2xl font-bold">
+              {stats.finalizadas}
+            </Text>
+            <Text
+              className="text-[9px] text-white/90 font-semibold uppercase"
+              numberOfLines={1}
+            >
+              Finalizada
+            </Text>
           </View>
         </View>
       </View>
 
       {/* Filtros - alinhado ao padrão */}
       <View className="bg-white px-4 py-3 border-b border-slate-200">
-        <ScrollView 
-          horizontal 
+        <ScrollView
+          horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ flexDirection: 'row', gap: 8 }}
+          contentContainerStyle={{ flexDirection: "row", gap: 8 }}
         >
           <FiltroButton label="Todas" valor="TODAS" count={stats.total} />
-          <FiltroButton label="Pendentes" valor="PENDENTES" count={stats.pendentes} />
-          <FiltroButton label="Em Execução" valor="EM_EXECUCAO" count={stats.emExecucao} />
-          <FiltroButton label="Finalizadas" valor="FINALIZADAS" count={stats.finalizadas} />
+          <FiltroButton
+            label="Pendentes"
+            valor="PENDENTES"
+            count={stats.pendentes}
+          />
+          <FiltroButton
+            label="Em Execução"
+            valor="EM_EXECUCAO"
+            count={stats.emExecucao}
+          />
+          <FiltroButton
+            label="Finalizadas"
+            valor="FINALIZADAS"
+            count={stats.finalizadas}
+          />
         </ScrollView>
       </View>
 

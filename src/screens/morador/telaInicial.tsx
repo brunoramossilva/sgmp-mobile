@@ -73,7 +73,8 @@ const TelaInicial = () => {
 
     const verificarIntroducao = async () => {
       try {
-        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const AsyncStorage =
+          require("@react-native-async-storage/async-storage").default;
         const chaveArmazenamento = `introducao_${usuario.cpf}_${usuario.papel}`;
         const jaVisualizado = await AsyncStorage.getItem(chaveArmazenamento);
         setDeveExibirIntroducao(jaVisualizado === null);
@@ -90,9 +91,10 @@ const TelaInicial = () => {
 
   const marcarComoVisto = async () => {
     try {
-      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const AsyncStorage =
+        require("@react-native-async-storage/async-storage").default;
       const chaveArmazenamento = `introducao_${usuario?.cpf}_${usuario?.papel}`;
-      await AsyncStorage.setItem(chaveArmazenamento, 'true');
+      await AsyncStorage.setItem(chaveArmazenamento, "true");
       setDeveExibirIntroducao(false);
     } catch (erro) {
       console.error(`Erro ao marcar introdução como visto: ${erro}`);
@@ -140,7 +142,10 @@ const TelaInicial = () => {
 
   if (carregandoIntroducao) {
     return (
-      <View className="flex-1 bg-white" style={{ paddingTop: (insets.top || 0) + 12 }}>
+      <View
+        className="flex-1 bg-white"
+        style={{ paddingTop: (insets.top || 0) + 12 }}
+      >
         <View className="px-4">
           <SkeletonBloco height={56} style={{ marginBottom: 12 }} />
           <SkeletonBloco height={140} style={{ marginBottom: 16 }} />
@@ -171,7 +176,7 @@ const TelaInicial = () => {
       backgroundColor: "#ffffff",
     },
     scrollContent: {
-      paddingBottom: 120 + insets.bottom, // Adiciona espaço extra baseado na área segura
+      paddingBottom: 140 + insets.bottom, // Adiciona espaço extra baseado na área segura
       backgroundColor: "#ffffff",
     },
     redButton: {
@@ -188,7 +193,7 @@ const TelaInicial = () => {
 
   return (
     <View style={styles.screenContainer} className="bg-white">
-      {/* Header */}
+      {/* Header - Parte Superior */}
       <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
         <View className="w-10">
           <IconeLucide id="predio" tamanho={32} cor="#ffffff" />
@@ -207,14 +212,23 @@ const TelaInicial = () => {
       </View>
 
       {/* Seção de informações do usuário */}
-      <View className="bg-red-600 px-4 pb-4 flex-row items-center">
+      <View className="bg-red-700 px-4 py-6 flex-row items-center">
         <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
           <Text className="text-red-600 text-2xl font-bold">
-            {usuario?.nome ? usuario.nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() : 'MD'}
+            {usuario?.nome
+              ? usuario.nome
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+              : "MD"}
           </Text>
         </View>
         <View>
-          <Text className="text-white text-xl font-semibold">Olá, {usuario?.nome || "Morador"}</Text>
+          <Text className="text-white text-xl font-semibold">
+            Olá, {usuario?.nome || "Morador"}
+          </Text>
           <Text className="text-sm text-white font-bold">Morador</Text>
         </View>
       </View>

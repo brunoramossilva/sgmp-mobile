@@ -39,19 +39,24 @@ export const mapApiToUI = (o: OrdemServicoApi): OrdemServicoUI => {
 
   // Calcular prioridade baseada no tempo, não apenas em aprovado
   const hoje = new Date();
-  const diasEmAberto = Math.floor((hoje.getTime() - dataAbertura.getTime()) / (1000 * 60 * 60 * 24));
-  
+  const diasEmAberto = Math.floor(
+    (hoje.getTime() - dataAbertura.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
   let prioridade: "Alta" | "Média" | "Baixa" = "Baixa";
-  
+
   if (uiStatus === "Finalizada") {
     // Ordens finalizadas mantêm prioridade baseada no tempo que levaram
-    prioridade = diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+    prioridade =
+      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
   } else if (!o.aprovado) {
     // Ordens não aprovadas: prioridade baseada no tempo de espera
-    prioridade = diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+    prioridade =
+      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
   } else {
     // Ordens aprovadas/em execução: prioridade baseada no tempo total
-    prioridade = diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+    prioridade =
+      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
   }
 
   return {
