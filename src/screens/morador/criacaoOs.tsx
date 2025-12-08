@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -26,6 +27,7 @@ import {
   MensagemErro,
 } from "../../components/formulario";
 import { useCriacaoOS } from "../../../docs/morador/useCriacaoOS";
+import { IconeLucide } from "../../components/icones";
 
 /**
  * Tela de Criação de Ordem de Serviço
@@ -56,6 +58,11 @@ export default function CriacaoOS() {
   const scrollViewRef = useRef<ScrollView>(null);
   const { width, height } = Dimensions.get("window");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [scrollInfo, setScrollInfo] = useState({
+    contentHeight: 1,
+    visibleHeight: 1,
+    offset: 0,
+  });
 
   // Valores responsivos calculados uma única vez
   const responsividade = useMemo(() => {
@@ -192,23 +199,23 @@ export default function CriacaoOS() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* Header com botão voltar */}
+      {/* Header */}
       <View
-        className="bg-red-600 px-4 py-3 flex-row items-center"
+        className="bg-red-600 px-4 py-3"
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="flex-row items-center"
-          style={{ gap: 8 }}
+        <Text
+          className="text-white text-lg font-bold"
+          style={{ lineHeight: 20 }}
         >
-          <Text
-            className="text-white text-base font-semibold"
-            style={{ lineHeight: 20 }}
-          >
-            Voltar
-          </Text>
-        </TouchableOpacity>
+          Criar Ordem de Serviço
+        </Text>
+        <Text
+          className="text-white/90 text-xs mt-1"
+          style={{ lineHeight: 18 }}
+        >
+          Descreva o problema que precisa ser resolvido. Será enviado para aprovação do síndico.
+        </Text>
       </View>
 
       <KeyboardAvoidingView
@@ -221,24 +228,25 @@ export default function CriacaoOS() {
           scrollEnabled={true}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 120 }}
+          onLayout={(e) => {
+            const layout = e?.nativeEvent?.layout;
+            if (!layout) return;
+            const { height } = layout;
+            setScrollInfo((s) => ({ ...s, visibleHeight: height || 1 }));
+          }}
+          onContentSizeChange={(_, h) =>
+            setScrollInfo((s) => ({ ...s, contentHeight: h || 1 }))
+          }
+          onScroll={(e) => {
+            const offsetY = e?.nativeEvent?.contentOffset?.y ?? 0;
+            setScrollInfo((s) => ({ ...s, offset: offsetY }));
+          }}
+          scrollEventThrottle={16}
         >
-          <View className="px-4 py-6">
-            {/* Cabeçalho */}
-            <View style={{ marginBottom: responsividade.margens.mb8 }}>
-              <Text
-                className="font-bold text-red-600 text-center"
-                style={{ fontSize: responsividade.fontSize.titulo }}
-              >
-                Criar Ordem de Serviço
-              </Text>
-              <Text
-                className="text-slate-600 mt-2"
-                style={{ fontSize: responsividade.fontSize.subtitulo }}
-              >
-                Descreva o problema que você gostaria de relatar. A solicitação
-                será enviada para aprovação do síndico.
-              </Text>
-            </View>
+          <View className="px-4 py-4">
+            {/* Espaço após header */}
+            <View style={{ marginBottom: responsividade.margens.mb4 }} />
 
             {/* Dica Informativa */}
             <View className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-6">
@@ -325,7 +333,111 @@ export default function CriacaoOS() {
             </View>
           </View>
         </ScrollView>
+
+        {/* Scrollbar custom em vermelho */}
+        {scrollInfo.contentHeight > scrollInfo.visibleHeight && (
+          <View
+            pointerEvents="none"
+            className="absolute"
+            style={{ right: 4, top: 8, bottom: 8, justifyContent: 'flex-start' }}
+          >
+            <View
+              className="rounded-full"
+              style={{ width: 4, backgroundColor: 'rgba(220,38,38,0.10)', height: '100%' }}
+            />
+            {(() => {
+              const { contentHeight, visibleHeight, offset } = scrollInfo;
+              const thumbHeight = Math.max(
+                28,
+                (visibleHeight / contentHeight) * visibleHeight
+              );
+              const maxThumbTop = visibleHeight - thumbHeight;
+              const scrollable = contentHeight - visibleHeight;
+              const thumbTop = scrollable <= 0
+                ? 0
+                : Math.min(maxThumbTop, (offset / scrollable) * maxThumbTop);
+
+              return (
+                <View
+                  className="absolute right-0 rounded-full"
+                  style={{ width: 4, backgroundColor: '#dc2626', height: thumbHeight, top: thumbTop }}
+                />
+              );
+            })()}
+          </View>
+        )}
+
+        {/* Navbar inferior */}
+        <View
+          className="absolute inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl"
+          style={{
+            bottom: Math.max(insets.bottom + 8, 24),
+          }}
+        >
+          <View className="flex-row justify-around items-center">
+            <NavItemServicos
+              idIcone="home"
+              label="Início"
+              isFocused={false}
+              onPress={() => navigation.goBack()}
+            />
+            <NavItemServicos
+              idIcone="servicos"
+              label="Serviços"
+              isFocused={true}
+              onPress={() => {}}
+            />
+            <NavItemServicos
+              idIcone="financeiro"
+              label="Financeiro"
+              isFocused={false}
+              onPress={() => Alert.alert('Navegação', 'Financeiro!')}
+            />
+            <NavItemServicos
+              idIcone="reservas"
+              label="Reservas"
+              isFocused={false}
+              onPress={() => Alert.alert('Navegação', 'Reservas!')}
+            />
+          </View>
+        </View>
+
+        {(carregando || isSubmitting) && (
+          <View className="absolute inset-0 bg-black/10 items-center justify-center">
+            <ActivityIndicator size="large" color="#dc2626" />
+          </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+interface NavItemServicosProps {
+  idIcone: "home" | "servicos" | "financeiro" | "reservas";
+  label: string;
+  isFocused: boolean;
+  onPress: () => void;
+}
+
+const NavItemServicos: React.FC<NavItemServicosProps> = ({
+  idIcone,
+  label,
+  isFocused,
+  onPress,
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className="items-center justify-center p-1"
+  >
+    <IconeLucide
+      id={idIcone}
+      tamanho={24}
+      cor={isFocused ? '#ffffff' : '#d1d5db'}
+    />
+    <Text
+      className={`text-xs ${isFocused ? 'text-white' : 'text-gray-300'} mt-1`}
+    >
+      {label}
+    </Text>
+  </TouchableOpacity>
+);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Dimensions } from 'react-native';
+import { IconeLucide } from '../icones';
 
 interface PropriedadesMensagemErro {
   mensagem: string;
@@ -33,22 +34,26 @@ export const MensagemErro: React.FC<PropriedadesMensagemErro> = ({
     erro: {
       container: 'bg-red-50 border-l-4 border-red-600',
       texto: 'text-red-700',
-      ícone: '❌',
+      iconeId: 'cancelar' as const,
+      iconeCor: '#dc2626',
     },
     sucesso: {
       container: 'bg-green-50 border-l-4 border-green-600',
       texto: 'text-green-700',
-      ícone: '✅',
+      iconeId: 'confirmar' as const,
+      iconeCor: '#15803d',
     },
     informacao: {
       container: 'bg-blue-50 border-l-4 border-blue-600',
       texto: 'text-blue-700',
-      ícone: 'ℹ️',
+      iconeId: 'home' as const,
+      iconeCor: '#1d4ed8',
     },
     aviso: {
       container: 'bg-orange-50 border-l-4 border-orange-600',
       texto: 'text-orange-700',
-      ícone: '⚠️',
+      iconeId: 'adicionar' as const,
+      iconeCor: '#ea580c',
     },
   };
 
@@ -62,13 +67,12 @@ export const MensagemErro: React.FC<PropriedadesMensagemErro> = ({
       accessibilityLiveRegion="polite"
     >
       {mostrarÍcone && (
-        <Text
-          className="mr-3 text-lg"
-          style={{ marginTop: 2 }}
-          accessibilityLabel={tipo}
-        >
-          {estiloAtual.ícone}
-        </Text>
+        <IconeLucide
+          id={estiloAtual.iconeId}
+          tamanho={20}
+          cor={estiloAtual.iconeCor}
+          className="mr-3"
+        />
       )}
       <Text
         className={`flex-1 font-medium ${estiloAtual.texto}`}

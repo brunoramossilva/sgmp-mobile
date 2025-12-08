@@ -1,0 +1,1 @@
+export { IconeLucide } from './IconeLucide';

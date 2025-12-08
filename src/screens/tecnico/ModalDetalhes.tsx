@@ -1,6 +1,7 @@
 import { Modal, View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { OrdemServicoUI } from "./types";
 import { corPrioridade, corStatus } from "./types";
+import { IconeLucide } from "../../components/icones";
 
 type Props = {
   visible: boolean;
@@ -101,19 +102,21 @@ export default function ModalDetalhes({
               <View className="flex-row mt-4 space-x-2">
                 <TouchableOpacity
                   onPress={onAceitar}
-                  className="flex-1 bg-green-600 p-3 rounded-xl mr-2"
+                  className="flex-1 bg-green-600 p-3 rounded-xl mr-2 flex-row items-center justify-center"
                 >
-                  <Text className="text-white text-center font-semibold">
-                    ✓ Aceitar OS
+                  <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                  <Text className="text-white font-semibold ml-2">
+                    Aceitar
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={onRecusar}
-                  className="flex-1 bg-red-600 p-3 rounded-xl"
+                  className="flex-1 bg-red-600 p-3 rounded-xl flex-row items-center justify-center"
                 >
-                  <Text className="text-white text-center font-semibold">
-                    ✕ Recusar OS
+                  <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
+                  <Text className="text-white font-semibold ml-2">
+                    Recusar
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -122,19 +125,21 @@ export default function ModalDetalhes({
             {ordem.status === "Aceita" && onFinalizar && (
               <TouchableOpacity
                 onPress={onFinalizar}
-                className="bg-green-600 p-3 rounded-xl mt-4"
+                className="bg-green-600 p-3 rounded-xl mt-4 flex-row items-center justify-center"
               >
-                <Text className="text-white text-center font-semibold">
-                  ✓ Finalizar OS
+                <IconeLucide id="verificado" tamanho={18} cor="#ffffff" />
+                <Text className="text-white font-semibold ml-2">
+                  Finalizar OS
                 </Text>
               </TouchableOpacity>
             )}
 
             <TouchableOpacity
               onPress={onClose}
-              className="bg-slate-500 p-3 rounded-xl mt-3"
+              className="bg-slate-500 p-3 rounded-xl mt-3 flex-row items-center justify-center"
             >
-              <Text className="text-white text-center font-semibold">
+              <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
+              <Text className="text-white font-semibold ml-2">
                 Fechar
               </Text>
             </TouchableOpacity>

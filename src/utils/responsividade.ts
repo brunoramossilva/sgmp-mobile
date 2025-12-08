@@ -169,3 +169,9 @@ export default {
   obterNumeroColunasGrid,
   obterMargemSegura,
 };
+
+/**
+ * Altura da navbar global (footer fixo)
+ * Usado para garantir padding bottom consistente em ScrollViews
+ */
+export const NAVBAR_HEIGHT = 100;
