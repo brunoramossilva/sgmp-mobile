@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   View,
@@ -15,6 +15,12 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
+import { CarrosselIntroducao } from "../../components/introducao";
+import { obterSlidesIntroducao } from "../../utils/conteudoIntroducao";
+import { IconeLucide } from "../../components/icones";
+import SkeletonBloco from "../../components/SkeletonBloco";
+import { NavbarGlobal } from "../../components/navegacao";
+import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 
 // --- DEFINIÇÃO DAS INTERFACES (TIPOS) ---
 
@@ -25,14 +31,6 @@ interface CustomButtonProps {
   // StyleProp é o tipo recomendado para estilos em React Native
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
-}
-
-// Tipos para o componente NavItem
-interface NavItemProps {
-  iconName: "home" | "services" | "financial" | "reservations"; // Definindo opções válidas
-  label: string;
-  isFocused: boolean; // O erro estava aqui, pois faltava tipar e garantir a propriedade
-  onPress: () => void;
 }
 
 // --- COMPONENTES AUXILIARES TIPADOS ---
@@ -50,33 +48,6 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   </TouchableOpacity>
 );
 
-const NavItem: React.FC<NavItemProps> = ({
-  iconName,
-  label,
-  isFocused,
-  onPress,
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    className="items-center justify-center p-1"
-  >
-    <Text className={`text-xl ${isFocused ? "text-white" : "text-gray-300"}`}>
-      {iconName === "home"
-        ? "🏠"
-        : iconName === "services"
-        ? "🔧"
-        : iconName === "financial"
-        ? "💰"
-        : "📆"}
-    </Text>
-    <Text
-      className={`text-xs ${isFocused ? "text-white" : "text-gray-300"} mt-1`}
-    >
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
 // --- COMPONENTE PRINCIPAL ---
 
 const TelaInicial = () => {
@@ -84,8 +55,59 @@ const TelaInicial = () => {
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
 
+  const [exibirIntroducao, setExibirIntroducao] = useState(false);
+  const [deveExibirIntroducao, setDeveExibirIntroducao] = useState(false);
+  const [carregandoIntroducao, setCarregandoIntroducao] = useState(true);
+
+  // Log para acompanhar mudanças do usuário
+  useEffect(() => {
+    console.log(`[Morador] Usuário atualizado:`, usuario);
+  }, [usuario]);
+
+  // Gerenciar estado de introdução do usuário - mover para useEffect
+  useEffect(() => {
+    if (!usuario?.cpf) {
+      setCarregandoIntroducao(false);
+      return;
+    }
+
+    const verificarIntroducao = async () => {
+      try {
+        const AsyncStorage =
+          require("@react-native-async-storage/async-storage").default;
+        const chaveArmazenamento = `introducao_${usuario.cpf}_${usuario.papel}`;
+        const jaVisualizado = await AsyncStorage.getItem(chaveArmazenamento);
+        setDeveExibirIntroducao(jaVisualizado === null);
+      } catch (erro) {
+        console.error(`Erro ao verificar introdução: ${erro}`);
+        setDeveExibirIntroducao(true);
+      } finally {
+        setCarregandoIntroducao(false);
+      }
+    };
+
+    verificarIntroducao();
+  }, [usuario?.cpf, usuario?.papel]);
+
+  const marcarComoVisto = async () => {
+    try {
+      const AsyncStorage =
+        require("@react-native-async-storage/async-storage").default;
+      const chaveArmazenamento = `introducao_${usuario?.cpf}_${usuario?.papel}`;
+      await AsyncStorage.setItem(chaveArmazenamento, "true");
+      setDeveExibirIntroducao(false);
+    } catch (erro) {
+      console.error(`Erro ao marcar introdução como visto: ${erro}`);
+    }
+  };
+
   useEffect(() => {
     console.log("TelaInicial do Morador renderizada");
+
+    // Mostrar introdução apenas uma vez, após carregamento
+    if (!carregandoIntroducao && deveExibirIntroducao && !exibirIntroducao) {
+      setExibirIntroducao(true);
+    }
 
     // Interceptar botão voltar do Android
     const backHandler = BackHandler.addEventListener(
@@ -97,7 +119,7 @@ const TelaInicial = () => {
     );
 
     return () => backHandler.remove();
-  }, []);
+  }, [carregandoIntroducao, deveExibirIntroducao, exibirIntroducao]);
 
   const handleLogout = () => {
     Alert.alert("Sair", "Deseja realmente fazer logout?", [
@@ -113,15 +135,49 @@ const TelaInicial = () => {
     ]);
   };
 
+  const aoFinalizarIntroducao = async () => {
+    await marcarComoVisto();
+    setExibirIntroducao(false);
+  };
+
+  if (carregandoIntroducao) {
+    return (
+      <View
+        className="flex-1 bg-white"
+        style={{ paddingTop: (insets.top || 0) + 12 }}
+      >
+        <View className="px-4">
+          <SkeletonBloco height={56} style={{ marginBottom: 12 }} />
+          <SkeletonBloco height={140} style={{ marginBottom: 16 }} />
+          {[1, 2, 3].map((i) => (
+            <SkeletonBloco key={i} height={90} />
+          ))}
+        </View>
+      </View>
+    );
+  }
+
+  // Mostrar carrossel se necessário
+  if (exibirIntroducao && usuario) {
+    const slidesIntroducao = obterSlidesIntroducao(usuario.papel);
+    return (
+      <CarrosselIntroducao
+        slides={slidesIntroducao}
+        aoConcluir={aoFinalizarIntroducao}
+        nomePapel={usuario.papel}
+      />
+    );
+  }
+
   // Definição de estilos usando StyleSheet para melhor performance e tipagem
   const styles = StyleSheet.create({
     screenContainer: {
       flex: 1,
-      backgroundColor: "#FDF7F5",
+      backgroundColor: "#ffffff",
     },
     scrollContent: {
-      paddingBottom: 120 + insets.bottom, // Adiciona espaço extra baseado na área segura
-      backgroundColor: "#FDF7F5",
+      paddingBottom: 140 + insets.bottom, // Adiciona espaço extra baseado na área segura
+      backgroundColor: "#ffffff",
     },
     redButton: {
       backgroundColor: "#EF4444",
@@ -136,46 +192,50 @@ const TelaInicial = () => {
   });
 
   return (
-    <View style={styles.screenContainer} className="bg-orange-50">
-      {/* Header */}
-      <View className="bg-red-600">
-        <View
-          className="px-4 flex-row items-center justify-between"
-          style={{ paddingTop: (insets.top || 0) + 8, paddingBottom: 12 }}
-        >
-          <View className="flex-1">
-            <Text className="text-white text-xl font-bold">CINOVA SGMP</Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="bg-red-700 px-3 py-2 rounded-lg"
-          >
-            <Text className="text-white text-sm font-semibold">Sair</Text>
-          </TouchableOpacity>
+    <View style={styles.screenContainer} className="bg-white">
+      {/* Header - Parte Superior */}
+      <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
+        <View className="w-10">
+          <IconeLucide id="predio" tamanho={32} cor="#ffffff" />
         </View>
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-white text-xl font-bold">CINOVA</Text>
+        </View>
+        <TouchableOpacity
+          onPress={handleLogout}
+          className="w-10 items-end"
+          accessibilityRole="button"
+          accessibilityLabel="Logout"
+        >
+          <IconeLucide id="logout" tamanho={28} cor="#ffffff" />
+        </TouchableOpacity>
       </View>
 
-      {/* Seção de informações do usuário com fundo mais claro */}
-      <View className="bg-red-700 px-4 pb-4 pt-6">
-        <View className="flex-row items-center">
-          <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4 shadow-md">
-            <Text className="text-red-600 text-2xl font-bold">
-              {usuario?.nome?.charAt(0).toUpperCase() || "M"}
-            </Text>
-          </View>
-          <View>
-            <Text className="text-white text-xl font-semibold">
-              Olá, {usuario?.nome || "Morador"}
-            </Text>
-            <Text className="text-sm text-white opacity-90">Morador</Text>
-          </View>
+      {/* Seção de informações do usuário */}
+      <View className="bg-red-700 px-4 py-4 flex-row items-center">
+        <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
+          <Text className="text-red-600 text-2xl font-bold">
+            {usuario?.nome
+              ? usuario.nome
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+              : "MD"}
+          </Text>
+        </View>
+        <View>
+          <Text className="text-white text-xl font-semibold">
+            Olá, {usuario?.nome || "Morador"}
+          </Text>
+          <Text className="text-sm text-white font-bold">Morador</Text>
         </View>
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        className="bg-orange-50 pt-4"
+        className="bg-white pt-4"
       >
         <View className="px-4 mb-4">
           <View className="flex-row justify-between items-center mb-2">
@@ -187,7 +247,7 @@ const TelaInicial = () => {
               textStyle={styles.whiteText}
             />
           </View>
-          <View className="bg-white p-4 rounded-lg shadow-sm">
+          <View className="bg-white p-4 rounded-2xl border border-slate-200 shadow-md">
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-base font-semibold text-gray-800">
                 Queremos ouvir você!
@@ -223,10 +283,10 @@ const TelaInicial = () => {
             showsHorizontalScrollIndicator={false}
             className="py-2"
           >
-            <View className="bg-white p-4 rounded-lg shadow-sm w-64 mr-4">
+            <View className="bg-white p-4 rounded-2xl border border-slate-200 shadow-md w-64 mr-4">
               <View className="flex-row justify-between items-center mb-2">
                 <View className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <Text className="text-red-600 text-lg">🏦</Text>
+                  <IconeLucide id="financeiro" tamanho={20} cor="#dc2626" />
                 </View>
                 <View className="bg-red-100 px-3 py-1 rounded-full">
                   <Text className="text-red-600 text-xs font-semibold">
@@ -247,10 +307,10 @@ const TelaInicial = () => {
               </Text>
             </View>
 
-            <View className="bg-white p-4 rounded-lg shadow-sm w-64 mr-4">
+            <View className="bg-white p-4 rounded-2xl border border-slate-200 shadow-md w-64 mr-4">
               <View className="flex-row justify-between items-center mb-2">
                 <View className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <Text className="text-green-600 text-lg">✅</Text>
+                  <IconeLucide id="confirmar" tamanho={20} cor="#15803d" />
                 </View>
                 <View className="bg-green-100 px-3 py-1 rounded-full">
                   <Text className="text-green-600 text-xs font-semibold">
@@ -271,39 +331,7 @@ const TelaInicial = () => {
         <View className="h-10"></View>
       </ScrollView>
 
-      <View
-        className="absolute inset-x-4 bg-red-600 py-3 px-2 rounded-2xl shadow-xl"
-        style={{
-          bottom: Math.max(insets.bottom + 8, 24), // Garante que fique acima dos botões do sistema
-        }}
-      >
-        <View className="flex-row justify-around items-center">
-          <NavItem
-            iconName="home"
-            label="Início"
-            isFocused={true}
-            onPress={() => Alert.alert("Navegação", "Início!")}
-          />
-          <NavItem
-            iconName="services"
-            label="Serviços"
-            isFocused={false}
-            onPress={() => navigation.navigate("CriacaoOsMorador" as never)}
-          />
-          <NavItem
-            iconName="financial"
-            label="Financeiro"
-            isFocused={false}
-            onPress={() => Alert.alert("Navegação", "Financeiro!")}
-          />
-          <NavItem
-            iconName="reservations"
-            label="Reservas"
-            isFocused={false}
-            onPress={() => Alert.alert("Navegação", "Reservas!")}
-          />
-        </View>
-      </View>
+      <NavbarGlobal />
     </View>
   );
 };

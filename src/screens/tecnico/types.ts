@@ -25,21 +25,39 @@ export const mapApiToUI = (o: OrdemServicoApi): OrdemServicoUI => {
 
   let uiStatus: OrdemServicoUI["status"] = "Pendente";
 
-  if (
-    statusRaw.includes("EM_EXECUCAO")
-  ) {
-    uiStatus = "Aceita";
-  } else if (
-    statusRaw.includes("CONCLUIDA")
-  ) {
+  // Mapear status da API para UI
+  if (statusRaw === "FINALIZADA" || statusRaw === "CONCLUIDA") {
     uiStatus = "Finalizada";
-  } else if (statusRaw.includes("RECUSADA") || statusRaw.includes("REJEITADA")) {
+  } else if (statusRaw === "RECUSADA" || statusRaw === "REJEITADA") {
     uiStatus = "Recusada";
-  } else if (statusRaw.includes("APROVADA")) {
+  } else if (statusRaw === "EM_EXECUCAO" || statusRaw === "ACEITA") {
+    uiStatus = "Aceita";
+  } else if (statusRaw === "ABERTA") {
+    // ABERTA sempre é Pendente (aguardando técnico aceitar)
     uiStatus = "Pendente";
   }
 
-  const prioridade = o.aprovado ? "Alta" : "Baixa";
+  // Calcular prioridade baseada no tempo, não apenas em aprovado
+  const hoje = new Date();
+  const diasEmAberto = Math.floor(
+    (hoje.getTime() - dataAbertura.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  let prioridade: "Alta" | "Média" | "Baixa" = "Baixa";
+
+  if (uiStatus === "Finalizada") {
+    // Ordens finalizadas mantêm prioridade baseada no tempo que levaram
+    prioridade =
+      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+  } else if (!o.aprovado) {
+    // Ordens não aprovadas: prioridade baseada no tempo de espera
+    prioridade =
+      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+  } else {
+    // Ordens aprovadas/em execução: prioridade baseada no tempo total
+    prioridade =
+      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+  }
 
   return {
     id: o.id,

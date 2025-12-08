@@ -20,6 +20,9 @@ import { OrdemServicoUI, mapApiToUI } from "./types";
 import CardOrdemAceita from "./CardOrdemAceita";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
+import SkeletonOrdem from "./SkeletonOrdem";
+import { NavbarGlobal } from "../../components/navegacao";
+import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 
 export default function OsAceitasTecnico() {
   const navigation = useNavigation();
@@ -172,8 +175,10 @@ export default function OsAceitasTecnico() {
           </Text>
 
           {loading ? (
-            <View className="items-center py-10">
-              <ActivityIndicator size="large" />
+            <View className="py-2">
+              {[1, 2, 3].map((i) => (
+                <SkeletonOrdem key={i} />
+              ))}
             </View>
           ) : ordens.length === 0 ? (
             <View className="bg-white p-4 rounded-2xl border border-slate-200">
@@ -192,7 +197,7 @@ export default function OsAceitasTecnico() {
             ))
           )}
         </View>
-        <View style={{ marginBottom: Math.max(insets.bottom + 2, 40) }} />
+        <View style={{ marginBottom: NAVBAR_HEIGHT }} />
       </ScrollView>
 
       <ModalDetalhes
@@ -213,6 +218,8 @@ export default function OsAceitasTecnico() {
         onClose={() => setModalFinalizacaoVisivel(false)}
         onConfirmar={finalizarOS}
       />
+
+      <NavbarGlobal />
     </View>
   );
 }

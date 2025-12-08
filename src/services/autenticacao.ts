@@ -53,6 +53,32 @@ export const buscarDadosUsuario = async (
       break;
   }
 
-  const response = await api.get<DadosUsuario>(endpoint);
-  return response.data;
+  const response = await api.get<any>(endpoint);
+
+  // Normalizar resposta: o backend retorna cpf_sindico para síndico
+  const dados = response.data;
+
+  let nome = dados.usuario?.nome || dados.nome || dados.morador?.nome || "";
+
+  let telefone =
+    dados.usuario?.telefone || dados.telefone || dados.morador?.telefone || "";
+
+  // Fallback extra: síndico sem nome/telefone -> busca em /moradores/{cpf}
+  if (papel === "SINDICO" && (!nome || !telefone)) {
+    try {
+      const moradorResp = await api.get<any>(`/moradores/${cpf}`);
+      const m = moradorResp.data;
+      nome = nome || m?.usuario?.nome || m?.nome || nome;
+      telefone = telefone || m?.usuario?.telefone || m?.telefone || telefone;
+    } catch (e) {
+      // Silencia fallback para evitar quebrar login
+      console.warn("Fallback morador para síndico falhou", e);
+    }
+  }
+
+  return {
+    cpf: dados.cpf || dados.cpf_sindico || cpf, // Fallback para cpf_sindico do backend
+    nome: nome || "",
+    telefone: telefone || "",
+  };
 };

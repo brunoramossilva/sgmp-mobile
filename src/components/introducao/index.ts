@@ -1,0 +1,1 @@
+export { CarrosselIntroducao } from "./CarrosselIntroducao";

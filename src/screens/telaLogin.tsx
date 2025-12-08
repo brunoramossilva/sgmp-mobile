@@ -59,6 +59,30 @@ export default function TelaLogin() {
     };
   }, []);
 
+  const formatarCpf = (valor: string): string => {
+    // Remove tudo que não é número
+    const apenasNumeros = valor.replace(/\D/g, "");
+
+    // Limita a 11 dígitos
+    const limitado = apenasNumeros.slice(0, 11);
+
+    // Formata para o padrão xxx.xxx.xxx-xx
+    if (limitado.length <= 3) {
+      return limitado;
+    } else if (limitado.length <= 6) {
+      return `${limitado.slice(0, 3)}.${limitado.slice(3)}`;
+    } else if (limitado.length <= 9) {
+      return `${limitado.slice(0, 3)}.${limitado.slice(3, 6)}.${limitado.slice(
+        6
+      )}`;
+    } else {
+      return `${limitado.slice(0, 3)}.${limitado.slice(3, 6)}.${limitado.slice(
+        6,
+        9
+      )}-${limitado.slice(9)}`;
+    }
+  };
+
   const handleLogin = async () => {
     Keyboard.dismiss();
 
@@ -90,7 +114,16 @@ export default function TelaLogin() {
         papel: loginResponse.usuario.papel,
       });
 
-      navigation.navigate("Inicial" as never);
+      // Navega para a tela inicial correspondente ao papel do usuário
+      const rotasIniciais: Record<string, string> = {
+        MORADOR: "InicialMorador",
+        FUNCIONARIO: "InicialTecnico",
+        SINDICO: "InicialSindico",
+      };
+
+      const rotaInicial =
+        rotasIniciais[loginResponse.usuario.papel] || "Inicial";
+      navigation.navigate(rotaInicial as never);
     } catch (erro: any) {
       console.error("Erro ao realizar login:", erro);
 
@@ -162,7 +195,7 @@ export default function TelaLogin() {
               >
                 <TextInput
                   value={cpf}
-                  onChangeText={setCpf}
+                  onChangeText={(texto) => setCpf(formatarCpf(texto))}
                   placeholder="000.000.000-00"
                   placeholderTextColor="#94a3b8"
                   keyboardType="numeric"
