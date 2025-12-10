@@ -1,6 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ProvedorAutenticacao } from "./src/contexto/ContextoAutenticacao";
+
+// Imports das telas existentes
 import LoginScreen from "./src/screens/telaLogin";
 import TelaInicial from "./src/screens/telaInicial";
 import InicialMorador from "./src/screens/morador/telaInicial";
@@ -12,6 +14,10 @@ import DetalhesOs from "./src/screens/detalhesOs";
 import AprovacaoOs from "./src/screens/sindico/aprovacaoOs";
 import OrdensSindicoExecucao from "./src/screens/sindico/ordensSindicoExecucao";
 import ServicosSindico from "./src/screens/sindico/servicosSindico";
+import FinanceiroMorador from "./src/screens/morador/financeiroMorador";
+import ReservasMorador from "./src/screens/morador/reservasMorador";
+import FinanceiroSindico from "./src/screens/sindico/financeiroSindico";
+import ReservasSindico from "./src/screens/sindico/reservasSindico";
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +64,16 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="FinanceiroMorador"
+            component={FinanceiroMorador}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ReservasMorador"
+            component={ReservasMorador}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="OsAceitasTecnico"
             component={OsAceitasTecnico}
             options={{ headerShown: false }}
@@ -80,6 +96,16 @@ export default function App() {
           <Stack.Screen
             name="ServicosSindico"
             component={ServicosSindico}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="FinanceiroSindico"
+            component={FinanceiroSindico}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ReservasSindico"
+            component={ReservasSindico}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>
