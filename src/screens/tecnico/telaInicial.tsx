@@ -133,8 +133,8 @@ export default function InicialTecnico() {
 
       // Ordenar por data mais recente primeiro
       const ordensOrdenadas = ordensTecnico.map(mapApiToUI).sort((a, b) => {
-        const dataA = new Date(a.data.split('/').reverse().join('-'));
-        const dataB = new Date(b.data.split('/').reverse().join('-'));
+        const dataA = new Date(a.data.split("/").reverse().join("-"));
+        const dataB = new Date(b.data.split("/").reverse().join("-"));
         return dataB.getTime() - dataA.getTime();
       });
       setOrdens(ordensOrdenadas);
@@ -228,7 +228,7 @@ export default function InicialTecnico() {
 
   const ordensExibidas = useMemo(() => {
     let filtradas: OrdemServicoUI[] = [];
-    
+
     if (abaSelecionada === "Pendentes") {
       filtradas = ordens.filter(
         (o) => o.raw?.status?.toUpperCase() === "AGUARDANDO_EXECUCAO"
@@ -243,11 +243,11 @@ export default function InicialTecnico() {
         return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
       });
     }
-    
+
     // Ordenar por data mais recente primeiro
     return filtradas.sort((a, b) => {
-      const dataA = new Date(a.data.split('/').reverse().join('-'));
-      const dataB = new Date(b.data.split('/').reverse().join('-'));
+      const dataA = new Date(a.data.split("/").reverse().join("-"));
+      const dataB = new Date(b.data.split("/").reverse().join("-"));
       return dataB.getTime() - dataA.getTime();
     });
   }, [ordens, abaSelecionada]);
@@ -294,7 +294,7 @@ export default function InicialTecnico() {
           <View className="flex-row items-center bg-red-700/50 py-1 px-3 rounded-full">
             <IconeLucide id="predio" tamanho={16} cor="#fff" />
             <Text className="text-white text-xs font-bold ml-2 tracking-widest">
-              CINOVA
+              CINOVA GESTÃO
             </Text>
           </View>
           <TouchableOpacity
@@ -320,12 +320,95 @@ export default function InicialTecnico() {
           </View>
           <Text className="text-white text-3xl font-bold">{tecnicoName}</Text>
         </View>
+
+        {/* Cards de Estatísticas */}
+        <View className="flex-row justify-between mt-6">
+          <View className="bg-white/10 px-4 py-3 rounded-xl flex-1 mr-2">
+            <Text className="text-white/70 text-xs font-medium">Pendentes</Text>
+            <Text className="text-white text-2xl font-bold">
+              {stats.pendentes}
+            </Text>
+          </View>
+          <View className="bg-white/10 px-4 py-3 rounded-xl flex-1 mx-1">
+            <Text className="text-white/70 text-xs font-medium">
+              Em Execução
+            </Text>
+            <Text className="text-white text-2xl font-bold">
+              {stats.aprovadas}
+            </Text>
+          </View>
+          <View className="bg-white/10 px-4 py-3 rounded-xl flex-1 ml-2">
+            <Text className="text-white/70 text-xs font-medium">
+              Finalizadas
+            </Text>
+            <Text className="text-white text-2xl font-bold">
+              {stats.finalizadas}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Filtros em formato de Tabs */}
+      <View className="px-6 pt-4 pb-2 bg-white border-b border-slate-100">
+        <View className="flex-row bg-slate-100 rounded-xl p-1">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAbaSelecionada("Pendentes")}
+            className={`flex-1 py-2.5 rounded-lg ${
+              abaSelecionada === "Pendentes" ? "bg-red-600" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-center text-sm font-bold ${
+                abaSelecionada === "Pendentes" ? "text-white" : "text-slate-600"
+              }`}
+            >
+              Pendentes
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAbaSelecionada("Em Execução")}
+            className={`flex-1 py-2.5 rounded-lg ${
+              abaSelecionada === "Em Execução" ? "bg-red-600" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-center text-sm font-bold ${
+                abaSelecionada === "Em Execução"
+                  ? "text-white"
+                  : "text-slate-600"
+              }`}
+            >
+              Em Execução
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAbaSelecionada("Finalizadas")}
+            className={`flex-1 py-2.5 rounded-lg ${
+              abaSelecionada === "Finalizadas" ? "bg-red-600" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-center text-sm font-bold ${
+                abaSelecionada === "Finalizadas"
+                  ? "text-white"
+                  : "text-slate-600"
+              }`}
+            >
+              Finalizadas
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
-          paddingTop: 20,
+          paddingTop: 16,
           paddingBottom: 40,
         }}
         showsVerticalScrollIndicator={false}
@@ -337,109 +420,11 @@ export default function InicialTecnico() {
           />
         }
       >
-        {/* CARDS DE STATUS */}
-        <View className="px-4 mb-6 -mt-8">
-          <View className="flex-row justify-between">
-            {/* Card PENDENTES */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Pendentes")}
-              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Pendentes"
-                  ? "bg-red-50 border-red-200"
-                  : "bg-white border-slate-100"
-              }`}
-              style={{ elevation: abaSelecionada === "Pendentes" ? 4 : 2 }}
-            >
-              <Text
-                className={`text-2xl font-bold ${
-                  abaSelecionada === "Pendentes"
-                    ? "text-red-600"
-                    : "text-slate-800"
-                }`}
-              >
-                {stats.pendentes}
-              </Text>
-              <Text
-                className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Pendentes"
-                    ? "text-red-400"
-                    : "text-slate-400"
-                }`}
-              >
-                Pendentes
-              </Text>
-            </TouchableOpacity>
-
-            {/* Card EM EXECUÇÃO */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Em Execução")}
-              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Em Execução"
-                  ? "bg-blue-50 border-blue-200"
-                  : "bg-white border-slate-100"
-              }`}
-              style={{ elevation: abaSelecionada === "Em Execução" ? 4 : 2 }}
-            >
-              <Text
-                className={`text-2xl font-bold ${
-                  abaSelecionada === "Em Execução"
-                    ? "text-blue-600"
-                    : "text-slate-800"
-                }`}
-              >
-                {stats.aprovadas}
-              </Text>
-              <Text
-                className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Em Execução"
-                    ? "text-blue-400"
-                    : "text-slate-400"
-                }`}
-              >
-                Em Execução
-              </Text>
-            </TouchableOpacity>
-
-            {/* Card FINALIZADAS */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Finalizadas")}
-              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Finalizadas"
-                  ? "bg-green-50 border-green-200"
-                  : "bg-white border-slate-100"
-              }`}
-              style={{ elevation: abaSelecionada === "Finalizadas" ? 4 : 2 }}
-            >
-              <Text
-                className={`text-2xl font-bold ${
-                  abaSelecionada === "Finalizadas"
-                    ? "text-green-600"
-                    : "text-slate-800"
-                }`}
-              >
-                {stats.finalizadas}
-              </Text>
-              <Text
-                className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Finalizadas"
-                    ? "text-green-400"
-                    : "text-slate-400"
-                }`}
-              >
-                Finalizadas
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* TÍTULO DA LISTA */}
         <View className="px-6 mb-3 mt-2">
           <Text className="text-sm font-bold text-slate-600 uppercase tracking-wider">
             {abaSelecionada === "Pendentes"
-              ? "Tarefas a Fazer"
+              ? "Novas Solicitações"
               : abaSelecionada === "Em Execução"
               ? "Em Andamento"
               : "Histórico Completo"}
@@ -451,19 +436,33 @@ export default function InicialTecnico() {
           {loadingList ? (
             [1, 2].map((i) => <SkeletonOrdem key={i} />)
           ) : ordensExibidas.length === 0 ? (
-            <View className="bg-white p-8 rounded-2xl border border-slate-100 items-center justify-center border-dashed mt-2">
-              <IconeLucide
-                id={abaSelecionada === "Pendentes" ? "verificado" : "alerta"}
-                tamanho={40}
-                cor="#cbd5e1"
-              />
-              <Text className="text-slate-500 font-medium mt-3">
-                Nenhuma ordem aqui
-              </Text>
-              <Text className="text-slate-400 text-xs text-center mt-1">
+            <View className="items-center justify-center py-16">
+              <View className="w-20 h-20 bg-slate-100 rounded-full items-center justify-center mb-4">
+                <IconeLucide
+                  id={
+                    abaSelecionada === "Pendentes"
+                      ? "verificado"
+                      : abaSelecionada === "Em Execução"
+                      ? "servicos"
+                      : "confirmar"
+                  }
+                  tamanho={36}
+                  cor="#94a3b8"
+                />
+              </View>
+              <Text className="text-slate-700 font-bold text-lg">
                 {abaSelecionada === "Pendentes"
-                  ? "Você não tem pendências."
-                  : "A lista está vazia."}
+                  ? "Tudo em dia!"
+                  : abaSelecionada === "Em Execução"
+                  ? "Nada em andamento"
+                  : "Sem histórico"}
+              </Text>
+              <Text className="text-slate-500 text-sm text-center mt-2 px-8">
+                {abaSelecionada === "Pendentes"
+                  ? "Nenhuma nova solicitação no momento"
+                  : abaSelecionada === "Em Execução"
+                  ? "Você não tem ordens em execução"
+                  : "Nenhuma ordem finalizada ainda"}
               </Text>
             </View>
           ) : (

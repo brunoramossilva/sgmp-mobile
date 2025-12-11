@@ -162,8 +162,8 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
     }
     // Ordenar por data mais recente primeiro
     return [...ordens].sort((a, b) => {
-      const dataA = new Date(a.dataAbertura.split('/').reverse().join('-'));
-      const dataB = new Date(b.dataAbertura.split('/').reverse().join('-'));
+      const dataA = new Date(a.dataAbertura.split("/").reverse().join("-"));
+      const dataB = new Date(b.dataAbertura.split("/").reverse().join("-"));
       return dataB.getTime() - dataA.getTime();
     });
   }, [filtroAtivo, ordensPendentes, ordensEmExecucao, todasOrdens]);

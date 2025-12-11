@@ -224,7 +224,7 @@ const TelaInicial = () => {
           <View className="flex-row items-center bg-red-700/50 py-1 px-3 rounded-full">
             <IconeLucide id="predio" tamanho={16} cor="#fff" />
             <Text className="text-white text-xs font-bold ml-2 tracking-widest">
-              CINOVA
+              CINOVA GESTÃO
             </Text>
           </View>
 

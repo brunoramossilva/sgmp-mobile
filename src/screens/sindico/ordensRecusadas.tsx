@@ -104,8 +104,8 @@ export default function OrdensRecusadas({ navigation }: OrdensRecusadasProps) {
       const recusadas = ordensUI
         .filter((o) => o.statusApi?.toUpperCase() === "RECUSADA")
         .sort((a, b) => {
-          const dataA = new Date(a.dataAbertura.split('/').reverse().join('-'));
-          const dataB = new Date(b.dataAbertura.split('/').reverse().join('-'));
+          const dataA = new Date(a.dataAbertura.split("/").reverse().join("-"));
+          const dataB = new Date(b.dataAbertura.split("/").reverse().join("-"));
           return dataB.getTime() - dataA.getTime();
         });
 

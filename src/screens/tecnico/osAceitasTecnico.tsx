@@ -63,8 +63,8 @@ export default function OsAceitasTecnico() {
 
       // Ordenar por data mais recente primeiro
       const mapped = ordensAceitas.map(mapApiToUI).sort((a, b) => {
-        const dataA = new Date(a.data.split('/').reverse().join('-'));
-        const dataB = new Date(b.data.split('/').reverse().join('-'));
+        const dataA = new Date(a.data.split("/").reverse().join("-"));
+        const dataB = new Date(b.data.split("/").reverse().join("-"));
         return dataB.getTime() - dataA.getTime();
       });
       setOrdens(mapped);
