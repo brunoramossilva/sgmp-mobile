@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IconeLucide } from "../components/icones";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { BotaoVoltar } from "../components/navegacao";
 import { OrdemServicoUI } from "../utils/mapeadores";
 
 // Fallback local para uso offline/demonstrativo
@@ -57,7 +58,7 @@ export default function DetalhesOS() {
     id: ordemInicial.id,
     titulo: ordemInicial.titulo,
     descricao: ordemInicial.descricao,
-    local: "Local não informado",
+    local: "Condomínio Vista Verde",
     solicitante: ordemInicial.solicitante,
     data: ordemInicial.dataAbertura,
     prioridade: ordemInicial.prioridade,
@@ -153,14 +154,7 @@ export default function DetalhesOS() {
         {/* Hero/Header brand */}
         <View className="bg-red-600 px-4 pb-4 pt-5">
           <View className="flex-row items-center justify-between">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="w-10 h-10 bg-white/10 rounded-full items-center justify-center"
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-            >
-              <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
-            </TouchableOpacity>
+            <BotaoVoltar />
             <Text className="text-white text-xl font-bold">
               Detalhes da Ordem
             </Text>

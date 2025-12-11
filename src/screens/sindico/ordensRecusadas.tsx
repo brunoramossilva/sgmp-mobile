@@ -14,6 +14,7 @@ import { getOrdens } from "../../services/ordemServico";
 import { mapApiToUI, OrdemServicoUI } from "../../utils/mapeadores";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
+import { BotaoVoltar } from "../../components/navegacao";
 
 const CardOrdemRecusada = ({
   ordem,
@@ -162,12 +163,9 @@ export default function OrdensRecusadas({ navigation }: OrdensRecusadasProps) {
       {/* Header */}
       <View className="bg-white px-6 py-4 border-b border-slate-200">
         <View className="flex-row items-center">
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center mr-3"
-          >
-            <IconeLucide id="anterior" tamanho={20} cor="#334155" />
-          </TouchableOpacity>
+          <View className="mr-3">
+            <BotaoVoltar cor="#334155" />
+          </View>
           <View className="flex-1">
             <Text className="text-xl font-bold text-slate-800">
               Ordens Recusadas

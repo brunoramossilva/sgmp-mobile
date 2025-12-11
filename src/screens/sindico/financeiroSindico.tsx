@@ -9,6 +9,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
+import { BotaoVoltar } from "../../components/navegacao";
 import { NavbarGlobal } from "../../components/navegacao";
 
 // IMPORTAÇÃO DOS DADOS MOCKADOS
@@ -103,12 +104,9 @@ export default function FinanceiroSindico() {
       >
         <View className="flex-row justify-between items-center">
           <View className="flex-row items-center flex-1">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="mr-3"
-            >
-              <IconeLucide id="anterior" tamanho={24} cor="#fff" />
-            </TouchableOpacity>
+            <View className="mr-3">
+              <BotaoVoltar />
+            </View>
             <View>
               <Text className="text-white text-lg font-bold">
                 Gestão Financeira

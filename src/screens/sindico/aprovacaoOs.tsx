@@ -20,6 +20,7 @@ import { useFetchOrdensSindico } from "../../hooks/useFetchOrdensSindico";
 import { ConfirmacaoModal } from "../../components/ConfirmacaoModal";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
+import { BotaoVoltar } from "../../components/navegacao";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { OrdemServicoUI } from "../../utils/mapeadores";
 
@@ -237,14 +238,7 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
         {/* Hero/Header brand */}
         <View className="bg-red-600 px-4 pb-4 pt-5">
           <View className="flex-row items-center justify-between">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="w-10 h-10 bg-white/10 rounded-full items-center justify-center"
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-            >
-              <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
-            </TouchableOpacity>
+            <BotaoVoltar />
             <Text className="text-white text-xl font-bold">
               Aprovação de Ordens
             </Text>

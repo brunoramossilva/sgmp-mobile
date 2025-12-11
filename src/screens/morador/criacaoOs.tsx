@@ -21,6 +21,7 @@ import { BotaoCriar, MensagemErro } from "../../components/formulario";
 import { useCriacaoOS } from "../../../docs/morador/useCriacaoOS";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
 import { IconeLucide } from "../../components/icones"; // Para o ícone do botão novo
+import { BotaoVoltar } from "../../components/navegacao";
 
 export default function CriacaoOS() {
   const navigation = useNavigation();
@@ -105,7 +106,8 @@ export default function CriacaoOS() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
+          <BotaoVoltar />
+          <View className="flex-1 mx-3">
             <Text className="text-white text-lg font-bold">
               Nova Solicitação
             </Text>
@@ -192,7 +194,7 @@ export default function CriacaoOS() {
           >
             <IconeLucide id="historico" tamanho={20} cor="#dc2626" />
             <Text className="text-red-700 font-bold text-sm ml-2">
-              Visualizar serviços
+              Acompanhar Minhas Solicitações
             </Text>
           </TouchableOpacity>
 

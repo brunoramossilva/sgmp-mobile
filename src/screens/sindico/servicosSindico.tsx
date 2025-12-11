@@ -21,10 +21,12 @@ import { IconeLucide } from "../../components/icones";
 import { OrdemServicoUI } from "../../utils/mapeadores";
 import SkeletonBloco from "../../components/SkeletonBloco";
 import { NavbarGlobal } from "../../components/navegacao";
+import { BotaoVoltar } from "../../components/navegacao";
 
 type FiltroStatus =
   | "TODAS"
   | "PENDENTES"
+  | "ACEITAS"
   | "EM_EXECUCAO"
   | "FINALIZADAS"
   | "RECUSADAS";
@@ -142,6 +144,8 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
     switch (filtroAtivo) {
       case "PENDENTES":
         return ordensPendentes;
+      case "ACEITAS":
+        return ordensEmExecucao.filter((o) => o.status === "Aceita");
       case "EM_EXECUCAO":
         return ordensEmExecucao.filter((o) => o.status === "Aceita");
       case "FINALIZADAS":
@@ -181,6 +185,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
     () => ({
       total: todasOrdens.length,
       pendentes: ordensPendentes.length,
+      aceitas: ordensEmExecucao.filter((o) => o.status === "Aceita").length,
       emExecucao: ordensEmExecucao.filter((o) => o.status === "Aceita").length,
       finalizadas: ordensEmExecucao.filter(
         (o) => o.status === "Finalizada" || o.status === "Recusada"
@@ -229,12 +234,9 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       {/* Header - padrão do design system */}
       <View className="bg-red-600 px-4 pb-4 pt-16">
         <View className="flex-row items-center justify-between mb-4">
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            className="w-10"
-          >
-            <IconeLucide id="anterior" tamanho={24} cor="#fff" />
-          </TouchableOpacity>
+          <View className="w-10">
+            <BotaoVoltar />
+          </View>
           <Text className="text-white text-xl font-bold">
             Todos os Serviços
           </Text>
@@ -252,26 +254,20 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
               Total
             </Text>
           </View>
-          <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
+          <View className="bg-white/10 rounded-lg px-2 py-1.5 flex-1 items-center">
             <Text className="text-yellow-300 text-2xl font-bold">
               {stats.pendentes}
             </Text>
-            <Text
-              className="text-[9px] text-white/90 font-semibold uppercase"
-              numberOfLines={1}
-            >
-              Pendente
+            <Text className="text-[8px] text-white/90 font-semibold uppercase text-center leading-tight">
+              Pendentes{"\n"}Aprovação
             </Text>
           </View>
-          <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
+          <View className="bg-white/10 rounded-lg px-2 py-1.5 flex-1 items-center">
             <Text className="text-blue-300 text-2xl font-bold">
-              {stats.emExecucao}
+              {stats.aceitas}
             </Text>
-            <Text
-              className="text-[9px] text-white/90 font-semibold uppercase"
-              numberOfLines={1}
-            >
-              Aceitas
+            <Text className="text-[8px] text-white/90 font-semibold uppercase text-center leading-tight">
+              Aguardando{"\n"}Execução
             </Text>
           </View>
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
@@ -282,7 +278,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
               className="text-[9px] text-white/90 font-semibold uppercase"
               numberOfLines={1}
             >
-              Finalizada
+              Concluídas
             </Text>
           </View>
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
@@ -308,9 +304,14 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
         >
           <FiltroButton label="Todas" valor="TODAS" count={stats.total} />
           <FiltroButton
-            label="Pendentes"
+            label="Pendentes Aprovação"
             valor="PENDENTES"
             count={stats.pendentes}
+          />
+          <FiltroButton
+            label="Aguardando Execução"
+            valor="ACEITAS"
+            count={stats.aceitas}
           />
           <FiltroButton
             label="Em Execução"
@@ -318,7 +319,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
             count={stats.emExecucao}
           />
           <FiltroButton
-            label="Finalizadas"
+            label="Concluídas"
             valor="FINALIZADAS"
             count={stats.finalizadas}
           />

@@ -128,18 +128,7 @@ export default function OsAceitasTecnico() {
         className="bg-red-600 px-4 py-3 flex-row items-center justify-between"
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="flex-row items-center"
-          style={{ gap: 8 }}
-        >
-          <Text
-            className="text-white text-base font-semibold"
-            style={{ lineHeight: 10 }}
-          >
-            Voltar
-          </Text>
-        </TouchableOpacity>
+        <BotaoVoltar />
         <TouchableOpacity
           onPress={() => {
             Alert.alert("Sair", "Deseja fazer logout?", [

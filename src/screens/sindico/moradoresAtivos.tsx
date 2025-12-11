@@ -21,6 +21,7 @@ import { getMoradores } from "../../services/morador";
 import { Morador } from "../../types/morador";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
+import { BotaoVoltar } from "../../components/navegacao";
 
 type Props = NativeStackScreenProps<any, "MoradoresAtivos">;
 
@@ -309,12 +310,7 @@ const MoradoresAtivos: React.FC<Props> = ({ navigation }) => {
         <View className="bg-white border-b border-slate-200 px-6 py-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
-              <TouchableOpacity
-                onPress={() => navigation.goBack()}
-                className="w-10 h-10 bg-slate-100 rounded-full items-center justify-center"
-              >
-                <IconeLucide id="anterior" tamanho={20} cor="#475569" />
-              </TouchableOpacity>
+              <BotaoVoltar />
               <Text className="text-xl font-bold text-slate-900">
                 Moradores Ativos
               </Text>
@@ -338,12 +334,7 @@ const MoradoresAtivos: React.FC<Props> = ({ navigation }) => {
       <View className="bg-white border-b border-slate-200 px-6 py-4">
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="w-10 h-10 bg-slate-100 rounded-full items-center justify-center"
-            >
-              <IconeLucide id="anterior" tamanho={20} cor="#475569" />
-            </TouchableOpacity>
+            <BotaoVoltar />
             <Text className="text-xl font-bold text-slate-900">
               Moradores Ativos
             </Text>
