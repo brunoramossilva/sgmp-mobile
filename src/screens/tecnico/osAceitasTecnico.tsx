@@ -55,12 +55,9 @@ export default function OsAceitasTecnico() {
         return;
       }
 
-      // Filtra ordens aceitas pelo técnico ou em execução
+      // Filtra ordens em execução pelo técnico
       const ordensAceitas = lista.filter(
-        (o) =>
-          o.aprovado === true &&
-          (o.status?.toUpperCase() === "ACEITA" ||
-            o.status?.toUpperCase() === "EM_EXECUCAO")
+        (o) => o.status?.toUpperCase() === "EM_EXECUCAO"
       );
 
       const mapped = ordensAceitas.map(mapApiToUI);

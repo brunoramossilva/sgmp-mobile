@@ -26,7 +26,6 @@ const ordemFallback: OrdemServicoUI = {
   prioridade: "Alta",
   status: "Aceita",
   cpf_morador: "00000000000",
-  aprovado: true,
 };
 
 type RouteParams = {
@@ -88,13 +87,12 @@ export default function DetalhesOS() {
       status: novoStatus,
       statusApi:
         novoStatus === "Finalizada"
-          ? "FINALIZADA"
+          ? "CONCLUIDA"
           : novoStatus === "Aceita"
-          ? "ACEITA"
+          ? "EM_EXECUCAO"
           : novoStatus === "Recusada"
-          ? "REJEITADA"
-          : "PENDENTE",
-      aprovado: novoStatus === "Aceita" || novoStatus === "Finalizada",
+          ? "RECUSADA"
+          : "PENDENTE_APROVACAO",
     };
   };
 

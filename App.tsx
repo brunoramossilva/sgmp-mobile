@@ -12,6 +12,7 @@ import CriacaoOS from "./src/screens/morador/criacaoOs";
 import OsAceitasTecnico from "./src/screens/tecnico/osAceitasTecnico";
 import DetalhesOs from "./src/screens/detalhesOs";
 import AprovacaoOs from "./src/screens/sindico/aprovacaoOs";
+import OrdensRecusadas from "./src/screens/sindico/ordensRecusadas";
 import OrdensSindicoExecucao from "./src/screens/sindico/ordensSindicoExecucao";
 import ServicosSindico from "./src/screens/sindico/servicosSindico";
 import FinanceiroMorador from "./src/screens/morador/financeiroMorador";
@@ -86,6 +87,11 @@ export default function App() {
           <Stack.Screen
             name="AprovacaoOs"
             component={AprovacaoOs}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="OrdensRecusadas"
+            component={OrdensRecusadas}
             options={{ headerShown: false }}
           />
           <Stack.Screen

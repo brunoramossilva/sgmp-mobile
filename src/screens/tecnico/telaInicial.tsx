@@ -39,12 +39,23 @@ const useDashboardData = () => {
   const fetchData = useCallback(async () => {
     try {
       const response = await getOrdens();
-      const ordensUI = response.map(mapApiToUI);
+
+      // Contar apenas OSs relevantes para o técnico
+      const pendentes = response.filter(
+        (o) => o.status?.toUpperCase() === "AGUARDANDO_EXECUCAO"
+      ).length;
+      const emExecucao = response.filter(
+        (o) => o.status?.toUpperCase() === "EM_EXECUCAO"
+      ).length;
+      const finalizadas = response.filter((o) => {
+        const statusUpper = o.status?.toUpperCase();
+        return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
+      }).length;
 
       setData({
-        pendentes: ordensUI.filter((o) => o.status === "Pendente").length,
-        aprovadas: ordensUI.filter((o) => o.status === "Aceita").length,
-        finalizadas: ordensUI.filter((o) => o.status === "Finalizada").length,
+        pendentes,
+        aprovadas: emExecucao,
+        finalizadas,
       });
     } catch (err) {
       console.error(err);
@@ -84,7 +95,7 @@ export default function InicialTecnico() {
 
   // Estados de UI/Filtro
   const [abaSelecionada, setAbaSelecionada] = useState<
-    "Pendentes" | "Aprovadas" | "Finalizadas"
+    "Pendentes" | "Em Execução" | "Finalizadas"
   >("Pendentes");
 
   const [modalDetalhesVisivel, setModalDetalhesVisivel] = useState(false);
@@ -101,7 +112,19 @@ export default function InicialTecnico() {
     try {
       setLoadingList(true);
       const response = await getOrdens();
-      setOrdens(response.map(mapApiToUI));
+
+      // Filtrar apenas OSs que o técnico deve ver
+      const ordensTecnico = response.filter((o) => {
+        const statusUpper = o.status?.toUpperCase();
+        return (
+          statusUpper === "AGUARDANDO_EXECUCAO" ||
+          statusUpper === "EM_EXECUCAO" ||
+          statusUpper === "CONCLUIDA" ||
+          statusUpper === "FINALIZADA"
+        );
+      });
+
+      setOrdens(ordensTecnico.map(mapApiToUI));
     } catch (err) {
       console.error("Erro ao carregar ordens:", err);
     } finally {
@@ -144,7 +167,6 @@ export default function InicialTecnico() {
     try {
       await updateOrdem(ordem.id, {
         status: "EM_EXECUCAO",
-        aprovado: true,
         cpf_funcionario: usuario?.cpf || null,
       });
       await carregarOrdens();
@@ -193,11 +215,18 @@ export default function InicialTecnico() {
 
   const ordensExibidas = useMemo(() => {
     if (abaSelecionada === "Pendentes")
-      return ordens.filter((o) => o.status === "Pendente");
-    if (abaSelecionada === "Aprovadas")
-      return ordens.filter((o) => o.status === "Aceita");
+      return ordens.filter(
+        (o) => o.raw?.status?.toUpperCase() === "AGUARDANDO_EXECUCAO"
+      );
+    if (abaSelecionada === "Em Execução")
+      return ordens.filter(
+        (o) => o.raw?.status?.toUpperCase() === "EM_EXECUCAO"
+      );
     if (abaSelecionada === "Finalizadas")
-      return ordens.filter((o) => o.status === "Finalizada");
+      return ordens.filter((o) => {
+        const statusUpper = o.raw?.status?.toUpperCase();
+        return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
+      });
     return [];
   }, [ordens, abaSelecionada]);
 
@@ -311,20 +340,20 @@ export default function InicialTecnico() {
               </Text>
             </TouchableOpacity>
 
-            {/* Card APROVADAS */}
+            {/* Card EM EXECUÇÃO */}
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Aprovadas")}
+              onPress={() => setAbaSelecionada("Em Execução")}
               className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Aprovadas"
+                abaSelecionada === "Em Execução"
                   ? "bg-blue-50 border-blue-200"
                   : "bg-white border-slate-100"
               }`}
-              style={{ elevation: abaSelecionada === "Aprovadas" ? 4 : 2 }}
+              style={{ elevation: abaSelecionada === "Em Execução" ? 4 : 2 }}
             >
               <Text
                 className={`text-2xl font-bold ${
-                  abaSelecionada === "Aprovadas"
+                  abaSelecionada === "Em Execução"
                     ? "text-blue-600"
                     : "text-slate-800"
                 }`}
@@ -333,12 +362,12 @@ export default function InicialTecnico() {
               </Text>
               <Text
                 className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Aprovadas"
+                  abaSelecionada === "Em Execução"
                     ? "text-blue-400"
                     : "text-slate-400"
                 }`}
               >
-                Aprovadas
+                Em Execução
               </Text>
             </TouchableOpacity>
 
@@ -380,7 +409,7 @@ export default function InicialTecnico() {
           <Text className="text-sm font-bold text-slate-600 uppercase tracking-wider">
             {abaSelecionada === "Pendentes"
               ? "Tarefas a Fazer"
-              : abaSelecionada === "Aprovadas"
+              : abaSelecionada === "Em Execução"
               ? "Em Andamento"
               : "Histórico Completo"}
           </Text>

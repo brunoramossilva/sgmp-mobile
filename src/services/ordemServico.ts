@@ -40,7 +40,7 @@ export const updateOrdem = async (
  *
  * Campos preenchidos automaticamente no backend:
  * - dataAbertura: DateTime @default(now())
- * - status: String @default("ABERTA")
+ * - status: String @default("PENDENTE_APROVACAO")
  *
  * @param payload - Dados para criação da OS
  * @returns Ordem de serviço criada

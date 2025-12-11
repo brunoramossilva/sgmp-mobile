@@ -163,11 +163,10 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
       setCarregandoModal(true);
       setErroModal(null);
 
-      // Preparar payload com status e flags
+      // Preparar payload com status correto
       const isAprovar = acaoModal === "aprovar";
       const dados = {
-        aprovado: isAprovar,
-        status: isAprovar ? "ACEITA" : "REJEITADA",
+        status: isAprovar ? "AGUARDANDO_EXECUCAO" : "RECUSADA",
         cpf_sindico: usuario?.cpf || "",
       };
 

@@ -30,33 +30,29 @@ export const mapApiToUI = (o: OrdemServicoApi): OrdemServicoUI => {
     uiStatus = "Finalizada";
   } else if (statusRaw === "RECUSADA" || statusRaw === "REJEITADA") {
     uiStatus = "Recusada";
-  } else if (statusRaw === "EM_EXECUCAO" || statusRaw === "ACEITA") {
+  } else if (statusRaw === "EM_EXECUCAO") {
     uiStatus = "Aceita";
-  } else if (statusRaw === "ABERTA") {
-    // ABERTA sempre é Pendente (aguardando técnico aceitar)
+  } else if (statusRaw === "AGUARDANDO_EXECUCAO") {
+    // AGUARDANDO_EXECUCAO = aprovado pelo síndico, aguardando técnico aceitar
     uiStatus = "Pendente";
   }
+  // PENDENTE_APROVACAO não deve aparecer para técnico (ainda com síndico)
 
-  // Calcular prioridade baseada no tempo, não apenas em aprovado
+  // Calcular prioridade baseada no tempo
   const hoje = new Date();
   const diasEmAberto = Math.floor(
     (hoje.getTime() - dataAbertura.getTime()) / (1000 * 60 * 60 * 24)
   );
 
   let prioridade: "Alta" | "Média" | "Baixa" = "Baixa";
-
-  if (uiStatus === "Finalizada") {
-    // Ordens finalizadas mantêm prioridade baseada no tempo que levaram
-    prioridade =
-      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
-  } else if (!o.aprovado) {
-    // Ordens não aprovadas: prioridade baseada no tempo de espera
-    prioridade =
-      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+  
+  // Prioridade baseada no tempo de espera
+  if (diasEmAberto > 7) {
+    prioridade = "Alta";
+  } else if (diasEmAberto > 3) {
+    prioridade = "Média";
   } else {
-    // Ordens aprovadas/em execução: prioridade baseada no tempo total
-    prioridade =
-      diasEmAberto > 7 ? "Alta" : diasEmAberto > 3 ? "Média" : "Baixa";
+    prioridade = "Baixa";
   }
 
   return {

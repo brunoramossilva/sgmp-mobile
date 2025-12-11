@@ -1,40 +1,42 @@
 /**
  * Mapeamento centralizado de ícones Lucide
  * Facilita manutenção, reutilização e futuras mudanças visuais
- * 
+ *
  * Usa um padrão de lazy loading para evitar problemas com Metro bundler
  */
 
 export type IdIcone =
-  | 'home'
-  | 'servicos'
-  | 'financeiro'
-  | 'reservas'
-  | 'boas-vindas'
-  | 'criar-os'
-  | 'acompanhar'
-  | 'comunicacao'
-  | 'comeco'
-  | 'tecnico'
-  | 'ordenar'
-  | 'cooperacao'
-  | 'executar'
-  | 'aprovar'
-  | 'progresso'
-  | 'historico'
-  | 'predio'
-  | 'adicionar'
-  | 'confirmar'
-  | 'cancelar'
-  | 'anterior'
-  | 'proximo'
-  | 'logout'
-  | 'alerta'
-  | 'moradores'
-  | 'gestao'
-  | 'calendario'
-  | 'relogio'
-  | 'verificado';
+  | "home"
+  | "servicos"
+  | "financeiro"
+  | "reservas"
+  | "boas-vindas"
+  | "criar-os"
+  | "acompanhar"
+  | "comunicacao"
+  | "comeco"
+  | "tecnico"
+  | "ordenar"
+  | "cooperacao"
+  | "executar"
+  | "aprovar"
+  | "progresso"
+  | "historico"
+  | "predio"
+  | "adicionar"
+  | "confirmar"
+  | "cancelar"
+  | "anterior"
+  | "proximo"
+  | "logout"
+  | "alerta"
+  | "moradores"
+  | "gestao"
+  | "calendario"
+  | "relogio"
+  | "verificado"
+  | "olho"
+  | "olho-fechado";
 
 interface ConfiguradorIcone {
   iconeNome: string;
@@ -50,190 +52,202 @@ interface ConfiguradorIcone {
 const MAPA_ICONES: Record<IdIcone, ConfiguradorIcone> = {
   // Navegação principal
   home: {
-    iconeNome: 'Home',
+    iconeNome: "Home",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de home/início',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de home/início",
   },
   servicos: {
-    iconeNome: 'Wrench',
+    iconeNome: "Wrench",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de serviços/manutenção',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de serviços/manutenção",
   },
   financeiro: {
-    iconeNome: 'DollarSign',
+    iconeNome: "DollarSign",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de financeiro',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de financeiro",
   },
   reservas: {
-    iconeNome: 'Calendar',
+    iconeNome: "Calendar",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de reservas/calendário',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de reservas/calendário",
   },
 
   // Carrossel de onboarding - Morador
-  'boas-vindas': {
-    iconeNome: 'Hand',
+  "boas-vindas": {
+    iconeNome: "Hand",
     tamanhoPadrao: 48,
-    corPadrao: '#3b82f6',
-    descricao: 'Ícone de boas-vindas',
+    corPadrao: "#3b82f6",
+    descricao: "Ícone de boas-vindas",
   },
-  'criar-os': {
-    iconeNome: 'FileText',
+  "criar-os": {
+    iconeNome: "FileText",
     tamanhoPadrao: 48,
-    corPadrao: '#10b981',
-    descricao: 'Ícone de criar ordem de serviço',
+    corPadrao: "#10b981",
+    descricao: "Ícone de criar ordem de serviço",
   },
   acompanhar: {
-    iconeNome: 'ClipboardList',
+    iconeNome: "ClipboardList",
     tamanhoPadrao: 48,
-    corPadrao: '#eab308',
-    descricao: 'Ícone de acompanhar status',
+    corPadrao: "#eab308",
+    descricao: "Ícone de acompanhar status",
   },
   comunicacao: {
-    iconeNome: 'MessageCircle',
+    iconeNome: "MessageCircle",
     tamanhoPadrao: 48,
-    corPadrao: '#a855f7',
-    descricao: 'Ícone de comunicação',
+    corPadrao: "#a855f7",
+    descricao: "Ícone de comunicação",
   },
   comeco: {
-    iconeNome: 'Rocket',
+    iconeNome: "Rocket",
     tamanhoPadrao: 48,
-    corPadrao: '#ef4444',
-    descricao: 'Ícone de início/começar',
+    corPadrao: "#ef4444",
+    descricao: "Ícone de início/começar",
   },
 
   // Carrossel de onboarding - Técnico
   tecnico: {
-    iconeNome: 'HardHat',
+    iconeNome: "HardHat",
     tamanhoPadrao: 48,
-    corPadrao: '#3b82f6',
-    descricao: 'Ícone de técnico',
+    corPadrao: "#3b82f6",
+    descricao: "Ícone de técnico",
   },
   ordenar: {
-    iconeNome: 'CheckCircle',
+    iconeNome: "CheckCircle",
     tamanhoPadrao: 48,
-    corPadrao: '#10b981',
-    descricao: 'Ícone de ordens aprovadas',
+    corPadrao: "#10b981",
+    descricao: "Ícone de ordens aprovadas",
   },
   cooperacao: {
-    iconeNome: 'Handshake',
+    iconeNome: "Handshake",
     tamanhoPadrao: 48,
-    corPadrao: '#eab308',
-    descricao: 'Ícone de cooperação/aceitar',
+    corPadrao: "#eab308",
+    descricao: "Ícone de cooperação/aceitar",
   },
   executar: {
-    iconeNome: 'Wrench',
+    iconeNome: "Wrench",
     tamanhoPadrao: 48,
-    corPadrao: '#a855f7',
-    descricao: 'Ícone de executar trabalho',
+    corPadrao: "#a855f7",
+    descricao: "Ícone de executar trabalho",
   },
 
   // Carrossel de onboarding - Síndico
   predio: {
-    iconeNome: 'Building2',
+    iconeNome: "Building2",
     tamanhoPadrao: 48,
-    corPadrao: '#3b82f6',
-    descricao: 'Ícone de prédio/condomínio',
+    corPadrao: "#3b82f6",
+    descricao: "Ícone de prédio/condomínio",
   },
   aprovar: {
-    iconeNome: 'Scale',
+    iconeNome: "Scale",
     tamanhoPadrao: 48,
-    corPadrao: '#10b981',
-    descricao: 'Ícone de aprovação',
+    corPadrao: "#10b981",
+    descricao: "Ícone de aprovação",
   },
   progresso: {
-    iconeNome: 'BarChart3',
+    iconeNome: "BarChart3",
     tamanhoPadrao: 48,
-    corPadrao: '#eab308',
-    descricao: 'Ícone de progresso/acompanhamento',
+    corPadrao: "#eab308",
+    descricao: "Ícone de progresso/acompanhamento",
   },
   historico: {
-    iconeNome: 'BookOpen',
+    iconeNome: "BookOpen",
     tamanhoPadrao: 48,
-    corPadrao: '#a855f7',
-    descricao: 'Ícone de histórico',
+    corPadrao: "#a855f7",
+    descricao: "Ícone de histórico",
   },
 
   // Ações e estados
   adicionar: {
-    iconeNome: 'Plus',
+    iconeNome: "Plus",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de adicionar/criar',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de adicionar/criar",
   },
   confirmar: {
-    iconeNome: 'Check',
+    iconeNome: "Check",
     tamanhoPadrao: 24,
-    corPadrao: '#10b981',
-    descricao: 'Ícone de confirmação',
+    corPadrao: "#10b981",
+    descricao: "Ícone de confirmação",
   },
   cancelar: {
-    iconeNome: 'X',
+    iconeNome: "X",
     tamanhoPadrao: 24,
-    corPadrao: '#ef4444',
-    descricao: 'Ícone de cancelamento',
+    corPadrao: "#ef4444",
+    descricao: "Ícone de cancelamento",
   },
   anterior: {
-    iconeNome: 'ChevronLeft',
+    iconeNome: "ChevronLeft",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de voltar/anterior',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de voltar/anterior",
   },
   proximo: {
-    iconeNome: 'ChevronRight',
+    iconeNome: "ChevronRight",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de próximo/avançar',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de próximo/avançar",
   },
 
   // Logout
   logout: {
-    iconeNome: 'LogOut',
+    iconeNome: "LogOut",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de logout/sair',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de logout/sair",
   },
 
   // Dashboard e gestão
   alerta: {
-    iconeNome: 'AlertCircle',
+    iconeNome: "AlertCircle",
     tamanhoPadrao: 24,
-    corPadrao: '#ef4444',
-    descricao: 'Ícone de alerta/aviso',
+    corPadrao: "#ef4444",
+    descricao: "Ícone de alerta/aviso",
   },
   moradores: {
-    iconeNome: 'Users',
+    iconeNome: "Users",
     tamanhoPadrao: 24,
-    corPadrao: '#10b981',
-    descricao: 'Ícone de moradores/usuários',
+    corPadrao: "#10b981",
+    descricao: "Ícone de moradores/usuários",
   },
   gestao: {
-    iconeNome: 'ClipboardList',
+    iconeNome: "ClipboardList",
     tamanhoPadrao: 24,
-    corPadrao: '#ffffff',
-    descricao: 'Ícone de gestão/gerenciamento',
+    corPadrao: "#ffffff",
+    descricao: "Ícone de gestão/gerenciamento",
   },
   calendario: {
-    iconeNome: 'Calendar',
+    iconeNome: "Calendar",
     tamanhoPadrao: 16,
-    corPadrao: '#64748b',
-    descricao: 'Ícone de calendário/data',
+    corPadrao: "#64748b",
+    descricao: "Ícone de calendário/data",
   },
   relogio: {
-    iconeNome: 'Clock',
+    iconeNome: "Clock",
     tamanhoPadrao: 16,
-    corPadrao: '#64748b',
-    descricao: 'Ícone de relógio/tempo',
+    corPadrao: "#64748b",
+    descricao: "Ícone de relógio/tempo",
   },
   verificado: {
-    iconeNome: 'CheckCircle',
+    iconeNome: "CheckCircle",
     tamanhoPadrao: 48,
-    corPadrao: '#10b981',
-    descricao: 'Ícone de verificado/sucesso',
+    corPadrao: "#10b981",
+    descricao: "Ícone de verificado/sucesso",
+  },
+  olho: {
+    iconeNome: "Eye",
+    tamanhoPadrao: 20,
+    corPadrao: "#64748b",
+    descricao: "Ícone de olho/visualizar",
+  },
+  "olho-fechado": {
+    iconeNome: "EyeOff",
+    tamanhoPadrao: 20,
+    corPadrao: "#64748b",
+    descricao: "Ícone de olho fechado/ocultar",
   },
 };
 
@@ -259,7 +273,7 @@ export function obterConfigIcone(id: IdIcone): ConfiguradorIcone {
 export function obterComponenteIcone(id: IdIcone) {
   try {
     const config = obterConfigIcone(id);
-    const modulo = require('lucide-react-native');
+    const modulo = require("lucide-react-native");
     return modulo[config.iconeNome] || null;
   } catch (erro) {
     console.error(`Erro ao carregar ícone "${id}":`, erro);

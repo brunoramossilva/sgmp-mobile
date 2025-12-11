@@ -99,10 +99,12 @@ export const converterStatus = (
     return "Recusada";
   }
 
-  if (["ACEITA", "EM_EXECUCAO"].includes(status)) {
+  if (status === "EM_EXECUCAO") {
     return "Aceita";
   }
 
+  // AGUARDANDO_EXECUCAO = aprovado pelo síndico, aguardando técnico
+  // PENDENTE_APROVACAO = aguardando aprovação do síndico
   return "Pendente";
 };
 

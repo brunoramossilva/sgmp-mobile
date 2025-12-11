@@ -102,11 +102,13 @@ const useDashboardData = () => {
   const fetchData = useCallback(async () => {
     try {
       const ordens = await getOrdens();
-      const ocorrenciasPendentes = ordens.filter((o) => !o.aprovado).length;
-      const ordensEmExecucao = ordens.filter(
-        (o) =>
-          o.aprovado && !STATUS_FINALIZADA.includes(o.status?.toUpperCase())
+      const ocorrenciasPendentes = ordens.filter(
+        (o) => o.status?.toUpperCase() === "PENDENTE_APROVACAO"
       ).length;
+      const ordensEmExecucao = ordens.filter((o) => {
+        const statusUpper = o.status?.toUpperCase();
+        return statusUpper === "AGUARDANDO_EXECUCAO" || statusUpper === "EM_EXECUCAO";
+      }).length;
       const moradoresAtivos = new Set(ordens.map((o) => o.cpf_morador)).size;
 
       setData({
@@ -322,6 +324,12 @@ const TelaInicial = () => {
               subLabel="Revisar solicitações"
               icon="aprovar"
               onPress={() => navigation.navigate("AprovacaoOs" as never)}
+            />
+            <ActionCard
+              label="OSs Recusadas"
+              subLabel="Visualizar recusadas"
+              icon="cancelar"
+              onPress={() => navigation.navigate("OrdensRecusadas" as never)}
             />
             <ActionCard
               label="Prestação de Contas"
