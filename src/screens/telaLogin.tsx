@@ -26,27 +26,9 @@ export default function TelaLogin() {
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [mensagemErro, setMensagemErro] = useState("");
 
-  const [tecladoVisivel, setTecladoVisivel] = useState(false);
-
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { autenticar } = useAutenticacao();
-
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      () => setTecladoVisivel(true)
-    );
-    const hideSubscription = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => setTecladoVisivel(false)
-    );
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
 
   const formatarCpf = (valor: string): string => {
     const apenasNumeros = valor.replace(/\D/g, "");
@@ -135,31 +117,25 @@ export default function TelaLogin() {
           style={{ paddingTop: insets.top }}
         >
           {/* ÁREA SUPERIOR (Logo) */}
-          {!tecladoVisivel && (
-            <View className="items-center justify-center flex-1 py-4">
-              <View className="bg-red-50 rounded-full p-4 mb-2 shadow-md">
-                <Image
-                  source={require("../../assets/sgmp-sem-fundo.png")}
-                  style={{ width: 100, height: 100 }}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text className="text-white text-2xl font-bold text-center">
-                SGMP Mobile
-              </Text>
+          <View className="items-center justify-center flex-1 py-4">
+            <View className="bg-red-50 rounded-full p-4 mb-2 shadow-md">
+              <Image
+                source={require("../../assets/sgmp-sem-fundo.png")}
+                style={{ width: 100, height: 100 }}
+                resizeMode="contain"
+              />
             </View>
-          )}
+            <Text className="text-white text-2xl font-bold text-center">
+              SGMP Mobile
+            </Text>
+          </View>
 
           {/* ÁREA INFERIOR (Card Branco) */}
           <View
             className="bg-white rounded-t-[32px] px-6 shadow-2xl w-full"
             style={{
               paddingTop: 32,
-              paddingBottom: tecladoVisivel
-                ? 20
-                : Math.max(insets.bottom, 20) + 10,
-              flex: tecladoVisivel ? 1 : 0,
-              marginTop: tecladoVisivel ? 20 : 0,
+              paddingBottom: Math.max(insets.bottom, 20) + 10,
             }}
           >
             <Text className="text-xl font-bold text-slate-800 mb-1">
@@ -268,17 +244,15 @@ export default function TelaLogin() {
             </TouchableOpacity>
 
             {/* Créditos */}
-            {!tecladoVisivel && (
-              <View className="mt-6 pt-4 border-t border-slate-100">
-                <Text className="text-slate-400 text-[10px] text-center leading-4">
-                  Time de Desenvolvimento:{"\n"}
-                  <Text className="text-slate-600 font-medium">
-                    Ágata Giovanna, Bruno Ramos, Diogo Rodrigues, Flávia
-                    Vitória, Gryghor Camonni e Lucas Cabral
-                  </Text>
+            <View className="mt-6 pt-4 border-t border-slate-100">
+              <Text className="text-slate-400 text-[10px] text-center leading-4">
+                Time de Desenvolvimento:{"\n"}
+                <Text className="text-slate-600 font-medium">
+                  Ágata Giovanna, Bruno Ramos, Diogo Rodrigues, Flávia Vitória,
+                  Gryghor Camonni e Lucas Cabral
                 </Text>
-              </View>
-            )}
+              </Text>
+            </View>
           </View>
         </View>
       </KeyboardAvoidingView>
