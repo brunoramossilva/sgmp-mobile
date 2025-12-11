@@ -24,31 +24,14 @@ const CardOrdemRecusada = ({
   ordem: OrdemServicoUI;
   onDetalhes: () => void;
 }) => {
-  const prioridadeCores = {
-    Alta: { bg: "bg-red-100", text: "text-red-700" },
-    Média: { bg: "bg-yellow-100", text: "text-yellow-700" },
-    Baixa: { bg: "bg-green-100", text: "text-green-700" },
-  } as const;
-
-  const cores = prioridadeCores[ordem.prioridade] ?? prioridadeCores.Baixa;
-
   return (
     <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 shadow-sm">
-      {/* Header: Prioridade + Solicitante */}
+      {/* Header: Solicitante */}
       <View className="flex-row justify-between items-start mb-2">
         <Text className="text-base font-semibold text-slate-900 flex-1 mr-3">
           {ordem.solicitante}
         </Text>
-        <View className={`px-2.5 py-1 rounded-full ${cores.bg}`}>
-          <Text className={`text-xs font-bold ${cores.text}`}>
-            {ordem.prioridade}
-          </Text>
-        </View>
-      </View>
-
-      {/* Status Recusada */}
-      <View className="mb-2">
-        <View className="bg-red-100 px-2.5 py-1 rounded-full self-start">
+        <View className="bg-red-100 px-2.5 py-1 rounded-full">
           <Text className="text-xs font-bold text-red-700">RECUSADA</Text>
         </View>
       </View>
@@ -144,6 +127,23 @@ export default function OrdensRecusadas({ navigation }: OrdensRecusadasProps) {
     [abrirDetalhes]
   );
 
+  const renderEmpty = useCallback(
+    () => (
+      <View className="items-center justify-center py-20">
+        <View className="w-20 h-20 rounded-full bg-green-50 items-center justify-center mb-4">
+          <IconeLucide id="verificado" tamanho={40} cor="#10b981" />
+        </View>
+        <Text className="text-slate-800 text-lg font-bold mb-2">
+          Nenhuma OS recusada
+        </Text>
+        <Text className="text-slate-500 text-sm text-center px-8">
+          Não há ordens de serviço recusadas no momento
+        </Text>
+      </View>
+    ),
+    []
+  );
+
   if (loading && !refreshing) {
     return (
       <View className="flex-1 bg-white">
@@ -170,42 +170,16 @@ export default function OrdensRecusadas({ navigation }: OrdensRecusadasProps) {
     );
   }
 
-  const renderEmpty = useCallback(
-    () => (
-      <View className="items-center justify-center py-20">
-        <View className="w-20 h-20 rounded-full bg-green-50 items-center justify-center mb-4">
-          <IconeLucide id="verificado" tamanho={40} cor="#10b981" />
-        </View>
-        <Text className="text-slate-800 text-lg font-bold mb-2">
-          Nenhuma OS recusada
-        </Text>
-        <Text className="text-slate-500 text-sm text-center px-8">
-          Não há ordens de serviço recusadas no momento
-        </Text>
-      </View>
-    ),
-    []
-  );
-
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+      <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
       {/* Header */}
-      <View className="bg-white px-6 py-4 border-b border-slate-200">
-        <View className="flex-row items-center">
-          <View className="mr-3">
-            <BotaoVoltar cor="#334155" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-xl font-bold text-slate-800">
-              Ordens Recusadas
-            </Text>
-            <Text className="text-sm text-slate-500">
-              {ordensRecusadas.length}{" "}
-              {ordensRecusadas.length === 1 ? "ordem" : "ordens"}
-            </Text>
-          </View>
+      <View className="bg-red-600 px-4 pb-4 pt-5">
+        <View className="flex-row items-center justify-between">
+          <BotaoVoltar />
+          <Text className="text-white text-xl font-bold">Ordens Recusadas</Text>
+          <View className="w-10" />
         </View>
       </View>
 
