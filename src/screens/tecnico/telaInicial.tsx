@@ -131,7 +131,13 @@ export default function InicialTecnico() {
         );
       });
 
-      setOrdens(ordensTecnico.map(mapApiToUI));
+      // Ordenar por data mais recente primeiro
+      const ordensOrdenadas = ordensTecnico.map(mapApiToUI).sort((a, b) => {
+        const dataA = new Date(a.data.split('/').reverse().join('-'));
+        const dataB = new Date(b.data.split('/').reverse().join('-'));
+        return dataB.getTime() - dataA.getTime();
+      });
+      setOrdens(ordensOrdenadas);
     } catch (err) {
       console.error("Erro ao carregar ordens:", err);
     } finally {
@@ -221,20 +227,29 @@ export default function InicialTecnico() {
   };
 
   const ordensExibidas = useMemo(() => {
-    if (abaSelecionada === "Pendentes")
-      return ordens.filter(
+    let filtradas: OrdemServicoUI[] = [];
+    
+    if (abaSelecionada === "Pendentes") {
+      filtradas = ordens.filter(
         (o) => o.raw?.status?.toUpperCase() === "AGUARDANDO_EXECUCAO"
       );
-    if (abaSelecionada === "Em Execução")
-      return ordens.filter(
+    } else if (abaSelecionada === "Em Execução") {
+      filtradas = ordens.filter(
         (o) => o.raw?.status?.toUpperCase() === "EM_EXECUCAO"
       );
-    if (abaSelecionada === "Finalizadas")
-      return ordens.filter((o) => {
+    } else if (abaSelecionada === "Finalizadas") {
+      filtradas = ordens.filter((o) => {
         const statusUpper = o.raw?.status?.toUpperCase();
         return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
       });
-    return [];
+    }
+    
+    // Ordenar por data mais recente primeiro
+    return filtradas.sort((a, b) => {
+      const dataA = new Date(a.data.split('/').reverse().join('-'));
+      const dataB = new Date(b.data.split('/').reverse().join('-'));
+      return dataB.getTime() - dataA.getTime();
+    });
   }, [ordens, abaSelecionada]);
 
   if (dashboardLoading) {

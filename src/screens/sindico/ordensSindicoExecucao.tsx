@@ -97,6 +97,15 @@ export default function OrdensSindicoExecucao({
     }, [refetch])
   );
 
+  // Ordenar por data mais recente primeiro
+  const ordensOrdenadas = useMemo(() => {
+    return [...ordensEmExecucao].sort((a, b) => {
+      const dataA = new Date(a.dataAbertura.split('/').reverse().join('-'));
+      const dataB = new Date(b.dataAbertura.split('/').reverse().join('-'));
+      return dataB.getTime() - dataA.getTime();
+    });
+  }, [ordensEmExecucao]);
+
   // Abre detalhes de uma ordem
   const abrirDetalhes = useCallback(
     (ordem: OrdemServicoUI) => {
@@ -202,7 +211,7 @@ export default function OrdensSindicoExecucao({
           </View>
         ) : (
           <FlatList
-            data={ordensEmExecucao}
+            data={ordensOrdenadas}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             scrollEnabled

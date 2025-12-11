@@ -18,6 +18,7 @@ import {
 } from "../../services/ordemServico";
 import { OrdemServicoUI, mapApiToUI } from "./types";
 import CardOrdemAceita from "./CardOrdemAceita";
+import { BotaoVoltar } from "../../components/navegacao";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
 import SkeletonOrdem from "./SkeletonOrdem";
@@ -60,7 +61,12 @@ export default function OsAceitasTecnico() {
         (o) => o.status?.toUpperCase() === "EM_EXECUCAO"
       );
 
-      const mapped = ordensAceitas.map(mapApiToUI);
+      // Ordenar por data mais recente primeiro
+      const mapped = ordensAceitas.map(mapApiToUI).sort((a, b) => {
+        const dataA = new Date(a.data.split('/').reverse().join('-'));
+        const dataB = new Date(b.data.split('/').reverse().join('-'));
+        return dataB.getTime() - dataA.getTime();
+      });
       setOrdens(mapped);
     } catch (err) {
       console.error(err);

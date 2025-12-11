@@ -100,10 +100,14 @@ export default function OrdensRecusadas({ navigation }: OrdensRecusadasProps) {
       const ordens = await getOrdens();
       const ordensUI = ordens.map(mapApiToUI);
 
-      // Filtra apenas as recusadas
-      const recusadas = ordensUI.filter(
-        (o) => o.statusApi?.toUpperCase() === "RECUSADA"
-      );
+      // Filtra apenas as recusadas e ordena por data mais recente
+      const recusadas = ordensUI
+        .filter((o) => o.statusApi?.toUpperCase() === "RECUSADA")
+        .sort((a, b) => {
+          const dataA = new Date(a.dataAbertura.split('/').reverse().join('-'));
+          const dataB = new Date(b.dataAbertura.split('/').reverse().join('-'));
+          return dataB.getTime() - dataA.getTime();
+        });
 
       setOrdensRecusadas(recusadas);
     } catch (erro) {

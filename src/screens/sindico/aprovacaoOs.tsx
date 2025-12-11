@@ -188,6 +188,15 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
     setErroModal(null);
   }, []);
 
+  // Ordenar por data mais recente primeiro
+  const ordensOrdenadas = useMemo(() => {
+    return [...ordensPendentes].sort((a, b) => {
+      const dataA = new Date(a.dataAbertura.split('/').reverse().join('-'));
+      const dataB = new Date(b.dataAbertura.split('/').reverse().join('-'));
+      return dataB.getTime() - dataA.getTime();
+    });
+  }, [ordensPendentes]);
+
   // Renderiza item
   const renderItem = useCallback(
     ({ item }: { item: OrdemServicoUI }) => (

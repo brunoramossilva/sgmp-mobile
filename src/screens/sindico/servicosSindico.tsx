@@ -135,25 +135,37 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
     return [...ordensPendentes, ...ordensEmExecucao];
   }, [ordensPendentes, ordensEmExecucao]);
 
-  // Aplica filtro
+  // Aplica filtro e ordena por data mais recente
   const ordensFiltradas = useMemo(() => {
+    let ordens: OrdemServicoUI[];
     switch (filtroAtivo) {
       case "PENDENTES":
-        return ordensPendentes;
+        ordens = ordensPendentes;
+        break;
       case "ACEITAS":
-        return ordensEmExecucao.filter((o) => o.status === "Aceita");
+        ordens = ordensEmExecucao.filter((o) => o.status === "Aceita");
+        break;
       case "EM_EXECUCAO":
-        return ordensEmExecucao.filter((o) => o.status === "Aceita");
+        ordens = ordensEmExecucao.filter((o) => o.status === "Aceita");
+        break;
       case "FINALIZADAS":
-        return ordensEmExecucao.filter(
+        ordens = ordensEmExecucao.filter(
           (o) => o.status === "Finalizada" || o.status === "Recusada"
         );
+        break;
       case "RECUSADAS":
-        return ordensEmExecucao.filter((o) => o.status === "Recusada");
+        ordens = ordensEmExecucao.filter((o) => o.status === "Recusada");
+        break;
       case "TODAS":
       default:
-        return todasOrdens;
+        ordens = todasOrdens;
     }
+    // Ordenar por data mais recente primeiro
+    return [...ordens].sort((a, b) => {
+      const dataA = new Date(a.dataAbertura.split('/').reverse().join('-'));
+      const dataB = new Date(b.dataAbertura.split('/').reverse().join('-'));
+      return dataB.getTime() - dataA.getTime();
+    });
   }, [filtroAtivo, ordensPendentes, ordensEmExecucao, todasOrdens]);
 
   // Abre detalhes de uma ordem
