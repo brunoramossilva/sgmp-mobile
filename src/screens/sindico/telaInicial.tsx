@@ -1,158 +1,122 @@
-// React
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-
-// React Native
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Alert,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
+  StatusBar,
   RefreshControl,
-  BackHandler,
-  Platform,
 } from "react-native";
-
-// Navigation
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-// Context
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
-
-// Services
-import { getOrdens, OrdemServicoApi } from "../../services/ordemServico";
-
-// Components
+import { getOrdens } from "../../services/ordemServico";
 import { IconeLucide } from "../../components/icones";
 import SkeletonBloco from "../../components/SkeletonBloco";
 import { NavbarGlobal } from "../../components/navegacao";
-
-// Utils
 import { IdIcone } from "../../utils/iconesLucide";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 
-interface CustomButtonProps {
-  title: string;
-  onPress: () => void;
-  style?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-}
-
-interface StatusCardProps {
-  title: string;
-  value: string;
-  iconId: IdIcone;
-  iconColor: string;
-  bgColorClass: string;
-  valueColorClass: string;
-  onPress: () => void;
-}
-
 // --- Interfaces ---
-/**
- * Dados do dashboard do síndico
- */
 interface DashboardData {
   ocorrenciasPendentes: number;
   ordensEmExecucao: number;
-  /**
-   * TODO: Integrar com endpoint /faturas quando disponível no backend
-   * Atualmente usando valor mockado
-   */
   faturasAtrasadasTotal: number;
   moradoresAtivos: number;
 }
 
-// Constantes para filtros de status
 const STATUS_FINALIZADA = ["FINALIZADA", "REJEITADA", "CANCELADA"];
-const CARD_WIDTH = 176; // largura do card (160) + espaçamento (16)
 
-// --- Componentes auxiliares tipados ---
-
-const CustomButton: React.FC<CustomButtonProps> = ({
-  title,
+// --- Componentes Visuais ---
+const MetricCard = ({
+  label,
+  value,
+  icon,
+  color,
   onPress,
-  style,
-  textStyle,
+}: {
+  label: string;
+  value: string | number;
+  icon: IdIcone;
+  color: string;
+  onPress: () => void;
 }) => (
-  <TouchableOpacity onPress={onPress} style={style} className="p-2 rounded-lg">
-    <Text style={textStyle} className="text-white font-semibold">
-      {title}
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.7}
+    className="bg-white p-4 rounded-2xl mr-3 w-36 shadow-sm border border-slate-100 justify-between h-36"
+    style={{ elevation: 2 }}
+  >
+    <View className="flex-row justify-between items-start">
+      <View className="w-10 h-10 rounded-full bg-slate-50 items-center justify-center">
+        <IconeLucide id={icon} tamanho={20} cor={color} />
+      </View>
+      <IconeLucide id="proximo" tamanho={14} cor="#cbd5e1" />
+    </View>
+    <View>
+      <Text className="text-2xl font-bold text-slate-800 tracking-tight">
+        {value}
+      </Text>
+      <Text className="text-xs font-medium text-slate-500 mt-1 leading-4">
+        {label}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const ActionCard = ({
+  label,
+  subLabel,
+  icon,
+  onPress,
+}: {
+  label: string;
+  subLabel: string;
+  icon: IdIcone;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.7}
+    className="bg-white p-4 rounded-2xl mr-3 w-40 shadow-sm border border-slate-100 h-40 justify-center items-center"
+    style={{ elevation: 2 }}
+  >
+    <View className="w-14 h-14 rounded-2xl bg-red-50 items-center justify-center mb-3">
+      <IconeLucide id={icon} tamanho={28} cor="#dc2626" />
+    </View>
+    <Text className="text-sm font-bold text-slate-800 text-center">
+      {label}
+    </Text>
+    <Text className="text-[10px] text-slate-400 text-center mt-1">
+      {subLabel}
     </Text>
   </TouchableOpacity>
 );
 
-const StatusCard: React.FC<StatusCardProps> = ({
-  title,
-  value,
-  iconId,
-  iconColor,
-  bgColorClass,
-  valueColorClass,
-  onPress,
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    className={`bg-white p-4 rounded-lg shadow-md border border-slate-200 w-40 mr-4 items-start justify-between`}
-    accessibilityRole="button"
-    accessibilityLabel={`${title}: ${value}`}
-  >
-    <View className="flex-row justify-between w-full items-center mb-2">
-      <View
-        className={`w-10 h-10 ${bgColorClass} rounded-full flex items-center justify-center`}
-      >
-        <IconeLucide id={iconId} tamanho={20} cor={iconColor} />
-      </View>
-    </View>
-    <Text className="text-sm font-medium text-gray-700 mb-1">{title}</Text>
-    <Text className={`text-xl font-bold ${valueColorClass}`}>{value}</Text>
-  </TouchableOpacity>
-);
-
-/**
- * Custom hook para gerenciar dados do dashboard
- */
 const useDashboardData = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      setError(null);
       const ordens = await getOrdens();
-
-      // Calcular métricas do dashboard
       const ocorrenciasPendentes = ordens.filter((o) => !o.aprovado).length;
-
       const ordensEmExecucao = ordens.filter(
         (o) =>
           o.aprovado && !STATUS_FINALIZADA.includes(o.status?.toUpperCase())
       ).length;
-
       const moradoresAtivos = new Set(ordens.map((o) => o.cpf_morador)).size;
 
       setData({
         ocorrenciasPendentes,
         ordensEmExecucao,
-        faturasAtrasadasTotal: 3450.5, // TODO: Integrar endpoint faturas
+        faturasAtrasadasTotal: 3450.5,
         moradoresAtivos,
       });
     } catch (err) {
-      console.error("Erro ao carregar dados do dashboard:", err);
-      setError("Não foi possível carregar os dados do dashboard");
+      console.error(err);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -165,422 +129,217 @@ const useDashboardData = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    if (isMounted) {
-      fetchData();
-    }
-
-    return () => {
-      isMounted = false;
-    };
+    fetchData();
   }, [fetchData]);
 
-  return { data, loading, error, refreshing, refetch };
+  return { data, loading, refreshing, refetch };
 };
-
-// --- Componente Principal --- //
 
 const TelaInicial = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
-  const { data, loading, error, refreshing, refetch } = useDashboardData();
-  const statusScrollRef = useRef<ScrollView | null>(null);
-  const scrollOffset = useRef(0);
-  const layoutWidthRef = useRef(0);
-  const [hasScroll, setHasScroll] = useState(false);
-  const [nearStart, setNearStart] = useState(true);
-  const [nearEnd, setNearEnd] = useState(false);
+  const { data, loading, refreshing, refetch } = useDashboardData();
 
-  const handleArrowPress = (direction: "left" | "right") => {
-    const delta = direction === "right" ? CARD_WIDTH : -CARD_WIDTH;
-    const nextOffset = Math.max(0, scrollOffset.current + delta);
-    statusScrollRef.current?.scrollTo({ x: nextOffset, animated: true });
-    scrollOffset.current = nextOffset;
-  };
+  const sindicoName = usuario?.nome?.trim()
+    ? usuario.nome.split(" ")[0]
+    : "Síndico";
 
-  // Nome do síndico com fallback
-  const sindicoName = usuario?.nome?.trim() ? usuario.nome : "Síndico(a)";
-
-  // Refetch automático ao focar na tela (após voltar de AprovacaoOs ou OrdensSindicoExecucao)
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [refetch])
   );
 
-  const styles = StyleSheet.create({
-    screenContainer: {
-      flex: 1,
-      backgroundColor: "#ffffff",
-    },
-    scrollContent: {
-      paddingBottom: NAVBAR_HEIGHT + 20,
-      backgroundColor: "#ffffff",
-    },
-    redButton: {
-      backgroundColor: "#EF4444",
-      paddingVertical: 6,
-      paddingHorizontal: 12,
-      borderRadius: 8,
-    },
-    whiteText: {
-      color: "#FFFFFF",
-      fontSize: 14,
-    },
-  });
-
-  // Renderizar loading state
-  if (loading) {
-    return (
-      <View style={styles.screenContainer} className="bg-white">
-        <View className="bg-red-600 p-4 pt-16">
-          <Text className="text-white text-xl font-bold text-center">
-            CINOVA
-          </Text>
-        </View>
-        <View className="p-4 pt-8">
-          {[1, 2, 3].map((i) => (
-            <SkeletonBloco key={i} height={90} style={{ marginBottom: 12 }} />
-          ))}
-        </View>
-        <NavbarGlobal />
-      </View>
-    );
-  }
-
-  // Renderizar error state
-  if (error || !data) {
-    return (
-      <View style={styles.screenContainer} className="bg-white">
-        <View className="bg-red-600 p-4 pt-16">
-          <Text className="text-white text-xl font-bold text-center">
-            CINOVA
-          </Text>
-        </View>
-        <View className="flex-1 items-center justify-center px-4">
-          <IconeLucide id="alerta" tamanho={56} cor="#ef4444" />
-          <Text className="text-gray-800 text-lg font-semibold mt-4 text-center">
-            Erro ao Carregar Dados
-          </Text>
-          <Text className="text-gray-600 mt-2 text-center">
-            {error || "Não foi possível carregar os dados do dashboard"}
-          </Text>
-          <TouchableOpacity
-            onPress={refetch}
-            className="mt-6 bg-red-600 px-6 py-3 rounded-lg"
-            accessibilityRole="button"
-            accessibilityLabel="Tentar novamente"
-          >
-            <Text className="text-white font-semibold">Tentar Novamente</Text>
-          </TouchableOpacity>
-        </View>
-        <NavbarGlobal />
-      </View>
-    );
-  }
-
   const handleLogout = () => {
-    Alert.alert("Desconectar", "Tem certeza que deseja sair?", [
-      {
-        text: "Cancelar",
-        onPress: () => {},
-        style: "cancel",
-      },
+    Alert.alert("Sair", "Deseja desconectar?", [
+      { text: "Cancelar", style: "cancel" },
       {
         text: "Sair",
+        style: "destructive",
         onPress: () => {
           desautenticar();
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "Login" as never }],
-          });
+          navigation.reset({ index: 0, routes: [{ name: "Login" as never }] });
         },
-        style: "destructive",
       },
     ]);
   };
 
+  if (loading) {
+    return (
+      <View className="flex-1 bg-white pt-20 px-4">
+        <SkeletonBloco
+          height={120}
+          style={{ marginBottom: 20, borderRadius: 20 }}
+        />
+        <View className="flex-row">
+          <SkeletonBloco
+            height={140}
+            width={150}
+            style={{ marginRight: 10, borderRadius: 16 }}
+          />
+          <SkeletonBloco
+            height={140}
+            width={150}
+            style={{ borderRadius: 16 }}
+          />
+        </View>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.screenContainer} className="bg-white">
-      {/* Header - Parte Superior */}
-      <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
-        <View className="w-10">
-          <IconeLucide id="predio" tamanho={32} cor="#ffffff" />
-        </View>
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-white text-xl font-bold">CINOVA</Text>
-        </View>
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="w-10 items-end"
-          accessibilityRole="button"
-          accessibilityLabel="Logout"
-        >
-          <IconeLucide id="logout" tamanho={28} cor="#ffffff" />
-        </TouchableOpacity>
-      </View>
+    <View className="flex-1 bg-slate-50">
+      <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
-      {/* Seção de Olá, Síndico(a) */}
-      <View className="bg-red-700 px-4 py-6 flex-row items-center">
-        <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
-          <Text className="text-red-600 text-2xl font-bold">
-            {sindicoName
-              ? sindicoName
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-              : "SD"}
-          </Text>
+      {/* HEADER UNIFICADO */}
+      <View
+        className="bg-red-600 px-6 pb-10 shadow-lg z-10"
+        style={{
+          paddingTop: (insets.top || 0) + 20,
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+        }}
+      >
+        <View className="flex-row justify-between items-center mb-6">
+          {/* LOGO E NOME PADRÃO */}
+          <View className="flex-row items-center bg-red-700/50 py-1 px-3 rounded-full">
+            <IconeLucide id="predio" tamanho={16} cor="#fff" />
+            <Text className="text-white text-xs font-bold ml-2 tracking-widest">
+              CINOVA
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="w-10 h-10 bg-white/20 rounded-full items-center justify-center"
+          >
+            <IconeLucide id="logout" tamanho={20} cor="#fff" />
+          </TouchableOpacity>
         </View>
+
+        {/* SAUDAÇÃO + BADGE DE SÍNDICO */}
         <View>
-          <Text className="text-white text-xl font-semibold">
-            Olá, {sindicoName}
-          </Text>
-          <Text className="text-sm text-white font-bold">Síndico(a)</Text>
+          <View className="flex-row items-center gap-2 mb-1">
+            <Text className="text-red-100 text-base font-medium">
+              Olá,
+            </Text>
+
+            {/* BADGE ESPECÍFICA DO SÍNDICO */}
+            <View className="bg-white/20 px-2 py-0.5 rounded-md border border-white/10">
+              <Text className="text-white text-[9px] font-bold uppercase tracking-wider">
+                Síndico
+              </Text>
+            </View>
+          </View>
+          <Text className="text-white text-3xl font-bold">{sindicoName}</Text>
         </View>
       </View>
 
-      {/* ScrollView para o conteúdo principal */}
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        className="bg-white pt-4"
+        className="flex-1 -mt-6"
+        contentContainerStyle={{ paddingBottom: NAVBAR_HEIGHT + 40 }}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refetch}
-            colors={["#dc2626"]}
             tintColor="#dc2626"
-            progressViewOffset={0}
           />
         }
       >
-        {/* Status Gerenciais Section */}
-        <View className="px-4 mb-6">
-          <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-xl font-bold text-gray-800">
-              Visão Geral da Gestão
-            </Text>
-            <CustomButton
-              title="Ver Relatórios"
-              onPress={() =>
-                Alert.alert("Gestão", "Navegar para Relatórios Gerenciais")
-              }
-              style={styles.redButton}
-              textStyle={styles.whiteText}
+        {/* CARROSSEL 1: MÉTRICAS */}
+        <View>
+          <Text className="px-6 text-sm font-bold text-slate-600 mb-3 uppercase tracking-wider">
+            Visão Geral
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 24, paddingRight: 10 }}
+            className="pb-4"
+          >
+            <MetricCard
+              label="Aprovações Pendentes"
+              value={data?.ocorrenciasPendentes || 0}
+              icon="alerta"
+              color={data?.ocorrenciasPendentes ? "#ef4444" : "#10b981"}
+              onPress={() => navigation.navigate("AprovacaoOs" as never)}
             />
-          </View>
-
-          {/* Cartões de Status Horizontal */}
-          <View className="relative">
-            {/* Fades condicionais */}
-            {!nearStart && (
-              <View
-                className="absolute left-0 top-0 bottom-0 w-10 z-10 pointer-events-none"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0)",
-                  shadowColor: "#000",
-                  shadowOpacity: 0.12,
-                  shadowRadius: 8,
-                  shadowOffset: { width: 6, height: 0 },
-                }}
-              />
-            )}
-            {!nearEnd && (
-              <View
-                className="absolute right-0 top-0 bottom-0 w-10 z-10 pointer-events-none"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0)",
-                  shadowColor: "#000",
-                  shadowOpacity: 0.12,
-                  shadowRadius: 8,
-                  shadowOffset: { width: -6, height: 0 },
-                }}
-              />
-            )}
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="py-2"
-              contentContainerStyle={{ paddingLeft: 16, paddingRight: 32 }}
-              ref={statusScrollRef}
-              snapToInterval={CARD_WIDTH}
-              snapToAlignment="start"
-              decelerationRate="fast"
-              disableIntervalMomentum
-              onLayout={(e) => {
-                layoutWidthRef.current = e.nativeEvent.layout.width;
-              }}
-              onScroll={(e) => {
-                const { x } = e.nativeEvent.contentOffset;
-                const { width: layoutWidth } = e.nativeEvent.layoutMeasurement;
-                const { width: contentWidth } = e.nativeEvent.contentSize;
-                const maxOffset = Math.max(0, contentWidth - layoutWidth);
-
-                scrollOffset.current = x;
-                setHasScroll(maxOffset > 8);
-                setNearStart(x <= 10);
-                setNearEnd(x >= maxOffset - 10);
-              }}
-              scrollEventThrottle={16}
-              onContentSizeChange={(w) => {
-                const maxOffset = Math.max(0, w - layoutWidthRef.current);
-                setHasScroll(maxOffset > 8);
-                setNearEnd(false);
-                setNearStart(true);
-              }}
-            >
-              <StatusCard
-                title="Ocorrências p/ Aprovar"
-                value={data.ocorrenciasPendentes.toString()}
-                iconId="alerta"
-                iconColor="#ef4444"
-                bgColorClass="bg-red-100"
-                valueColorClass="text-red-600"
-                onPress={() => navigation.navigate("AprovacaoOs" as never)}
-              />
-
-              <StatusCard
-                title="Ordens em Execução"
-                value={data.ordensEmExecucao.toString()}
-                iconId="servicos"
-                iconColor="#3b82f6"
-                bgColorClass="bg-blue-100"
-                valueColorClass="text-blue-600"
-                onPress={() =>
-                  navigation.navigate("OrdensSindicoExecucao" as never)
-                }
-              />
-
-              <StatusCard
-                title="Faturas em Atraso"
-                value={`R$ ${data.faturasAtrasadasTotal
-                  .toFixed(2)
-                  .replace(".", ",")}`}
-                iconId="financeiro"
-                iconColor="#eab308"
-                bgColorClass="bg-yellow-100"
-                valueColorClass="text-yellow-700"
-                onPress={() =>
-                  Alert.alert(
-                    "Status",
-                    "Ver Faturas em Atraso e emitir segunda via"
-                  )
-                }
-              />
-
-              <StatusCard
-                title="Moradores Ativos"
-                value={data.moradoresAtivos.toString()}
-                iconId="moradores"
-                iconColor="#10b981"
-                bgColorClass="bg-green-100"
-                valueColorClass="text-green-600"
-                onPress={() =>
-                  Alert.alert("Status", "Ver lista completa de Moradores")
-                }
-              />
-            </ScrollView>
-            {hasScroll && !nearEnd && (
-              <TouchableOpacity
-                onPress={() => handleArrowPress("right")}
-                accessibilityRole="button"
-                accessibilityLabel="Avançar cards"
-                className="absolute right-2 top-1/2 -mt-3 z-20 bg-red-500 rounded-full p-1.5 shadow"
-              >
-                <IconeLucide id="proximo" tamanho={14} cor="#ffffff" />
-              </TouchableOpacity>
-            )}
-
-            {hasScroll && !nearStart && (
-              <TouchableOpacity
-                onPress={() => handleArrowPress("left")}
-                accessibilityRole="button"
-                accessibilityLabel="Voltar cards"
-                className="absolute left-2 top-1/2 -mt-3 z-20 bg-red-500 rounded-full p-1.5 shadow"
-              >
-                <IconeLucide id="anterior" tamanho={14} cor="#ffffff" />
-              </TouchableOpacity>
-            )}
-          </View>
+            <MetricCard
+              label="Ordens em Execução"
+              value={data?.ordensEmExecucao || 0}
+              icon="servicos"
+              color="#3b82f6"
+              onPress={() =>
+                navigation.navigate("OrdensSindicoExecucao" as never)
+              }
+            />
+            <MetricCard
+              label="Faturas em Atraso"
+              value={`R$ ${(data?.faturasAtrasadasTotal || 0).toLocaleString(
+                "pt-BR"
+              )}`}
+              icon="financeiro"
+              color="#eab308"
+              onPress={() => navigation.navigate("FinanceiroSindico" as never)}
+            />
+            <MetricCard
+              label="Moradores Ativos"
+              value={data?.moradoresAtivos || 0}
+              icon="moradores"
+              color="#6366f1"
+              onPress={() => Alert.alert("Moradores", "Lista de moradores")}
+            />
+          </ScrollView>
         </View>
 
-        {/* Ações Rápidas */}
-        <View className="px-4 mb-4">
-          <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-xl font-bold text-gray-800">
-              Ações de Gestão Rápida
+        {/* CARROSSEL 2: AÇÕES RÁPIDAS */}
+        <View className="mt-4">
+          <View className="px-6 flex-row justify-between items-center mb-3">
+            <Text className="text-sm font-bold text-slate-600 uppercase tracking-wider">
+              Ações Rápidas
             </Text>
-            <CustomButton
-              title="Ver Tudo"
-              onPress={() =>
-                Alert.alert("Ações", "Abrir menu de ações completas")
-              }
-              style={styles.redButton}
-              textStyle={styles.whiteText}
+            <TouchableOpacity>
+              <Text className="text-xs font-bold text-red-600">Ver todas</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 24, paddingRight: 10 }}
+            className="pb-4"
+          >
+            <ActionCard
+              label="Novo Comunicado"
+              subLabel="Enviar aviso geral"
+              icon="comunicacao"
+              onPress={() => Alert.alert("Novo Comunicado", "Abrir editor")}
             />
-          </View>
-          <View className="bg-white p-4 rounded-lg shadow-md border border-slate-200">
-            {/* Ação 1: Publicar Novo Comunicado */}
-            <TouchableOpacity
-              onPress={() => Alert.alert("Ação", "Criar Novo Comunicado")}
-              className="flex-row items-center p-2 border-b border-gray-100"
-              accessibilityRole="button"
-              accessibilityLabel="Publicar Novo Comunicado"
-            >
-              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
-                <IconeLucide id="comunicacao" tamanho={20} cor="#a855f7" />
-              </View>
-              <Text className="text-base text-gray-800 font-medium flex-1">
-                Publicar Novo Comunicado
-              </Text>
-              <IconeLucide id="proximo" tamanho={20} cor="#9ca3af" />
-            </TouchableOpacity>
-
-            {/* Ação 2: Aprovar Ordens */}
-            <TouchableOpacity
-              onPress={() => Alert.alert("Ação", "Revisar e Aprovar Ordens")}
-              className="flex-row items-center p-2 border-b border-gray-100"
-              accessibilityRole="button"
-              accessibilityLabel={`Revisar ${data.ocorrenciasPendentes} ordens pendentes`}
-            >
-              <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center mr-3">
-                <IconeLucide id="aprovar" tamanho={20} cor="#10b981" />
-              </View>
-              <Text className="text-base text-gray-800 font-medium flex-1">
-                Revisar Ordens Pendentes ({data.ocorrenciasPendentes})
-              </Text>
-              <IconeLucide id="proximo" tamanho={20} cor="#9ca3af" />
-            </TouchableOpacity>
-
-            {/* Ação 3: Relatório Financeiro */}
-            <TouchableOpacity
-              onPress={() =>
-                Alert.alert("Ação", "Visualizar Prestação de Contas")
-              }
-              className="flex-row items-center p-2"
-              accessibilityRole="button"
-              accessibilityLabel="Prestação de Contas Mensal"
-            >
-              <View className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center mr-3">
-                <IconeLucide id="historico" tamanho={20} cor="#3b82f6" />
-              </View>
-              <Text className="text-base text-gray-800 font-medium flex-1">
-                Prestação de Contas (Mensal)
-              </Text>
-              <IconeLucide id="proximo" tamanho={20} cor="#9ca3af" />
-            </TouchableOpacity>
-          </View>
+            <ActionCard
+              label="Aprovar Ordens"
+              subLabel="Revisar solicitações"
+              icon="aprovar"
+              onPress={() => navigation.navigate("AprovacaoOs" as never)}
+            />
+            <ActionCard
+              label="Prestação de Contas"
+              subLabel="Relatório Mensal"
+              icon="financeiro"
+              onPress={() => navigation.navigate("FinanceiroSindico" as never)}
+            />
+            <ActionCard
+              label="Agenda Áreas"
+              subLabel="Verificar reservas"
+              icon="calendario"
+              onPress={() => navigation.navigate("ReservasSindico" as never)}
+            />
+          </ScrollView>
         </View>
-        <View className="h-10" />
       </ScrollView>
 
-      {/* Navbar Global */}
-      <NavbarGlobal />
+      <NavbarGlobal telaAtiva="Inicio" />
     </View>
   );
 };

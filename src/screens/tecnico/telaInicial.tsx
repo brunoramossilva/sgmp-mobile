@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,130 +6,47 @@ import {
   ScrollView,
   Alert,
   StyleSheet,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
+  StatusBar,
   RefreshControl,
-  BackHandler,
+  Platform,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
-import { CarrosselIntroducao } from "../../components/introducao";
-import { obterSlidesIntroducao } from "../../utils/conteudoIntroducao";
-import {
-  getOrdens,
-  updateOrdem,
-  OrdemServicoApi,
-} from "../../services/ordemServico";
+// NavbarGlobal removida conforme solicitado
+import { IconeLucide } from "../../components/icones";
+import SkeletonBloco from "../../components/SkeletonBloco";
+import { NAVBAR_HEIGHT } from "../../utils/responsividade";
+
+// Services e Types
+import { getOrdens, updateOrdem } from "../../services/ordemServico";
 import { OrdemServicoUI, mapApiToUI } from "./types";
 import CardOrdemPendente from "./CardOrdemPendente";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
 import SkeletonOrdem from "./SkeletonOrdem";
-import { IconeLucide } from "../../components/icones";
-import SkeletonBloco from "../../components/SkeletonBloco";
 
-// --- TIPOS E INTERFACES ---
-
-interface CustomButtonProps {
-  title: string;
-  onPress: () => void;
-  style?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-}
-
-interface StatusCardProps {
-  title: string;
-  value: string;
-  iconId:
-    | "servicos"
-    | "confirmar"
-    | "alerta"
-    | "comunicacao"
-    | "progresso"
-    | "verificado";
-  iconColor: string;
-  bgColorClass: string;
-  valueColorClass: string;
-  onPress: () => void;
-}
-
-interface DashboardData {
-  ordensAguardando: number;
-  ordensAceitas: number;
-  ordensFinalizadas: number;
-}
-
-// --- COMPONENTES AUXILIARES ---
-
-const CustomButton: React.FC<CustomButtonProps> = ({
-  title,
-  onPress,
-  style,
-  textStyle,
-}) => (
-  <TouchableOpacity onPress={onPress} style={style} className="p-2 rounded-lg">
-    <Text style={textStyle} className="text-white font-semibold">
-      {title}
-    </Text>
-  </TouchableOpacity>
-);
-
-const StatusCard: React.FC<StatusCardProps> = ({
-  title,
-  value,
-  iconId,
-  iconColor,
-  bgColorClass,
-  valueColorClass,
-  onPress,
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    className={`${bgColorClass} rounded-xl p-3 shadow-sm border border-slate-200 flex-1 mx-1`}
-  >
-    <View className="items-center">
-      <View className="w-10 h-10 items-center justify-center mb-2">
-        <IconeLucide id={iconId} tamanho={24} cor={iconColor} />
-      </View>
-      <Text className={`text-2xl font-bold ${valueColorClass} mb-1`}>
-        {value}
-      </Text>
-      <Text className="text-xs text-gray-600 font-medium text-center">
-        {title}
-      </Text>
-    </View>
-  </TouchableOpacity>
-);
-
-// --- HOOK CUSTOMIZADO PARA DASHBOARD ---
-
+// --- HOOK DE DASHBOARD ---
 const useDashboardData = () => {
-  const [data, setData] = useState<DashboardData>({
-    ordensAguardando: 0,
-    ordensAceitas: 0,
-    ordensFinalizadas: 0,
+  const [data, setData] = useState({
+    pendentes: 0,
+    aprovadas: 0,
+    finalizadas: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      setError(null);
       const response = await getOrdens();
       const ordensUI = response.map(mapApiToUI);
 
       setData({
-        ordensAguardando: ordensUI.filter((o) => o.status === "Pendente")
-          .length,
-        ordensAceitas: ordensUI.filter((o) => o.status === "Aceita").length,
-        ordensFinalizadas: ordensUI.filter((o) => o.status === "Finalizada")
-          .length,
+        pendentes: ordensUI.filter((o) => o.status === "Pendente").length,
+        aprovadas: ordensUI.filter((o) => o.status === "Aceita").length,
+        finalizadas: ordensUI.filter((o) => o.status === "Finalizada").length,
       });
-    } catch (err: any) {
-      setError(err.message || "Erro ao carregar dashboard");
+    } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
@@ -146,80 +63,81 @@ const useDashboardData = () => {
     fetchData();
   }, [fetchData]);
 
-  return { data, loading, error, refreshing, refetch };
+  return { data, loading, refreshing, refetch };
 };
 
 // --- COMPONENTE PRINCIPAL ---
-
-export default function TelaInicial() {
+export default function InicialTecnico() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
+
+  // Estados de Dados
   const {
-    data,
+    data: stats,
     loading: dashboardLoading,
-    error,
     refreshing,
     refetch,
   } = useDashboardData();
-
   const [ordens, setOrdens] = useState<OrdemServicoUI[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [exibirIntroducao, setExibirIntroducao] = useState(false);
-  const [deveExibirIntroducao, setDeveExibirIntroducao] = useState(false);
-  const [carregandoIntroducao, setCarregandoIntroducao] = useState(true);
+  const [loadingList, setLoadingList] = useState(false);
+
+  // Estados de UI/Filtro
+  const [abaSelecionada, setAbaSelecionada] = useState<
+    "Pendentes" | "Aprovadas" | "Finalizadas"
+  >("Pendentes");
+
   const [modalDetalhesVisivel, setModalDetalhesVisivel] = useState(false);
   const [modalFinalizacaoVisivel, setModalFinalizacaoVisivel] = useState(false);
   const [ordemSelecionada, setOrdemSelecionada] =
     useState<OrdemServicoUI | null>(null);
-  const [abaSelecionada, setAbaSelecionada] = useState<
-    "pendentes" | "aceitas" | "finalizadas"
-  >("pendentes");
 
-  // Refetch ao focar na tela
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-      carregarOrdens();
-    }, [refetch])
-  );
+  const tecnicoName = usuario?.nome?.trim()
+    ? usuario.nome.split(" ")[0]
+    : "Colaborador";
 
+  // Carregar lista completa
   const carregarOrdens = useCallback(async () => {
     try {
-      setLoading(true);
+      setLoadingList(true);
       const response = await getOrdens();
       setOrdens(response.map(mapApiToUI));
     } catch (err) {
       console.error("Erro ao carregar ordens:", err);
     } finally {
-      setLoading(false);
+      setLoadingList(false);
     }
   }, []);
 
-  useEffect(() => {
-    carregarOrdens();
-  }, [carregarOrdens]);
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+      carregarOrdens();
+    }, [refetch, carregarOrdens])
+  );
 
   const handleLogout = () => {
-    Alert.alert("Desconectar", "Tem certeza que deseja sair?", [
-      { text: "Cancelar", onPress: () => {}, style: "cancel" },
+    Alert.alert("Sair", "Deseja desconectar?", [
+      { text: "Cancelar", style: "cancel" },
       {
         text: "Sair",
+        style: "destructive",
         onPress: () => {
           desautenticar();
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "Login" as never }],
-          });
+          navigation.reset({ index: 0, routes: [{ name: "Login" as never }] });
         },
-        style: "destructive",
       },
     ]);
   };
 
+  // --- AÇÕES ---
   const abrirDetalhes = (ordem: OrdemServicoUI) => {
     setOrdemSelecionada(ordem);
     setModalDetalhesVisivel(true);
+  };
+  const abrirFinalizacao = (ordem: OrdemServicoUI) => {
+    setOrdemSelecionada(ordem);
+    setModalFinalizacaoVisivel(true);
   };
 
   const aceitarOS = async (ordem: OrdemServicoUI) => {
@@ -231,41 +149,29 @@ export default function TelaInicial() {
       });
       await carregarOrdens();
       refetch();
-      Alert.alert("Sucesso", "Ordem aceita com sucesso!");
+      Alert.alert("Sucesso", "Ordem aceita!");
     } catch (err) {
-      Alert.alert("Erro", "Não foi possível aceitar a ordem");
-      console.error(err);
+      Alert.alert("Erro", "Falha ao aceitar ordem");
     }
   };
 
   const recusarOS = async (ordem: OrdemServicoUI) => {
-    Alert.alert(
-      "Confirmar Recusa",
-      "Tem certeza que deseja recusar esta ordem?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Recusar",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await updateOrdem(ordem.id, { status: "RECUSADA" });
-              await carregarOrdens();
-              refetch();
-              Alert.alert("Sucesso", "Ordem recusada");
-            } catch (err) {
-              Alert.alert("Erro", "Não foi possível recusar a ordem");
-              console.error(err);
-            }
-          },
+    Alert.alert("Confirmar Recusa", "Deseja recusar esta ordem?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Recusar",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await updateOrdem(ordem.id, { status: "RECUSADA" });
+            await carregarOrdens();
+            refetch();
+          } catch (err) {
+            Alert.alert("Erro", "Falha ao recusar ordem");
+          }
         },
-      ]
-    );
-  };
-
-  const abrirFinalizacao = (ordem: OrdemServicoUI) => {
-    setOrdemSelecionada(ordem);
-    setModalFinalizacaoVisivel(true);
+      },
+    ]);
   };
 
   const finalizarOS = async () => {
@@ -279,324 +185,225 @@ export default function TelaInicial() {
       refetch();
       setModalFinalizacaoVisivel(false);
       setOrdemSelecionada(null);
-      Alert.alert("Sucesso", "Ordem finalizada com sucesso!");
+      Alert.alert("Sucesso", "Ordem finalizada!");
     } catch (err) {
-      Alert.alert("Erro", "Não foi possível finalizar a ordem");
-      console.error(err);
+      Alert.alert("Erro", "Falha ao finalizar ordem");
     }
   };
 
-  // Dados filtrados por abas
-  const ordensAgrupadas = useMemo(() => {
-    return {
-      pendentes: ordens.filter((o) => o.status === "Pendente"),
-      aceitas: ordens.filter((o) => o.status === "Aceita"),
-      finalizadas: ordens.filter((o) => o.status === "Finalizada"),
-    };
-  }, [ordens]);
-
   const ordensExibidas = useMemo(() => {
-    switch (abaSelecionada) {
-      case "pendentes":
-        return ordensAgrupadas.pendentes;
-      case "aceitas":
-        return ordensAgrupadas.aceitas;
-      case "finalizadas":
-        return ordensAgrupadas.finalizadas;
-      default:
-        return [];
-    }
-  }, [abaSelecionada, ordensAgrupadas]);
+    if (abaSelecionada === "Pendentes")
+      return ordens.filter((o) => o.status === "Pendente");
+    if (abaSelecionada === "Aprovadas")
+      return ordens.filter((o) => o.status === "Aceita");
+    if (abaSelecionada === "Finalizadas")
+      return ordens.filter((o) => o.status === "Finalizada");
+    return [];
+  }, [ordens, abaSelecionada]);
 
-  const styles = StyleSheet.create({
-    screenContainer: {
-      flex: 1,
-      backgroundColor: "#ffffff",
-    },
-    redButton: {
-      backgroundColor: "#EF4444",
-      paddingVertical: 6,
-      paddingHorizontal: 12,
-      borderRadius: 8,
-    },
-    whiteText: {
-      color: "#FFFFFF",
-      fontSize: 14,
-    },
-    abaSelecionada: {
-      borderBottomWidth: 3,
-      borderBottomColor: "#dc2626",
-    },
-    abaInativa: {
-      borderBottomWidth: 1,
-      borderBottomColor: "#e5e7eb",
-    },
-  });
-
-  // Mostrar introdução se necessário
-  if (exibirIntroducao && usuario) {
-    const slidesIntroducao = obterSlidesIntroducao(usuario.papel);
-    return (
-      <CarrosselIntroducao
-        slides={slidesIntroducao}
-        aoConcluir={async () => {
-          setExibirIntroducao(false);
-        }}
-        nomePapel={usuario.papel}
-      />
-    );
-  }
-
-  // Loading state
   if (dashboardLoading) {
     return (
-      <View style={styles.screenContainer} className="bg-white">
-        <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
-          <View className="w-10">
-            <IconeLucide id="servicos" tamanho={32} cor="#ffffff" />
-          </View>
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-white text-xl font-bold">Técnico</Text>
-          </View>
-          <View className="w-10 items-end">
-            <IconeLucide id="logout" tamanho={28} cor="#ffffff" />
-          </View>
-        </View>
-        <View className="p-4 pt-8">
-          {[1, 2, 3].map((i) => (
-            <SkeletonBloco key={i} height={90} style={{ marginBottom: 12 }} />
-          ))}
-        </View>
-      </View>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <View style={styles.screenContainer} className="bg-white">
-        <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
-          <View className="w-10">
-            <IconeLucide id="servicos" tamanho={32} cor="#ffffff" />
-          </View>
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-white text-xl font-bold">Técnico</Text>
-          </View>
-          <TouchableOpacity onPress={handleLogout} className="w-10 items-end">
-            <IconeLucide id="logout" tamanho={28} cor="#ffffff" />
-          </TouchableOpacity>
-        </View>
-        <View className="flex-1 items-center justify-center px-4">
-          <IconeLucide id="alerta" tamanho={56} cor="#ef4444" />
-          <Text className="text-gray-800 text-lg font-semibold mt-4 text-center">
-            Erro ao Carregar Dados
-          </Text>
-          <Text className="text-gray-600 mt-2 text-center">{error}</Text>
-          <TouchableOpacity
-            onPress={refetch}
-            className="mt-6 bg-red-600 px-6 py-3 rounded-lg"
-          >
-            <Text className="text-white font-semibold">Tentar Novamente</Text>
-          </TouchableOpacity>
+      <View className="flex-1 bg-white pt-20 px-4">
+        <SkeletonBloco
+          height={120}
+          style={{ marginBottom: 20, borderRadius: 20 }}
+        />
+        <View className="flex-row gap-3">
+          <SkeletonBloco height={100} style={{ flex: 1, borderRadius: 16 }} />
+          <SkeletonBloco height={100} style={{ flex: 1, borderRadius: 16 }} />
+          <SkeletonBloco height={100} style={{ flex: 1, borderRadius: 16 }} />
         </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.screenContainer} className="bg-white">
-      {/* Header - Parte Superior */}
-      <View className="bg-red-600 p-4 pt-16 flex-row items-center justify-between">
-        <View className="w-10">
-          <IconeLucide id="predio" tamanho={32} cor="#ffffff" />
-        </View>
-        <View className="flex-1 items-center justify-center">
-          <Text className="text-white text-xl font-bold">CINOVA</Text>
-        </View>
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="w-10 items-end"
-          accessibilityRole="button"
-          accessibilityLabel="Logout"
-        >
-          <IconeLucide id="logout" tamanho={28} cor="#ffffff" />
-        </TouchableOpacity>
-      </View>
+    <View className="flex-1 bg-slate-50">
+      <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
-      {/* Header - Parte Inferior */}
-      <View className="bg-red-700 px-4 py-3 flex-row items-center">
-        <View className="w-16 h-16 bg-white rounded-full flex items-center justify-center mr-4">
-          <Text className="text-red-600 text-2xl font-bold">
-            {usuario?.nome
-              ? usuario.nome
-                  .split(" ")
-                  .slice(0, 2)
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-              : "TC"}
-          </Text>
+      {/* HEADER UNIFICADO (CURVO - CINOVA) */}
+      <View
+        className="bg-red-600 px-6 pb-12 shadow-lg z-10" // Aumentei pb-12 para dar mais espaço
+        style={{
+          paddingTop: (insets.top || 0) + 20,
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+        }}
+      >
+        <View className="flex-row justify-between items-center mb-6">
+          <View className="flex-row items-center bg-red-700/50 py-1 px-3 rounded-full">
+            <IconeLucide id="predio" tamanho={16} cor="#fff" />
+            <Text className="text-white text-xs font-bold ml-2 tracking-widest">
+              CINOVA
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="w-10 h-10 bg-white/20 rounded-full items-center justify-center"
+          >
+            <IconeLucide id="logout" tamanho={20} cor="#fff" />
+          </TouchableOpacity>
         </View>
+
         <View>
-          <Text className="text-white text-xl font-semibold">
-            Olá, {usuario?.nome || "Técnico"}
-          </Text>
-          <Text className="text-sm text-white font-bold">
-            Técnico Condominial
-          </Text>
+          <View className="flex-row items-center gap-2 mb-1">
+            <Text className="text-red-100 text-base font-medium">
+              Bom trabalho,
+            </Text>
+
+            {/* BADGE PADRONIZADA (BRANCO TRANSLÚCIDO) */}
+            <View className="bg-white/20 px-2 py-0.5 rounded-md border border-white/10">
+              <Text className="text-white text-[9px] font-bold uppercase tracking-wider">
+                Funcionário
+              </Text>
+            </View>
+          </View>
+          <Text className="text-white text-3xl font-bold">{tecnicoName}</Text>
         </View>
       </View>
 
-      {/* Cards de Status - Fixo */}
-      <View className="bg-white px-4 py-4 border-b border-slate-200">
-        <Text className="text-lg font-bold text-gray-800 mb-3">
-          Visão Geral
-        </Text>
-        <View className="flex-row">
-          <StatusCard
-            title="Aguardando"
-            value={data.ordensAguardando.toString()}
-            iconId="comunicacao"
-            iconColor="#ef4444"
-            bgColorClass="bg-red-100"
-            valueColorClass="text-red-600"
-            onPress={() => setAbaSelecionada("pendentes")}
-          />
-
-          <StatusCard
-            title="Aceitas"
-            value={data.ordensAceitas.toString()}
-            iconId="progresso"
-            iconColor="#3b82f6"
-            bgColorClass="bg-blue-100"
-            valueColorClass="text-blue-600"
-            onPress={() => setAbaSelecionada("aceitas")}
-          />
-
-          <StatusCard
-            title="Finalizadas"
-            value={data.ordensFinalizadas.toString()}
-            iconId="verificado"
-            iconColor="#10b981"
-            bgColorClass="bg-green-100"
-            valueColorClass="text-green-600"
-            onPress={() => setAbaSelecionada("finalizadas")}
-          />
-        </View>
-      </View>
-
-      {/* Abas de Filtro - Fixo */}
-      <View className="bg-white flex-row border-b border-slate-200">
-        <TouchableOpacity
-          onPress={() => setAbaSelecionada("pendentes")}
-          style={[
-            abaSelecionada === "pendentes"
-              ? styles.abaSelecionada
-              : styles.abaInativa,
-          ]}
-          className="flex-1 py-3 items-center"
-        >
-          <Text
-            className={`font-semibold text-sm ${
-              abaSelecionada === "pendentes" ? "text-red-600" : "text-gray-600"
-            }`}
-          >
-            Pendentes ({ordensAgrupadas.pendentes.length})
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setAbaSelecionada("aceitas")}
-          style={[
-            abaSelecionada === "aceitas"
-              ? styles.abaSelecionada
-              : styles.abaInativa,
-          ]}
-          className="flex-1 py-3 items-center"
-        >
-          <Text
-            className={`font-semibold text-sm ${
-              abaSelecionada === "aceitas" ? "text-red-600" : "text-gray-600"
-            }`}
-          >
-            Aceitas ({ordensAgrupadas.aceitas.length})
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setAbaSelecionada("finalizadas")}
-          style={[
-            abaSelecionada === "finalizadas"
-              ? styles.abaSelecionada
-              : styles.abaInativa,
-          ]}
-          className="flex-1 py-3 items-center"
-        >
-          <Text
-            className={`font-semibold text-sm ${
-              abaSelecionada === "finalizadas"
-                ? "text-red-600"
-                : "text-gray-600"
-            }`}
-          >
-            Finalizadas ({ordensAgrupadas.finalizadas.length})
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* ScrollView apenas para Lista de Ordens */}
       <ScrollView
-        className="flex-1 bg-white"
-        contentContainerStyle={{ paddingBottom: 20 }}
+        className="flex-1"
+        contentContainerStyle={{
+          paddingTop: 20,
+          paddingBottom: 40,
+        }}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refetch}
-            colors={["#dc2626"]}
             tintColor="#dc2626"
           />
         }
       >
-        {/* Lista de Ordens */}
-        <View className="px-4 mb-4">
-          {loading ? (
-            <View className="py-2">
-              {[1, 2, 3].map((i) => (
-                <SkeletonOrdem key={i} />
-              ))}
-            </View>
-          ) : ordensExibidas.length === 0 ? (
-            <View className="bg-slate-50 p-6 rounded-xl border border-slate-200 items-center justify-center">
-              <IconeLucide
-                id={
-                  abaSelecionada === "pendentes"
-                    ? "alerta"
-                    : abaSelecionada === "aceitas"
-                    ? "servicos"
-                    : "confirmar"
-                }
-                tamanho={48}
-                cor={
-                  abaSelecionada === "pendentes"
-                    ? "#ef4444"
-                    : abaSelecionada === "aceitas"
-                    ? "#3b82f6"
-                    : "#10b981"
-                }
-              />
-              <Text className="text-slate-600 text-center mt-3 font-medium">
-                {abaSelecionada === "pendentes"
-                  ? "Nenhuma ordem aguardando"
-                  : abaSelecionada === "aceitas"
-                  ? "Nenhuma ordem aceita"
-                  : "Nenhuma ordem finalizada"}
+        {/* CARDS DE STATUS */}
+        <View className="px-4 mb-6 -mt-8">
+          <View className="flex-row justify-between">
+            {/* Card PENDENTES */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setAbaSelecionada("Pendentes")}
+              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
+                abaSelecionada === "Pendentes"
+                  ? "bg-red-50 border-red-200"
+                  : "bg-white border-slate-100"
+              }`}
+              style={{ elevation: abaSelecionada === "Pendentes" ? 4 : 2 }}
+            >
+              <Text
+                className={`text-2xl font-bold ${
+                  abaSelecionada === "Pendentes"
+                    ? "text-red-600"
+                    : "text-slate-800"
+                }`}
+              >
+                {stats.pendentes}
               </Text>
-              <Text className="text-slate-500 text-center text-sm mt-1">
-                {abaSelecionada === "pendentes"
-                  ? "Você está em dia com suas tarefas!"
-                  : abaSelecionada === "aceitas"
-                  ? "Aceite novas ordens para começar"
-                  : "Suas ordens finalizadas aparecerão aqui"}
+              <Text
+                className={`text-[9px] font-bold uppercase mt-1 ${
+                  abaSelecionada === "Pendentes"
+                    ? "text-red-400"
+                    : "text-slate-400"
+                }`}
+              >
+                Pendentes
+              </Text>
+            </TouchableOpacity>
+
+            {/* Card APROVADAS */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setAbaSelecionada("Aprovadas")}
+              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
+                abaSelecionada === "Aprovadas"
+                  ? "bg-blue-50 border-blue-200"
+                  : "bg-white border-slate-100"
+              }`}
+              style={{ elevation: abaSelecionada === "Aprovadas" ? 4 : 2 }}
+            >
+              <Text
+                className={`text-2xl font-bold ${
+                  abaSelecionada === "Aprovadas"
+                    ? "text-blue-600"
+                    : "text-slate-800"
+                }`}
+              >
+                {stats.aprovadas}
+              </Text>
+              <Text
+                className={`text-[9px] font-bold uppercase mt-1 ${
+                  abaSelecionada === "Aprovadas"
+                    ? "text-blue-400"
+                    : "text-slate-400"
+                }`}
+              >
+                Aprovadas
+              </Text>
+            </TouchableOpacity>
+
+            {/* Card FINALIZADAS */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setAbaSelecionada("Finalizadas")}
+              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
+                abaSelecionada === "Finalizadas"
+                  ? "bg-green-50 border-green-200"
+                  : "bg-white border-slate-100"
+              }`}
+              style={{ elevation: abaSelecionada === "Finalizadas" ? 4 : 2 }}
+            >
+              <Text
+                className={`text-2xl font-bold ${
+                  abaSelecionada === "Finalizadas"
+                    ? "text-green-600"
+                    : "text-slate-800"
+                }`}
+              >
+                {stats.finalizadas}
+              </Text>
+              <Text
+                className={`text-[9px] font-bold uppercase mt-1 ${
+                  abaSelecionada === "Finalizadas"
+                    ? "text-green-400"
+                    : "text-slate-400"
+                }`}
+              >
+                Finalizadas
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* TÍTULO DA LISTA */}
+        <View className="px-6 mb-3 mt-2">
+          <Text className="text-sm font-bold text-slate-600 uppercase tracking-wider">
+            {abaSelecionada === "Pendentes"
+              ? "Tarefas a Fazer"
+              : abaSelecionada === "Aprovadas"
+              ? "Em Andamento"
+              : "Histórico Completo"}
+          </Text>
+        </View>
+
+        {/* LISTA DE ORDENS */}
+        <View className="px-4">
+          {loadingList ? (
+            [1, 2].map((i) => <SkeletonOrdem key={i} />)
+          ) : ordensExibidas.length === 0 ? (
+            <View className="bg-white p-8 rounded-2xl border border-slate-100 items-center justify-center border-dashed mt-2">
+              <IconeLucide
+                id={abaSelecionada === "Pendentes" ? "verificado" : "alerta"}
+                tamanho={40}
+                cor="#cbd5e1"
+              />
+              <Text className="text-slate-500 font-medium mt-3">
+                Nenhuma ordem aqui
+              </Text>
+              <Text className="text-slate-400 text-xs text-center mt-1">
+                {abaSelecionada === "Pendentes"
+                  ? "Você não tem pendências."
+                  : "A lista está vazia."}
               </Text>
             </View>
           ) : (
@@ -606,12 +413,12 @@ export default function TelaInicial() {
                 ordem={ordem}
                 onDetalhes={() => abrirDetalhes(ordem)}
                 onAceitar={
-                  abaSelecionada === "pendentes"
+                  abaSelecionada === "Pendentes"
                     ? () => aceitarOS(ordem)
                     : undefined
                 }
                 onRecusar={
-                  abaSelecionada === "pendentes"
+                  abaSelecionada === "Pendentes"
                     ? () => recusarOS(ordem)
                     : undefined
                 }
