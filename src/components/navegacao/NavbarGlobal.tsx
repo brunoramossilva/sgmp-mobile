@@ -180,7 +180,7 @@ const NavbarGlobal: React.FC<NavbarGlobalProps> = React.memo(
       [navigation]
     );
 
-    // Lógica do botão de voltar (CORRIGIDA)
+    // Lógica do botão de voltar 
     useFocusEffect(
       useCallback(() => {
         const onBack = () => {

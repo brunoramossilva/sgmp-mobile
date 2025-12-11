@@ -8,6 +8,7 @@ import {
   Platform,
   Keyboard,
   ActivityIndicator,
+  TouchableOpacity, // Adicionado
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -19,6 +20,7 @@ import { CriacaoOSFormulario, schemaCriacaoOS } from "../../types/ordemServico";
 import { BotaoCriar, MensagemErro } from "../../components/formulario";
 import { useCriacaoOS } from "../../../docs/morador/useCriacaoOS";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
+import { IconeLucide } from "../../components/icones"; // Para o ícone do botão novo
 
 export default function CriacaoOS() {
   const navigation = useNavigation();
@@ -85,11 +87,19 @@ export default function CriacaoOS() {
     if (usuario) await executarCriacao(dados.descricao, usuario.cpf);
   };
 
+  // Ação do novo botão (apenas visual por enquanto)
+  const handleVerHistorico = () => {
+    Alert.alert(
+      "Minhas Solicitações",
+      "Aqui será exibida a lista de suas ordens abertas."
+    );
+  };
+
   if (!usuario) return null;
 
   return (
     <View className="flex-1 bg-slate-50">
-      {/* HEADER FIXO */}
+      {/* HEADER FIXO (Estrutura Original Mantida) */}
       <View
         className="bg-red-600 px-4 pb-4 shadow-md z-10"
         style={{ paddingTop: (insets.top || 0) + 12 }}
@@ -132,7 +142,8 @@ export default function CriacaoOS() {
             </View>
           )}
 
-          <View className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm mb-5 h-60">
+          {/* INPUT CARD */}
+          <View className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm mb-4 h-60">
             <Text className="text-slate-700 font-bold mb-2 text-sm">
               Descrição do Problema *
             </Text>
@@ -173,7 +184,19 @@ export default function CriacaoOS() {
             </View>
           </View>
 
-          {/* BOTÃO */}
+          {/* Ver historico */}
+          <TouchableOpacity
+            onPress={handleVerHistorico}
+            activeOpacity={0.7}
+            className="flex-row items-center justify-center p-3 mb-2 rounded-xl border border-red-200 bg-red-50"
+          >
+            <IconeLucide id="historico" tamanho={20} cor="#dc2626" />
+            <Text className="text-red-700 font-bold text-sm ml-2">
+              Visualizar serviços
+            </Text>
+          </TouchableOpacity>
+
+          {/* BOTÃO ENVIAR */}
           <View className="mt-auto">
             <BotaoCriar
               titulo={carregando ? "Enviando..." : "Enviar Solicitação"}
