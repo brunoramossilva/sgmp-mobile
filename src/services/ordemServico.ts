@@ -7,7 +7,6 @@ export type OrdemServicoApi = {
   dataAbertura: string;
   dataConclusao?: string | null;
   status: string;
-  aprovado: boolean;
   cpf_morador: string;
   morador?: { nome?: string };
   cpf_funcionario?: string | null;
@@ -41,8 +40,7 @@ export const updateOrdem = async (
  *
  * Campos preenchidos automaticamente no backend:
  * - dataAbertura: DateTime @default(now())
- * - status: String @default("ABERTA")
- * - aprovado: Boolean @default(false)
+ * - status: String @default("PENDENTE_APROVACAO")
  *
  * @param payload - Dados para criação da OS
  * @returns Ordem de serviço criada

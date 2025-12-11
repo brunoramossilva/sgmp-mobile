@@ -17,11 +17,15 @@ import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { IconeLucide } from "../../components/icones";
 import SkeletonBloco from "../../components/SkeletonBloco";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
+import { CarrosselIntroducao } from "../../components/introducao";
+import { obterSlidesIntroducao } from "../../utils/conteudoIntroducao";
+import { useIntroducaoUsuario } from "../../hooks/useIntroducaoUsuario";
 
 // Services e Types
 import { getOrdens, updateOrdem } from "../../services/ordemServico";
-import { OrdemServicoUI, mapApiToUI } from "./types";
+import { OrdemServicoUI, mapApiToUI } from "../../utils/mapeadores";
 import CardOrdemPendente from "./CardOrdemPendente";
+import CardOrdemAceita from "./CardOrdemAceita";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
 import SkeletonOrdem from "./SkeletonOrdem";
@@ -39,12 +43,23 @@ const useDashboardData = () => {
   const fetchData = useCallback(async () => {
     try {
       const response = await getOrdens();
-      const ordensUI = response.map(mapApiToUI);
+
+      // Contar apenas OSs relevantes para o técnico
+      const pendentes = response.filter(
+        (o) => o.status?.toUpperCase() === "AGUARDANDO_EXECUCAO"
+      ).length;
+      const emExecucao = response.filter(
+        (o) => o.status?.toUpperCase() === "EM_EXECUCAO"
+      ).length;
+      const finalizadas = response.filter((o) => {
+        const statusUpper = o.status?.toUpperCase();
+        return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
+      }).length;
 
       setData({
-        pendentes: ordensUI.filter((o) => o.status === "Pendente").length,
-        aprovadas: ordensUI.filter((o) => o.status === "Aceita").length,
-        finalizadas: ordensUI.filter((o) => o.status === "Finalizada").length,
+        pendentes,
+        aprovadas: emExecucao,
+        finalizadas,
       });
     } catch (err) {
       console.error(err);
@@ -72,6 +87,10 @@ export default function InicialTecnico() {
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
 
+  const cpf = usuario?.cpf || "";
+  const { deveExibirIntroducao, marcarComoVisto, carregando } =
+    useIntroducaoUsuario(cpf, "FUNCIONARIO");
+
   // Estados de Dados
   const {
     data: stats,
@@ -84,7 +103,7 @@ export default function InicialTecnico() {
 
   // Estados de UI/Filtro
   const [abaSelecionada, setAbaSelecionada] = useState<
-    "Pendentes" | "Aprovadas" | "Finalizadas"
+    "Pendentes" | "Em Execução" | "Finalizadas"
   >("Pendentes");
 
   const [modalDetalhesVisivel, setModalDetalhesVisivel] = useState(false);
@@ -101,7 +120,25 @@ export default function InicialTecnico() {
     try {
       setLoadingList(true);
       const response = await getOrdens();
-      setOrdens(response.map(mapApiToUI));
+
+      // Filtrar apenas OSs que o técnico deve ver
+      const ordensTecnico = response.filter((o) => {
+        const statusUpper = o.status?.toUpperCase();
+        return (
+          statusUpper === "AGUARDANDO_EXECUCAO" ||
+          statusUpper === "EM_EXECUCAO" ||
+          statusUpper === "CONCLUIDA" ||
+          statusUpper === "FINALIZADA"
+        );
+      });
+
+      // Ordenar por data mais recente primeiro
+      const ordensOrdenadas = ordensTecnico.map(mapApiToUI).sort((a, b) => {
+        const dataA = new Date(a.data.split("/").reverse().join("-"));
+        const dataB = new Date(b.data.split("/").reverse().join("-"));
+        return dataB.getTime() - dataA.getTime();
+      });
+      setOrdens(ordensOrdenadas);
     } catch (err) {
       console.error("Erro ao carregar ordens:", err);
     } finally {
@@ -135,6 +172,7 @@ export default function InicialTecnico() {
     setOrdemSelecionada(ordem);
     setModalDetalhesVisivel(true);
   };
+
   const abrirFinalizacao = (ordem: OrdemServicoUI) => {
     setOrdemSelecionada(ordem);
     setModalFinalizacaoVisivel(true);
@@ -144,7 +182,6 @@ export default function InicialTecnico() {
     try {
       await updateOrdem(ordem.id, {
         status: "EM_EXECUCAO",
-        aprovado: true,
         cpf_funcionario: usuario?.cpf || null,
       });
       await carregarOrdens();
@@ -174,11 +211,11 @@ export default function InicialTecnico() {
     ]);
   };
 
-  const finalizarOS = async () => {
+  const finalizarOS = async (solucao: string) => {
     if (!ordemSelecionada) return;
     try {
       await updateOrdem(ordemSelecionada.id, {
-        status: "FINALIZADA",
+        status: "CONCLUIDA",
         dataConclusao: new Date().toISOString(),
       });
       await carregarOrdens();
@@ -192,13 +229,29 @@ export default function InicialTecnico() {
   };
 
   const ordensExibidas = useMemo(() => {
-    if (abaSelecionada === "Pendentes")
-      return ordens.filter((o) => o.status === "Pendente");
-    if (abaSelecionada === "Aprovadas")
-      return ordens.filter((o) => o.status === "Aceita");
-    if (abaSelecionada === "Finalizadas")
-      return ordens.filter((o) => o.status === "Finalizada");
-    return [];
+    let filtradas: OrdemServicoUI[] = [];
+
+    if (abaSelecionada === "Pendentes") {
+      filtradas = ordens.filter(
+        (o) => o.statusApi?.toUpperCase() === "AGUARDANDO_EXECUCAO"
+      );
+    } else if (abaSelecionada === "Em Execução") {
+      filtradas = ordens.filter(
+        (o) => o.statusApi?.toUpperCase() === "EM_EXECUCAO"
+      );
+    } else if (abaSelecionada === "Finalizadas") {
+      filtradas = ordens.filter((o) => {
+        const statusUpper = o.statusApi?.toUpperCase();
+        return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
+      });
+    }
+
+    // Ordenar por data mais recente primeiro
+    return filtradas.sort((a, b) => {
+      const dataA = new Date(a.data.split("/").reverse().join("-"));
+      const dataB = new Date(b.data.split("/").reverse().join("-"));
+      return dataB.getTime() - dataA.getTime();
+    });
   }, [ordens, abaSelecionada]);
 
   if (dashboardLoading) {
@@ -221,6 +274,15 @@ export default function InicialTecnico() {
     <View className="flex-1 bg-slate-50">
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
+      {/* Carrossel de Introdução */}
+      {!carregando && deveExibirIntroducao && (
+        <CarrosselIntroducao
+          slides={obterSlidesIntroducao("FUNCIONARIO")}
+          aoConcluir={marcarComoVisto}
+          nomePapel="FUNCIONARIO"
+        />
+      )}
+
       {/* HEADER UNIFICADO (CURVO - CINOVA) */}
       <View
         className="bg-red-600 px-6 pb-12 shadow-lg z-10" // Aumentei pb-12 para dar mais espaço
@@ -234,7 +296,7 @@ export default function InicialTecnico() {
           <View className="flex-row items-center bg-red-700/50 py-1 px-3 rounded-full">
             <IconeLucide id="predio" tamanho={16} cor="#fff" />
             <Text className="text-white text-xs font-bold ml-2 tracking-widest">
-              CINOVA
+              CINOVA GESTÃO
             </Text>
           </View>
           <TouchableOpacity
@@ -260,12 +322,95 @@ export default function InicialTecnico() {
           </View>
           <Text className="text-white text-3xl font-bold">{tecnicoName}</Text>
         </View>
+
+        {/* Cards de Estatísticas */}
+        <View className="flex-row justify-between mt-6">
+          <View className="bg-white/10 px-4 py-3 rounded-xl flex-1 mr-2">
+            <Text className="text-white/70 text-xs font-medium">Pendentes</Text>
+            <Text className="text-white text-2xl font-bold">
+              {stats.pendentes}
+            </Text>
+          </View>
+          <View className="bg-white/10 px-4 py-3 rounded-xl flex-1 mx-1">
+            <Text className="text-white/70 text-xs font-medium">
+              Em Execução
+            </Text>
+            <Text className="text-white text-2xl font-bold">
+              {stats.aprovadas}
+            </Text>
+          </View>
+          <View className="bg-white/10 px-4 py-3 rounded-xl flex-1 ml-2">
+            <Text className="text-white/70 text-xs font-medium">
+              Finalizadas
+            </Text>
+            <Text className="text-white text-2xl font-bold">
+              {stats.finalizadas}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Filtros em formato de Tabs */}
+      <View className="px-6 pt-4 pb-2 bg-white border-b border-slate-100">
+        <View className="flex-row bg-slate-100 rounded-xl p-1">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAbaSelecionada("Pendentes")}
+            className={`flex-1 py-2.5 rounded-lg ${
+              abaSelecionada === "Pendentes" ? "bg-red-600" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-center text-sm font-bold ${
+                abaSelecionada === "Pendentes" ? "text-white" : "text-slate-600"
+              }`}
+            >
+              Pendentes
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAbaSelecionada("Em Execução")}
+            className={`flex-1 py-2.5 rounded-lg ${
+              abaSelecionada === "Em Execução" ? "bg-red-600" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-center text-sm font-bold ${
+                abaSelecionada === "Em Execução"
+                  ? "text-white"
+                  : "text-slate-600"
+              }`}
+            >
+              Em Execução
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => setAbaSelecionada("Finalizadas")}
+            className={`flex-1 py-2.5 rounded-lg ${
+              abaSelecionada === "Finalizadas" ? "bg-red-600" : "bg-transparent"
+            }`}
+          >
+            <Text
+              className={`text-center text-sm font-bold ${
+                abaSelecionada === "Finalizadas"
+                  ? "text-white"
+                  : "text-slate-600"
+              }`}
+            >
+              Finalizadas
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
-          paddingTop: 20,
+          paddingTop: 16,
           paddingBottom: 40,
         }}
         showsVerticalScrollIndicator={false}
@@ -277,110 +422,12 @@ export default function InicialTecnico() {
           />
         }
       >
-        {/* CARDS DE STATUS */}
-        <View className="px-4 mb-6 -mt-8">
-          <View className="flex-row justify-between">
-            {/* Card PENDENTES */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Pendentes")}
-              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Pendentes"
-                  ? "bg-red-50 border-red-200"
-                  : "bg-white border-slate-100"
-              }`}
-              style={{ elevation: abaSelecionada === "Pendentes" ? 4 : 2 }}
-            >
-              <Text
-                className={`text-2xl font-bold ${
-                  abaSelecionada === "Pendentes"
-                    ? "text-red-600"
-                    : "text-slate-800"
-                }`}
-              >
-                {stats.pendentes}
-              </Text>
-              <Text
-                className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Pendentes"
-                    ? "text-red-400"
-                    : "text-slate-400"
-                }`}
-              >
-                Pendentes
-              </Text>
-            </TouchableOpacity>
-
-            {/* Card APROVADAS */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Aprovadas")}
-              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Aprovadas"
-                  ? "bg-blue-50 border-blue-200"
-                  : "bg-white border-slate-100"
-              }`}
-              style={{ elevation: abaSelecionada === "Aprovadas" ? 4 : 2 }}
-            >
-              <Text
-                className={`text-2xl font-bold ${
-                  abaSelecionada === "Aprovadas"
-                    ? "text-blue-600"
-                    : "text-slate-800"
-                }`}
-              >
-                {stats.aprovadas}
-              </Text>
-              <Text
-                className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Aprovadas"
-                    ? "text-blue-400"
-                    : "text-slate-400"
-                }`}
-              >
-                Aprovadas
-              </Text>
-            </TouchableOpacity>
-
-            {/* Card FINALIZADAS */}
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setAbaSelecionada("Finalizadas")}
-              className={`p-3 rounded-2xl w-[31%] items-center shadow-sm border ${
-                abaSelecionada === "Finalizadas"
-                  ? "bg-green-50 border-green-200"
-                  : "bg-white border-slate-100"
-              }`}
-              style={{ elevation: abaSelecionada === "Finalizadas" ? 4 : 2 }}
-            >
-              <Text
-                className={`text-2xl font-bold ${
-                  abaSelecionada === "Finalizadas"
-                    ? "text-green-600"
-                    : "text-slate-800"
-                }`}
-              >
-                {stats.finalizadas}
-              </Text>
-              <Text
-                className={`text-[9px] font-bold uppercase mt-1 ${
-                  abaSelecionada === "Finalizadas"
-                    ? "text-green-400"
-                    : "text-slate-400"
-                }`}
-              >
-                Finalizadas
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* TÍTULO DA LISTA */}
         <View className="px-6 mb-3 mt-2">
           <Text className="text-sm font-bold text-slate-600 uppercase tracking-wider">
             {abaSelecionada === "Pendentes"
-              ? "Tarefas a Fazer"
-              : abaSelecionada === "Aprovadas"
+              ? "Novas Solicitações"
+              : abaSelecionada === "Em Execução"
               ? "Em Andamento"
               : "Histórico Completo"}
           </Text>
@@ -391,39 +438,68 @@ export default function InicialTecnico() {
           {loadingList ? (
             [1, 2].map((i) => <SkeletonOrdem key={i} />)
           ) : ordensExibidas.length === 0 ? (
-            <View className="bg-white p-8 rounded-2xl border border-slate-100 items-center justify-center border-dashed mt-2">
-              <IconeLucide
-                id={abaSelecionada === "Pendentes" ? "verificado" : "alerta"}
-                tamanho={40}
-                cor="#cbd5e1"
-              />
-              <Text className="text-slate-500 font-medium mt-3">
-                Nenhuma ordem aqui
-              </Text>
-              <Text className="text-slate-400 text-xs text-center mt-1">
+            <View className="items-center justify-center py-16">
+              <View className="w-20 h-20 bg-slate-100 rounded-full items-center justify-center mb-4">
+                <IconeLucide
+                  id={
+                    abaSelecionada === "Pendentes"
+                      ? "verificado"
+                      : abaSelecionada === "Em Execução"
+                      ? "servicos"
+                      : "confirmar"
+                  }
+                  tamanho={36}
+                  cor="#94a3b8"
+                />
+              </View>
+              <Text className="text-slate-700 font-bold text-lg">
                 {abaSelecionada === "Pendentes"
-                  ? "Você não tem pendências."
-                  : "A lista está vazia."}
+                  ? "Tudo em dia!"
+                  : abaSelecionada === "Em Execução"
+                  ? "Nada em andamento"
+                  : "Sem histórico"}
+              </Text>
+              <Text className="text-slate-500 text-sm text-center mt-2 px-8">
+                {abaSelecionada === "Pendentes"
+                  ? "Nenhuma nova solicitação no momento"
+                  : abaSelecionada === "Em Execução"
+                  ? "Você não tem ordens em execução"
+                  : "Nenhuma ordem finalizada ainda"}
               </Text>
             </View>
           ) : (
-            ordensExibidas.map((ordem) => (
-              <CardOrdemPendente
-                key={ordem.id}
-                ordem={ordem}
-                onDetalhes={() => abrirDetalhes(ordem)}
-                onAceitar={
-                  abaSelecionada === "Pendentes"
-                    ? () => aceitarOS(ordem)
-                    : undefined
-                }
-                onRecusar={
-                  abaSelecionada === "Pendentes"
-                    ? () => recusarOS(ordem)
-                    : undefined
-                }
-              />
-            ))
+            ordensExibidas.map((ordem) => {
+              // Usar card diferente dependendo da aba
+              if (abaSelecionada === "Em Execução") {
+                return (
+                  <CardOrdemAceita
+                    key={ordem.id}
+                    ordem={ordem}
+                    onDetalhes={() => abrirDetalhes(ordem)}
+                    onFinalizar={() => abrirFinalizacao(ordem)}
+                  />
+                );
+              } else if (abaSelecionada === "Finalizadas") {
+                return (
+                  <CardOrdemPendente
+                    key={ordem.id}
+                    ordem={ordem}
+                    onDetalhes={() => abrirDetalhes(ordem)}
+                  />
+                );
+              } else {
+                // Pendentes
+                return (
+                  <CardOrdemPendente
+                    key={ordem.id}
+                    ordem={ordem}
+                    onDetalhes={() => abrirDetalhes(ordem)}
+                    onAceitar={() => aceitarOS(ordem)}
+                    onRecusar={() => recusarOS(ordem)}
+                  />
+                );
+              }
+            })
           )}
         </View>
       </ScrollView>

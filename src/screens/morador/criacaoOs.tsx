@@ -18,9 +18,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { CriacaoOSFormulario, schemaCriacaoOS } from "../../types/ordemServico";
 import { BotaoCriar, MensagemErro } from "../../components/formulario";
-import { useCriacaoOS } from "../../../docs/morador/useCriacaoOS";
+import { useCriacaoOS } from "../../hooks/useCriacaoOS";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
 import { IconeLucide } from "../../components/icones"; // Para o ícone do botão novo
+import { BotaoVoltar } from "../../components/navegacao";
 
 export default function CriacaoOS() {
   const navigation = useNavigation();
@@ -70,7 +71,7 @@ export default function CriacaoOS() {
 
   useEffect(() => {
     if (sucesso) {
-      Alert.alert("Sucesso! ✓", "Ordem de Serviço enviada para o síndico.", [
+      Alert.alert("Sucesso!", "Ordem de Serviço enviada para o síndico.", [
         {
           text: "OK",
           onPress: () => {
@@ -105,7 +106,8 @@ export default function CriacaoOS() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
+          <BotaoVoltar />
+          <View className="flex-1 mx-3">
             <Text className="text-white text-lg font-bold">
               Nova Solicitação
             </Text>
@@ -129,8 +131,8 @@ export default function CriacaoOS() {
         <View className="flex-1 px-4 pt-6 pb-36 justify-start">
           {/* DICA */}
           <View className="flex-row items-center bg-blue-50 p-3 rounded-xl border border-blue-100 mb-5 shadow-sm">
-            <Text style={{ marginRight: 10, fontSize: 18 }}>💡</Text>
-            <Text className="text-blue-700 text-xs ml-0 flex-1 leading-4">
+            <IconeLucide id="alerta" tamanho={20} cor="#1d4ed8" />
+            <Text className="text-blue-700 text-xs ml-2 flex-1 leading-4">
               Quanto mais detalhes você fornecer, mais rápida será a análise e
               aprovação do síndico.
             </Text>
@@ -176,7 +178,7 @@ export default function CriacaoOS() {
               >
                 {descricaoValue?.length < 10
                   ? `Mínimo de 10 caracteres`
-                  : "✓ Descrição válida"}
+                  : "Descrição válida"}
               </Text>
               <Text className="text-slate-400 text-[10px]">
                 {descricaoValue?.length || 0}/500
@@ -192,7 +194,7 @@ export default function CriacaoOS() {
           >
             <IconeLucide id="historico" tamanho={20} cor="#dc2626" />
             <Text className="text-red-700 font-bold text-sm ml-2">
-              Visualizar serviços
+              Acompanhar Minhas Solicitações
             </Text>
           </TouchableOpacity>
 

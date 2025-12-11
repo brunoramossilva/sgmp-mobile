@@ -16,8 +16,9 @@ import {
   updateOrdem,
   OrdemServicoApi,
 } from "../../services/ordemServico";
-import { OrdemServicoUI, mapApiToUI } from "./types";
+import { OrdemServicoUI, mapApiToUI } from "../../utils/mapeadores";
 import CardOrdemAceita from "./CardOrdemAceita";
+import { BotaoVoltar } from "../../components/navegacao";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
 import SkeletonOrdem from "./SkeletonOrdem";
@@ -55,15 +56,17 @@ export default function OsAceitasTecnico() {
         return;
       }
 
-      // Filtra ordens aceitas pelo técnico ou em execução
+      // Filtra ordens em execução pelo técnico
       const ordensAceitas = lista.filter(
-        (o) =>
-          o.aprovado === true &&
-          (o.status?.toUpperCase() === "ACEITA" ||
-            o.status?.toUpperCase() === "EM_EXECUCAO")
+        (o) => o.status?.toUpperCase() === "EM_EXECUCAO"
       );
 
-      const mapped = ordensAceitas.map(mapApiToUI);
+      // Ordenar por data mais recente primeiro
+      const mapped = ordensAceitas.map(mapApiToUI).sort((a, b) => {
+        const dataA = new Date(a.data.split("/").reverse().join("-"));
+        const dataB = new Date(b.data.split("/").reverse().join("-"));
+        return dataB.getTime() - dataA.getTime();
+      });
       setOrdens(mapped);
     } catch (err) {
       console.error(err);
@@ -108,13 +111,13 @@ export default function OsAceitasTecnico() {
     setModalFinalizacaoVisivel(true);
   };
 
-  const finalizarOS = async () => {
+  const finalizarOS = async (solucao: string) => {
     if (!ordemSelecionada) return;
 
     await atualizarStatus(
       ordemSelecionada,
       {
-        status: "FINALIZADA",
+        status: "CONCLUIDA",
         dataConclusao: new Date().toISOString(),
       },
       "Finalizada"
@@ -122,6 +125,8 @@ export default function OsAceitasTecnico() {
 
     setModalFinalizacaoVisivel(false);
     setOrdemSelecionada(null);
+    Alert.alert("Sucesso", "Ordem finalizada!");
+    fetchOrdens();
   };
 
   return (
@@ -131,18 +136,7 @@ export default function OsAceitasTecnico() {
         className="bg-red-600 px-4 py-3 flex-row items-center justify-between"
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="flex-row items-center"
-          style={{ gap: 8 }}
-        >
-          <Text
-            className="text-white text-base font-semibold"
-            style={{ lineHeight: 10 }}
-          >
-            Voltar
-          </Text>
-        </TouchableOpacity>
+        <BotaoVoltar />
         <TouchableOpacity
           onPress={() => {
             Alert.alert("Sair", "Deseja fazer logout?", [

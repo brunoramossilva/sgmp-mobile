@@ -14,14 +14,15 @@ export interface OrdemServicoUI {
   descricao: string; // descrição completa
   solicitante: string; // nome do morador
   dataAbertura: string; // "DD/MM/YYYY"
+  data: string; // alias para dataAbertura (compatibilidade)
   dataConclusao?: string; // "DD/MM/YYYY" ou undefined
   diasEmAberto: number; // número de dias desde abertura
   prioridade: "Alta" | "Média" | "Baixa";
-  status: "Pendente" | "Aceita" | "Finalizada" | "Recusada";
+  status: "Pendente" | "Aceita" | "Em Execução" | "Finalizada" | "Recusada";
+  local: string; // local do serviço
   cpf_morador: string;
   cpf_funcionario?: string | null;
   cpf_sindico?: string | null;
-  aprovado: boolean;
   statusApi?: string; // status original da API
 }
 
@@ -65,48 +66,29 @@ export const calcularDiasEmAberto = (dataAbertura: string): number => {
 };
 
 /**
- * Calcula prioridade baseado em status e tempo
- * @param aprovado - boolean
+ * Calcula prioridade baseado no tempo
  * @param diasEmAberto - número de dias
  * @returns prioridade
  */
 export const calcularPrioridade = (
-  aprovado: boolean,
   diasEmAberto: number
 ): "Alta" | "Média" | "Baixa" => {
-  // Se não aprovado, prioridade baseada no tempo de espera
-  if (!aprovado) {
-    if (diasEmAberto > 7) return "Alta";
-    if (diasEmAberto > 3) return "Média";
-    return "Baixa";
-  }
-
-  // Se aprovado (aceita/em execução), prioridade baseada no tempo desde abertura
-  if (diasEmAberto > 7) {
-    return "Alta";
-  }
-
-  // 3 a 7 dias = Média
-  if (diasEmAberto > 3) {
-    return "Média";
-  }
-
-  // Menos de 3 dias = Baixa
+  // Prioridade baseada no tempo de espera
+  if (diasEmAberto > 7) return "Alta";
+  if (diasEmAberto > 3) return "Média";
   return "Baixa";
 };
 
 /**
  * Converte status da API para status UI
  * @param statusApi - status do banco de dados
- * @param aprovado - boolean
  * @returns status formatado
  */
 export const converterStatus = (
-  statusApi?: string | null,
-  aprovado?: boolean
-): "Pendente" | "Aceita" | "Finalizada" | "Recusada" => {
+  statusApi?: string | null
+): "Pendente" | "Aceita" | "Em Execução" | "Finalizada" | "Recusada" => {
   if (!statusApi) {
-    return aprovado ? "Aceita" : "Pendente";
+    return "Pendente";
   }
 
   const status = statusApi.toUpperCase();
@@ -119,11 +101,16 @@ export const converterStatus = (
     return "Recusada";
   }
 
-  if (["ABERTA", "ACEITA", "EM_EXECUCAO"].includes(status)) {
-    return aprovado ? "Aceita" : "Pendente";
+  if (status === "EM_EXECUCAO") {
+    return "Em Execução";
   }
 
-  return aprovado ? "Aceita" : "Pendente";
+  if (status === "AGUARDANDO_EXECUCAO") {
+    return "Aceita";
+  }
+
+  // PENDENTE_APROVACAO = aguardando aprovação do síndico
+  return "Pendente";
 };
 
 /**
@@ -146,32 +133,79 @@ export const truncarTexto = (texto: string, max: number = 40): string => {
  */
 export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
   const diasEmAberto = calcularDiasEmAberto(ordem.dataAbertura);
-  const prioridade = calcularPrioridade(ordem.aprovado, diasEmAberto);
-  const status = converterStatus(ordem.status, ordem.aprovado);
-  
+  const prioridade = calcularPrioridade(diasEmAberto);
+  const status = converterStatus(ordem.status);
+
   // Debug log
   if (ordem.status === "FINALIZADA") {
-    console.log("Mapeando ordem finalizada:", { id: ordem.id, statusApi: ordem.status, statusUI: status });
+    console.log("Mapeando ordem finalizada:", {
+      id: ordem.id,
+      statusApi: ordem.status,
+      statusUI: status,
+    });
   }
+
+  const dataFormatada = formatarData(ordem.dataAbertura);
 
   return {
     id: ordem.id,
     titulo: truncarTexto(ordem.descricao, 40),
     descricao: ordem.descricao,
     solicitante: ordem.morador?.nome ?? "Desconhecido",
-    dataAbertura: formatarData(ordem.dataAbertura),
+    dataAbertura: dataFormatada,
+    data: dataFormatada, // alias para compatibilidade
     dataConclusao: ordem.dataConclusao
       ? formatarData(ordem.dataConclusao)
       : undefined,
     diasEmAberto,
     prioridade,
     status,
+    local: ordem.local ?? "Condomínio Vista Verde",
     cpf_morador: ordem.cpf_morador,
     cpf_funcionario: ordem.cpf_funcionario,
     cpf_sindico: ordem.cpf_sindico,
-    aprovado: ordem.aprovado,
     statusApi: ordem.status,
   };
+};
+
+/**
+ * Retorna classes de cores Tailwind para prioridade
+ * @param prioridade - prioridade da ordem
+ * @returns classes CSS Tailwind
+ */
+export const corPrioridade = (prioridade: string) => {
+  switch (prioridade) {
+    case "Alta":
+      return "bg-red-100 text-red-700";
+    case "Média":
+      return "bg-yellow-100 text-yellow-700";
+    case "Baixa":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
+};
+
+/**
+ * Retorna classes de cores Tailwind para status
+ * @param status - status da ordem
+ * @returns classes CSS Tailwind
+ */
+export const corStatus = (status: string) => {
+  switch (status) {
+    case "Pendente":
+      return "bg-orange-100 text-orange-700";
+    case "Aceita":
+      return "bg-blue-100 text-blue-700";
+    case "Em Execução":
+      return "bg-purple-100 text-purple-700";
+    case "Recusada":
+      return "bg-red-100 text-red-700";
+    case "Finalizada":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
 };
 
 /**
@@ -179,13 +213,10 @@ export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
  * @param ordem - ordem de UI
  * @returns dados para enviar na API
  */
-export const mapUIToApi = (
-  ordem: OrdemServicoUI
-): Partial<OrdemServicoApi> => {
+export const mapUIToApi = (ordem: OrdemServicoUI): Partial<OrdemServicoApi> => {
   return {
     descricao: ordem.descricao,
     status: ordem.statusApi,
-    aprovado: ordem.aprovado,
     cpf_sindico: ordem.cpf_sindico,
     cpf_funcionario: ordem.cpf_funcionario,
   };

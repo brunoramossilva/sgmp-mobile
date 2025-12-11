@@ -154,9 +154,12 @@ export const ConfirmacaoModal = React.memo(
               {/* Erro */}
               {erroLocal && (
                 <View className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                  <Text className="text-red-600 text-sm font-medium">
-                    ⚠️ {erroLocal}
-                  </Text>
+                  <View className="flex-row items-center">
+                    <IconeLucide id="alerta" tamanho={18} cor="#dc2626" />
+                    <Text className="text-red-600 text-sm font-medium ml-2">
+                      {erroLocal}
+                    </Text>
+                  </View>
                 </View>
               )}
             </ScrollView>

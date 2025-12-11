@@ -140,7 +140,7 @@ export const CarrosselIntroducao: React.FC<PropriedadesCarrosselIntroducao> = ({
             scrollEventThrottle={16}
             onScroll={handleScroll}
             showsHorizontalScrollIndicator={false}
-            scrollEnabled={false}
+            scrollEnabled={true}
             renderItem={({ item }) => (
               <Animated.View
                 style={{

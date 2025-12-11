@@ -1,8 +1,3 @@
-/**
- * Tela de monitoramento de ordens em execução
- * Síndico acompanha o progresso das ordens aprovadas
- */
-
 import React, { useCallback, useMemo } from "react";
 import {
   View,
@@ -20,6 +15,8 @@ import { useFetchOrdensSindico } from "../../hooks/useFetchOrdensSindico";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
 import { OrdemServicoUI } from "../../utils/mapeadores";
+import { BotaoVoltar } from "../../components/navegacao";
+import SkeletonBloco from "../../components/SkeletonBloco";
 
 // Card alinhado ao design system (bordas 2xl, chips e CTA sólido)
 const CardOrdemAceita = ({
@@ -54,12 +51,12 @@ const CardOrdemAceita = ({
         </View>
       </View>
 
-      {/* Título + descrição */}
-      <Text className="text-sm font-semibold text-slate-800" numberOfLines={1}>
-        {ordem.titulo}
-      </Text>
-      <Text className="text-xs text-slate-600 mt-1" numberOfLines={2}>
+      {/* Descrição do serviço */}
+      <Text className="text-sm font-semibold text-slate-800" numberOfLines={2}>
         {ordem.descricao}
+      </Text>
+      <Text className="text-xs text-slate-500 mt-1">
+        Em execução há {ordem.diasEmAberto}d
       </Text>
 
       {/* Informações: Data + Dias em aberto */}
@@ -101,6 +98,15 @@ export default function OrdensSindicoExecucao({
     }, [refetch])
   );
 
+  // Ordenar por data mais recente primeiro
+  const ordensOrdenadas = useMemo(() => {
+    return [...ordensEmExecucao].sort((a, b) => {
+      const dataA = new Date(a.dataAbertura.split("/").reverse().join("-"));
+      const dataB = new Date(b.dataAbertura.split("/").reverse().join("-"));
+      return dataB.getTime() - dataA.getTime();
+    });
+  }, [ordensEmExecucao]);
+
   // Abre detalhes de uma ordem
   const abrirDetalhes = useCallback(
     (ordem: OrdemServicoUI) => {
@@ -127,14 +133,40 @@ export default function OrdensSindicoExecucao({
   // Statísticas
   const stats = useMemo(() => {
     const emExecucao = ordensEmExecucao.filter(
-      (o) => o.status === "Aceita"
+      (o) => o.statusApi?.toUpperCase() === "EM_EXECUCAO"
     ).length;
-    const finalizadas = ordensEmExecucao.filter(
-      (o) => o.status === "Finalizada"
+    const concluidas = ordensEmExecucao.filter(
+      (o) => o.statusApi?.toUpperCase() === "CONCLUIDA"
     ).length;
 
-    return { emExecucao, finalizadas };
+    return { emExecucao, concluidas };
   }, [ordensEmExecucao]);
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-white">
+        <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
+        <View className="bg-red-600 px-4 pb-4 pt-5">
+          <View className="flex-row items-center justify-between">
+            <BotaoVoltar />
+            <Text className="text-white text-xl font-bold">
+              Ordens em Execução
+            </Text>
+            <View className="w-10" />
+          </View>
+        </View>
+        <View className="p-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonBloco
+              key={i}
+              height={140}
+              style={{ marginBottom: 12, borderRadius: 16 }}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1">
@@ -144,14 +176,7 @@ export default function OrdensSindicoExecucao({
         {/* Hero/Header brand */}
         <View className="bg-red-600 px-4 pb-4 pt-5">
           <View className="flex-row items-center justify-between">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="w-10 h-10 bg-white/10 rounded-full items-center justify-center"
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-            >
-              <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
-            </TouchableOpacity>
+            <BotaoVoltar />
             <Text className="text-white text-xl font-bold">
               Ordens em Execução
             </Text>
@@ -168,10 +193,10 @@ export default function OrdensSindicoExecucao({
             </View>
             <View className="bg-white/10 rounded-lg px-3 py-2 min-w-[110] items-center">
               <Text className="text-[11px] text-white/80 font-semibold">
-                FINALIZADAS
+                CONCLUÍDAS
               </Text>
               <Text className="text-lg font-bold text-white">
-                {stats.finalizadas}
+                {stats.concluidas}
               </Text>
             </View>
           </View>
@@ -213,7 +238,7 @@ export default function OrdensSindicoExecucao({
           </View>
         ) : (
           <FlatList
-            data={ordensEmExecucao}
+            data={ordensOrdenadas}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             scrollEnabled

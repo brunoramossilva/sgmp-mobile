@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
+import { BotaoVoltar } from "../../components/navegacao";
 
 // IMPORTAÇÃO DOS DADOS CENTRALIZADOS (Financeiro apenas)
 import { FATURAS_MOCK, formatarMoeda, Fatura } from "../../utils/dadosMock";
@@ -49,7 +50,7 @@ export default function FinanceiroMorador() {
         icone = "alerta";
         break;
       case "agua":
-        icone = "servicos";
+        icone = "financeiro";
         break;
       default:
         icone = "financeiro";
@@ -111,7 +112,8 @@ export default function FinanceiroMorador() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
+          <BotaoVoltar />
+          <View className="flex-1 mx-3">
             <Text className="text-white text-lg font-bold">Financeiro</Text>
             <Text className="text-white/80 text-xs">
               Acompanhe suas contas e faturas
@@ -119,7 +121,7 @@ export default function FinanceiroMorador() {
           </View>
           {/* Botão de filtro simples (visual) */}
           <TouchableOpacity className="bg-red-700 p-2 rounded-lg opacity-90">
-            <IconeLucide id="servicos" tamanho={20} cor="#fff" />
+            <IconeLucide id="financeiro" tamanho={20} cor="#fff" />
           </TouchableOpacity>
         </View>
       </View>

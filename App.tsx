@@ -12,12 +12,14 @@ import CriacaoOS from "./src/screens/morador/criacaoOs";
 import OsAceitasTecnico from "./src/screens/tecnico/osAceitasTecnico";
 import DetalhesOs from "./src/screens/detalhesOs";
 import AprovacaoOs from "./src/screens/sindico/aprovacaoOs";
+import OrdensRecusadas from "./src/screens/sindico/ordensRecusadas";
 import OrdensSindicoExecucao from "./src/screens/sindico/ordensSindicoExecucao";
 import ServicosSindico from "./src/screens/sindico/servicosSindico";
 import FinanceiroMorador from "./src/screens/morador/financeiroMorador";
 import ReservasMorador from "./src/screens/morador/reservasMorador";
 import FinanceiroSindico from "./src/screens/sindico/financeiroSindico";
 import ReservasSindico from "./src/screens/sindico/reservasSindico";
+import MoradoresAtivos from "./src/screens/sindico/moradoresAtivos";
 
 const Stack = createNativeStackNavigator();
 
@@ -89,6 +91,11 @@ export default function App() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="OrdensRecusadas"
+            component={OrdensRecusadas}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="OrdensSindicoExecucao"
             component={OrdensSindicoExecucao}
             options={{ headerShown: false }}
@@ -106,6 +113,11 @@ export default function App() {
           <Stack.Screen
             name="ReservasSindico"
             component={ReservasSindico}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MoradoresAtivos"
+            component={MoradoresAtivos}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

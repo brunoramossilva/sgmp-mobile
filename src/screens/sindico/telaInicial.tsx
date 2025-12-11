@@ -17,6 +17,9 @@ import SkeletonBloco from "../../components/SkeletonBloco";
 import { NavbarGlobal } from "../../components/navegacao";
 import { IdIcone } from "../../utils/iconesLucide";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
+import { CarrosselIntroducao } from "../../components/introducao";
+import { obterSlidesIntroducao } from "../../utils/conteudoIntroducao";
+import { useIntroducaoUsuario } from "../../hooks/useIntroducaoUsuario";
 
 // --- Interfaces ---
 interface DashboardData {
@@ -102,11 +105,13 @@ const useDashboardData = () => {
   const fetchData = useCallback(async () => {
     try {
       const ordens = await getOrdens();
-      const ocorrenciasPendentes = ordens.filter((o) => !o.aprovado).length;
-      const ordensEmExecucao = ordens.filter(
-        (o) =>
-          o.aprovado && !STATUS_FINALIZADA.includes(o.status?.toUpperCase())
+      const ocorrenciasPendentes = ordens.filter(
+        (o) => o.status?.toUpperCase() === "PENDENTE_APROVACAO"
       ).length;
+      const ordensEmExecucao = ordens.filter((o) => {
+        const statusUpper = o.status?.toUpperCase();
+        return statusUpper === "EM_EXECUCAO";
+      }).length;
       const moradoresAtivos = new Set(ordens.map((o) => o.cpf_morador)).size;
 
       setData({
@@ -140,6 +145,10 @@ const TelaInicial = () => {
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
   const { data, loading, refreshing, refetch } = useDashboardData();
+
+  const cpf = usuario?.cpf || "";
+  const { deveExibirIntroducao, marcarComoVisto, carregando } =
+    useIntroducaoUsuario(cpf, "SINDICO");
 
   const sindicoName = usuario?.nome?.trim()
     ? usuario.nome.split(" ")[0]
@@ -192,6 +201,15 @@ const TelaInicial = () => {
     <View className="flex-1 bg-slate-50">
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
+      {/* Carrossel de Introdução */}
+      {!carregando && deveExibirIntroducao && (
+        <CarrosselIntroducao
+          slides={obterSlidesIntroducao("SINDICO")}
+          aoConcluir={marcarComoVisto}
+          nomePapel="SINDICO"
+        />
+      )}
+
       {/* HEADER UNIFICADO */}
       <View
         className="bg-red-600 px-6 pb-10 shadow-lg z-10"
@@ -206,7 +224,7 @@ const TelaInicial = () => {
           <View className="flex-row items-center bg-red-700/50 py-1 px-3 rounded-full">
             <IconeLucide id="predio" tamanho={16} cor="#fff" />
             <Text className="text-white text-xs font-bold ml-2 tracking-widest">
-              CINOVA
+              CINOVA GESTÃO
             </Text>
           </View>
 
@@ -221,9 +239,7 @@ const TelaInicial = () => {
         {/* SAUDAÇÃO + BADGE DE SÍNDICO */}
         <View>
           <View className="flex-row items-center gap-2 mb-1">
-            <Text className="text-red-100 text-base font-medium">
-              Olá,
-            </Text>
+            <Text className="text-red-100 text-base font-medium">Olá,</Text>
 
             {/* BADGE ESPECÍFICA DO SÍNDICO */}
             <View className="bg-white/20 px-2 py-0.5 rounded-md border border-white/10">
@@ -289,7 +305,7 @@ const TelaInicial = () => {
               value={data?.moradoresAtivos || 0}
               icon="moradores"
               color="#6366f1"
-              onPress={() => Alert.alert("Moradores", "Lista de moradores")}
+              onPress={() => navigation.navigate("MoradoresAtivos" as never)}
             />
           </ScrollView>
         </View>
@@ -322,6 +338,12 @@ const TelaInicial = () => {
               subLabel="Revisar solicitações"
               icon="aprovar"
               onPress={() => navigation.navigate("AprovacaoOs" as never)}
+            />
+            <ActionCard
+              label="OSs Recusadas"
+              subLabel="Visualizar recusadas"
+              icon="cancelar"
+              onPress={() => navigation.navigate("OrdensRecusadas" as never)}
             />
             <ActionCard
               label="Prestação de Contas"

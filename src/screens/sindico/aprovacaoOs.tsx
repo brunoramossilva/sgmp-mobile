@@ -20,6 +20,7 @@ import { useFetchOrdensSindico } from "../../hooks/useFetchOrdensSindico";
 import { ConfirmacaoModal } from "../../components/ConfirmacaoModal";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
+import { BotaoVoltar } from "../../components/navegacao";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { OrdemServicoUI } from "../../utils/mapeadores";
 
@@ -58,25 +59,19 @@ const CardOrdemPendente = ({
         </View>
       </View>
 
-      {/* Título + descrição curta */}
-      <Text className="text-sm font-semibold text-slate-800" numberOfLines={1}>
-        {ordem.titulo}
-      </Text>
-      <Text className="text-xs text-slate-600 mt-1" numberOfLines={2}>
+      {/* Descrição do serviço */}
+      <Text className="text-sm font-semibold text-slate-800" numberOfLines={2}>
         {ordem.descricao}
       </Text>
+      <Text className="text-xs text-slate-500 mt-1">
+        Aguardando aprovação há {ordem.diasEmAberto}d
+      </Text>
 
-      {/* Datas */}
+      {/* Data de abertura */}
       <View className="flex-row gap-3 mt-3 mb-3">
         <View className="flex-row items-center gap-1">
           <IconeLucide id="calendario" tamanho={14} cor="#64748b" />
           <Text className="text-xs text-slate-600">{ordem.dataAbertura}</Text>
-        </View>
-        <View className="flex-row items-center gap-1">
-          <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
-          <Text className="text-xs text-slate-600">
-            {ordem.diasEmAberto}d em aberto
-          </Text>
         </View>
       </View>
 
@@ -163,11 +158,10 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
       setCarregandoModal(true);
       setErroModal(null);
 
-      // Preparar payload com status e flags
+      // Preparar payload com status correto
       const isAprovar = acaoModal === "aprovar";
       const dados = {
-        aprovado: isAprovar,
-        status: isAprovar ? "ACEITA" : "REJEITADA",
+        status: isAprovar ? "AGUARDANDO_EXECUCAO" : "RECUSADA",
         cpf_sindico: usuario?.cpf || "",
       };
 
@@ -193,6 +187,15 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
     setAcaoModal(null);
     setErroModal(null);
   }, []);
+
+  // Ordenar por data mais recente primeiro
+  const ordensOrdenadas = useMemo(() => {
+    return [...ordensPendentes].sort((a, b) => {
+      const dataA = new Date(a.dataAbertura.split("/").reverse().join("-"));
+      const dataB = new Date(b.dataAbertura.split("/").reverse().join("-"));
+      return dataB.getTime() - dataA.getTime();
+    });
+  }, [ordensPendentes]);
 
   // Renderiza item
   const renderItem = useCallback(
@@ -238,14 +241,7 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
         {/* Hero/Header brand */}
         <View className="bg-red-600 px-4 pb-4 pt-5">
           <View className="flex-row items-center justify-between">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="w-10 h-10 bg-white/10 rounded-full items-center justify-center"
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-            >
-              <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
-            </TouchableOpacity>
+            <BotaoVoltar />
             <Text className="text-white text-xl font-bold">
               Aprovação de Ordens
             </Text>

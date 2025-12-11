@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IconeLucide } from "../components/icones";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { BotaoVoltar } from "../components/navegacao";
 import { OrdemServicoUI } from "../utils/mapeadores";
 
 // Fallback local para uso offline/demonstrativo
@@ -22,11 +23,12 @@ const ordemFallback: OrdemServicoUI = {
     "Há um vazamento na torneira do banheiro do apartamento 101. O morador relatou que o problema começou há cerca de 3 dias e está piorando progressivamente. A água está vazando mesmo com a torneira fechada.",
   solicitante: "João Silva",
   dataAbertura: "28/11/2024",
+  data: "28/11/2024",
   diasEmAberto: 3,
   prioridade: "Alta",
   status: "Aceita",
+  local: "Condomínio Vista Verde",
   cpf_morador: "00000000000",
-  aprovado: true,
 };
 
 type RouteParams = {
@@ -58,7 +60,7 @@ export default function DetalhesOS() {
     id: ordemInicial.id,
     titulo: ordemInicial.titulo,
     descricao: ordemInicial.descricao,
-    local: "Local não informado",
+    local: "Condomínio Vista Verde",
     solicitante: ordemInicial.solicitante,
     data: ordemInicial.dataAbertura,
     prioridade: ordemInicial.prioridade,
@@ -88,13 +90,12 @@ export default function DetalhesOS() {
       status: novoStatus,
       statusApi:
         novoStatus === "Finalizada"
-          ? "FINALIZADA"
+          ? "CONCLUIDA"
           : novoStatus === "Aceita"
-          ? "ACEITA"
+          ? "EM_EXECUCAO"
           : novoStatus === "Recusada"
-          ? "REJEITADA"
-          : "PENDENTE",
-      aprovado: novoStatus === "Aceita" || novoStatus === "Finalizada",
+          ? "RECUSADA"
+          : "PENDENTE_APROVACAO",
     };
   };
 
@@ -155,14 +156,7 @@ export default function DetalhesOS() {
         {/* Hero/Header brand */}
         <View className="bg-red-600 px-4 pb-4 pt-5">
           <View className="flex-row items-center justify-between">
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              className="w-10 h-10 bg-white/10 rounded-full items-center justify-center"
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-            >
-              <IconeLucide id="anterior" tamanho={20} cor="#ffffff" />
-            </TouchableOpacity>
+            <BotaoVoltar />
             <Text className="text-white text-xl font-bold">
               Detalhes da Ordem
             </Text>
@@ -176,8 +170,11 @@ export default function DetalhesOS() {
         >
           {/* Cabeçalho com Prioridade e Status */}
           <View className="bg-white p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm">
-            <Text className="text-2xl font-bold text-red-700 mb-3 flex-1">
-              {ordem.titulo}
+            <Text className="text-xl font-bold text-slate-800 mb-1">
+              Ordem de Serviço #{ordem.id}
+            </Text>
+            <Text className="text-sm text-slate-500 mb-3">
+              Solicitado por {ordem.solicitante} em {ordem.data}
             </Text>
             <View className="flex-row gap-2 flex-wrap">
               <View
@@ -296,17 +293,23 @@ export default function DetalhesOS() {
                     onPress={aceitarOS}
                     className="flex-1 bg-green-600 p-4 rounded-xl mr-2"
                   >
-                    <Text className="text-white text-center font-semibold">
-                      ✓ Aceitar OS
-                    </Text>
+                    <View className="flex-row items-center justify-center">
+                      <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                      <Text className="text-white text-center font-semibold ml-2">
+                        Aceitar OS
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={recusarOS}
                     className="flex-1 bg-red-600 p-4 rounded-xl"
                   >
-                    <Text className="text-white text-center font-semibold">
-                      ✕ Recusar OS
-                    </Text>
+                    <View className="flex-row items-center justify-center">
+                      <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
+                      <Text className="text-white text-center font-semibold ml-2">
+                        Recusar OS
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
               )}
@@ -317,9 +320,12 @@ export default function DetalhesOS() {
                   onPress={() => setModalFinalizacaoVisivel(true)}
                   className="bg-green-600 p-4 rounded-xl mb-3"
                 >
-                  <Text className="text-white text-center font-semibold">
-                    ✓ Finalizar OS
-                  </Text>
+                  <View className="flex-row items-center justify-center">
+                    <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                    <Text className="text-white text-center font-semibold ml-2">
+                      Finalizar OS
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               )}
             </View>
@@ -344,9 +350,12 @@ export default function DetalhesOS() {
           >
             <View className="flex-1 justify-center items-center bg-black/50 px-4">
               <View className="bg-white w-full rounded-2xl p-6">
-                <Text className="text-2xl font-bold text-red-700 mb-4 text-center">
-                  ✓ Finalizar Ordem de Serviço
-                </Text>
+                <View className="flex-row items-center justify-center mb-4">
+                  <IconeLucide id="confirmar" tamanho={24} cor="#b91c1c" />
+                  <Text className="text-2xl font-bold text-red-700 ml-2 text-center">
+                    Finalizar Ordem de Serviço
+                  </Text>
+                </View>
                 <View className="bg-slate-100 p-3 rounded-xl mb-4">
                   <Text className="text-lg font-semibold text-slate-800">
                     {ordem.titulo}
@@ -375,9 +384,12 @@ export default function DetalhesOS() {
                   onPress={finalizarOS}
                   className="bg-green-600 p-4 rounded-xl mb-2"
                 >
-                  <Text className="text-white text-center font-semibold">
-                    ✓ Confirmar Finalização
-                  </Text>
+                  <View className="flex-row items-center justify-center">
+                    <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                    <Text className="text-white text-center font-semibold ml-2">
+                      Confirmar Finalização
+                    </Text>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {

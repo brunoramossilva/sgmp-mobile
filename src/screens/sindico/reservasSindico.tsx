@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
+import { BotaoVoltar } from "../../components/navegacao";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
 
 // Dados
@@ -22,7 +23,7 @@ export default function ReservasSindico() {
     new Date().toLocaleDateString("pt-BR")
   );
 
-  //  GERADOR DE CALENDÁRIO 
+  //  GERADOR DE CALENDÁRIO
   const calendarioDias = useMemo(() => {
     const dias = [];
     const hoje = new Date();
@@ -112,8 +113,16 @@ export default function ReservasSindico() {
             {item.area}
           </Text>
           <View className="flex-row gap-4">
-            <Text className="text-xs text-slate-500">📅 {item.data}</Text>
-            <Text className="text-xs text-slate-500">⏰ {item.horario}</Text>
+            <View className="flex-row items-center">
+              <IconeLucide id="calendario" tamanho={14} cor="#64748b" />
+              <Text className="text-xs text-slate-500 ml-1">{item.data}</Text>
+            </View>
+            <View className="flex-row items-center">
+              <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
+              <Text className="text-xs text-slate-500 ml-1">
+                {item.horario}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -122,7 +131,14 @@ export default function ReservasSindico() {
           <View className="flex-row gap-3 mt-1">
             <TouchableOpacity
               onPress={() =>
-                Alert.alert("Aprovar", "Deseja aprovar esta reserva?")
+                Alert.alert("Aprovar", "Deseja aprovar esta reserva?", [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Aprovar",
+                    style: "default",
+                    onPress: () => console.log("Reserva aprovada"),
+                  },
+                ])
               }
               className="flex-1 bg-green-600 py-2 rounded-lg items-center"
             >
@@ -130,7 +146,14 @@ export default function ReservasSindico() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
-                Alert.alert("Recusar", "Deseja recusar esta reserva?")
+                Alert.alert("Recusar", "Deseja recusar esta reserva?", [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Recusar",
+                    style: "destructive",
+                    onPress: () => console.log("Reserva recusada"),
+                  },
+                ])
               }
               className="flex-1 bg-red-50 py-2 rounded-lg items-center border border-red-100"
             >
@@ -150,13 +173,18 @@ export default function ReservasSindico() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
-            <Text className="text-white text-lg font-bold">
-              Gestão de Reservas
-            </Text>
-            <Text className="text-white/80 text-xs">
-              Calendário de ocupação
-            </Text>
+          <View className="flex-row items-center flex-1">
+            <View className="mr-3">
+              <BotaoVoltar />
+            </View>
+            <View>
+              <Text className="text-white text-lg font-bold">
+                Gestão de Reservas
+              </Text>
+              <Text className="text-white/80 text-xs">
+                Calendário de ocupação
+              </Text>
+            </View>
           </View>
           <View className="bg-red-700 p-2 rounded-lg opacity-80">
             <IconeLucide id="reservas" tamanho={20} cor="#fff" />
@@ -239,8 +267,8 @@ export default function ReservasSindico() {
 
           {reservasFiltradas.length === 0 ? (
             <View className="bg-white p-8 rounded-2xl border border-slate-100 items-center justify-center border-dashed">
-              <Text className="text-4xl mb-2">📅</Text>
-              <Text className="text-slate-500 font-medium">
+              <IconeLucide id="calendario" tamanho={48} cor="#64748b" />
+              <Text className="text-slate-500 font-medium mt-2">
                 Nenhuma reserva para este dia
               </Text>
               <Text className="text-slate-400 text-xs text-center mt-1">

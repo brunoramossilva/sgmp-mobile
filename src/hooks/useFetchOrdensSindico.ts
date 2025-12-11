@@ -68,15 +68,16 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
       // Mapeia para UI
       const ordensUI = ordens.map(mapApiToUI);
 
-      // Filtra pendentes (não aprovado)
-      const pendentes = ordensUI.filter((o) => !o.aprovado);
-
-      // Filtra em execução (aprovado e status não é final)
-      const emExecucao = ordensUI.filter(
-        (o) =>
-          o.aprovado &&
-          !["FINALIZADA", "RECUSADA", "CANCELADA"].includes(o.status)
+      // Filtra pendentes (status PENDENTE_APROVACAO)
+      const pendentes = ordensUI.filter((o) => 
+        o.statusApi?.toUpperCase() === "PENDENTE_APROVACAO"
       );
+
+      // Filtra em execução (AGUARDANDO_EXECUCAO, EM_EXECUCAO e CONCLUIDA)
+      const emExecucao = ordensUI.filter((o) => {
+        const statusUpper = o.statusApi?.toUpperCase();
+        return statusUpper === "AGUARDANDO_EXECUCAO" || statusUpper === "EM_EXECUCAO" || statusUpper === "CONCLUIDA";
+      });
 
       setOrdensPendentes(pendentes);
       setOrdensEmExecucao(emExecucao);
@@ -103,34 +104,20 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
       if (!isMountedRef.current) return;
 
       try {
-        // Backup dos estados anteriores
-        const pendantesAnterior = [...ordensPendentes];
-        const execucaoAnterior = [...ordensEmExecucao];
-
-        // Update otimista (remove de pendentes se aprovando)
-        if (dados.aprovado !== undefined) {
-          const index = ordensPendentes.findIndex((o) => o.id === ordemId);
-          if (index !== -1) {
-            const ordemAtualizada = {
-              ...ordensPendentes[index],
-              aprovado: dados.aprovado,
-              cpf_sindico:
-                dados.cpf_sindico || ordensPendentes[index].cpf_sindico,
-            };
-
-            if (dados.aprovado) {
-              // Move para execução
-              const novasPendentes = ordensPendentes.filter(
-                (o) => o.id !== ordemId
-              );
-              setOrdensPendentes(novasPendentes);
-              setOrdensEmExecucao([...ordensEmExecucao, ordemAtualizada]);
-            } else {
-              // Mantém em pendentes (rejeitou)
-              const novasPendentes = [...ordensPendentes];
-              novasPendentes[index] = ordemAtualizada;
-              setOrdensPendentes(novasPendentes);
+        // Update otimista: remove da lista de pendentes se atualizou status
+        if (dados.status) {
+          const statusUpper = dados.status.toUpperCase();
+          
+          if (statusUpper === "AGUARDANDO_EXECUCAO") {
+            // Aprovado: remove de pendentes e adiciona em execução
+            const ordem = ordensPendentes.find((o) => o.id === ordemId);
+            if (ordem) {
+              setOrdensPendentes(ordensPendentes.filter((o) => o.id !== ordemId));
+              setOrdensEmExecucao([...ordensEmExecucao, { ...ordem, statusApi: dados.status }]);
             }
+          } else if (statusUpper === "RECUSADA") {
+            // Recusado: apenas remove de pendentes
+            setOrdensPendentes(ordensPendentes.filter((o) => o.id !== ordemId));
           }
         }
 

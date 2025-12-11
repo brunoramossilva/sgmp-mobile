@@ -11,10 +11,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
-import { BotaoCriar } from "../../components/formulario"; 
+import { BotaoVoltar } from "../../components/navegacao";
+import { BotaoCriar } from "../../components/formulario";
 
 // Dados
-import { AREAS_COMUNS, HORARIOS_RESERVA_MOCK, AreaComum } from "../../utils/dadosMock";
+import {
+  AREAS_COMUNS,
+  HORARIOS_RESERVA_MOCK,
+  AreaComum,
+} from "../../utils/dadosMock";
 
 export default function ReservasMorador() {
   const insets = useSafeAreaInsets();
@@ -30,7 +35,7 @@ export default function ReservasMorador() {
   );
   const [loading, setLoading] = useState(false);
 
-  //CALENDÁRIO SIMPLES 
+  //CALENDÁRIO SIMPLES
   const gerarDiasDoCalendario = () => {
     const dias = [];
     const hoje = new Date();
@@ -64,7 +69,7 @@ export default function ReservasMorador() {
     setTimeout(() => {
       setLoading(false);
       Alert.alert(
-        "Reserva Confirmada! 🎉",
+        "Reserva Confirmada!",
         `Você reservou: ${areaSelecionada.titulo}\nData: ${diasCalendario[dataSelecionada].dataCompleta}\nHorário: ${horarioSelecionado}`,
         [
           {
@@ -95,7 +100,8 @@ export default function ReservasMorador() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
+          <BotaoVoltar />
+          <View className="flex-1 mx-3">
             <Text className="text-white text-lg font-bold">Reservas</Text>
             <Text className="text-white/80 text-xs">
               Agende seu momento de lazer
