@@ -17,7 +17,7 @@ export interface OrdemServicoUI {
   dataConclusao?: string; // "DD/MM/YYYY" ou undefined
   diasEmAberto: number; // número de dias desde abertura
   prioridade: "Alta" | "Média" | "Baixa";
-  status: "Pendente" | "Aceita" | "Finalizada" | "Recusada";
+  status: "Pendente" | "Aceita" | "Em Execução" | "Finalizada" | "Recusada";
   cpf_morador: string;
   cpf_funcionario?: string | null;
   cpf_sindico?: string | null;
@@ -84,7 +84,7 @@ export const calcularPrioridade = (
  */
 export const converterStatus = (
   statusApi?: string | null
-): "Pendente" | "Aceita" | "Finalizada" | "Recusada" => {
+): "Pendente" | "Aceita" | "Em Execução" | "Finalizada" | "Recusada" => {
   if (!statusApi) {
     return "Pendente";
   }
@@ -100,10 +100,13 @@ export const converterStatus = (
   }
 
   if (status === "EM_EXECUCAO") {
+    return "Em Execução";
+  }
+
+  if (status === "AGUARDANDO_EXECUCAO") {
     return "Aceita";
   }
 
-  // AGUARDANDO_EXECUCAO = aprovado pelo síndico, aguardando técnico
   // PENDENTE_APROVACAO = aguardando aprovação do síndico
   return "Pendente";
 };
@@ -130,10 +133,14 @@ export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
   const diasEmAberto = calcularDiasEmAberto(ordem.dataAbertura);
   const prioridade = calcularPrioridade(diasEmAberto);
   const status = converterStatus(ordem.status);
-  
+
   // Debug log
   if (ordem.status === "FINALIZADA") {
-    console.log("Mapeando ordem finalizada:", { id: ordem.id, statusApi: ordem.status, statusUI: status });
+    console.log("Mapeando ordem finalizada:", {
+      id: ordem.id,
+      statusApi: ordem.status,
+      statusUI: status,
+    });
   }
 
   return {
@@ -160,9 +167,7 @@ export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
  * @param ordem - ordem de UI
  * @returns dados para enviar na API
  */
-export const mapUIToApi = (
-  ordem: OrdemServicoUI
-): Partial<OrdemServicoApi> => {
+export const mapUIToApi = (ordem: OrdemServicoUI): Partial<OrdemServicoApi> => {
   return {
     descricao: ordem.descricao,
     status: ordem.statusApi,

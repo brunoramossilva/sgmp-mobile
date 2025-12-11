@@ -1,8 +1,3 @@
-/**
- * Tela de visualização consolidada de todos os serviços
- * Síndico visualiza ordens pendentes, em execução e finalizadas
- */
-
 import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
@@ -44,24 +39,34 @@ const CardOrdemServico = ({
     Pendente: {
       bg: "bg-yellow-100",
       text: "text-yellow-700",
+      label: "Pendente",
     },
     Aceita: {
       bg: "bg-blue-100",
       text: "text-blue-700",
+      label: "Aguardando Execução",
+    },
+    "Em Execução": {
+      bg: "bg-purple-100",
+      text: "text-purple-700",
+      label: "Em Execução",
     },
     Finalizada: {
       bg: "bg-green-100",
       text: "text-green-700",
+      label: "Finalizada",
     },
     Recusada: {
       bg: "bg-red-100",
       text: "text-red-700",
+      label: "Recusada",
     },
   };
 
   const cores = statusMap[ordem.status as keyof typeof statusMap] ?? {
     bg: "bg-gray-100",
     text: "text-gray-700",
+    label: ordem.status,
   };
 
   return (
@@ -76,7 +81,7 @@ const CardOrdemServico = ({
         </Text>
         <View className={`px-2.5 py-1 rounded-full ${cores.bg}`}>
           <Text className={`text-xs font-bold ${cores.text}`}>
-            {ordem.status}
+            {cores.label}
           </Text>
         </View>
       </View>
@@ -146,7 +151,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
         ordens = ordensEmExecucao.filter((o) => o.status === "Aceita");
         break;
       case "EM_EXECUCAO":
-        ordens = ordensEmExecucao.filter((o) => o.status === "Aceita");
+        ordens = ordensEmExecucao.filter((o) => o.status === "Em Execução");
         break;
       case "FINALIZADAS":
         ordens = ordensEmExecucao.filter(
@@ -194,7 +199,8 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       total: todasOrdens.length,
       pendentes: ordensPendentes.length,
       aceitas: ordensEmExecucao.filter((o) => o.status === "Aceita").length,
-      emExecucao: ordensEmExecucao.filter((o) => o.status === "Aceita").length,
+      emExecucao: ordensEmExecucao.filter((o) => o.status === "Em Execução")
+        .length,
       finalizadas: ordensEmExecucao.filter(
         (o) => o.status === "Finalizada" || o.status === "Recusada"
       ).length,
@@ -256,7 +262,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
             <Text className="text-white text-2xl font-bold">{stats.total}</Text>
             <Text
-              className="text-[9px] text-white/90 font-semibold uppercase"
+              className="text-[8px] text-white/90 font-semibold uppercase"
               numberOfLines={1}
             >
               Total
@@ -266,7 +272,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
             <Text className="text-yellow-300 text-2xl font-bold">
               {stats.pendentes}
             </Text>
-            <Text className="text-[8px] text-white/90 font-semibold uppercase text-center leading-tight">
+            <Text className="text-[6px] text-white/90 font-semibold uppercase text-center leading-tight">
               Pendentes{"\n"}Aprovação
             </Text>
           </View>
@@ -274,8 +280,16 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
             <Text className="text-blue-300 text-2xl font-bold">
               {stats.aceitas}
             </Text>
-            <Text className="text-[8px] text-white/90 font-semibold uppercase text-center leading-tight">
+            <Text className="text-[5.6px] text-white/90 font-semibold uppercase text-center leading-tight">
               Aguardando{"\n"}Execução
+            </Text>
+          </View>
+          <View className="bg-white/10 rounded-lg px-2 py-1.5 flex-1 items-center">
+            <Text className="text-purple-300 text-2xl font-bold">
+              {stats.emExecucao}
+            </Text>
+            <Text className="text-[7px] text-white/90 font-semibold uppercase text-center leading-tight">
+              Em{"\n"}Execução
             </Text>
           </View>
           <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
@@ -283,7 +297,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
               {stats.finalizadas}
             </Text>
             <Text
-              className="text-[9px] text-white/90 font-semibold uppercase"
+              className="text-[6px] text-white/90 font-semibold uppercase"
               numberOfLines={1}
             >
               Concluídas
@@ -294,7 +308,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
               {stats.recusadas}
             </Text>
             <Text
-              className="text-[9px] text-white/90 font-semibold uppercase"
+              className="text-[6px] text-white/90 font-semibold uppercase"
               numberOfLines={1}
             >
               Recusadas
