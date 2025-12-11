@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface DadosAutenticacao {
   cpf: string;
@@ -30,8 +31,21 @@ export const ProvedorAutenticacao: React.FC<{ children: ReactNode }> = ({
     });
   };
 
-  const desautenticar = () => {
+  const desautenticar = async () => {
     setUsuario(null);
+
+    // Limpar todas as chaves de introdução do AsyncStorage
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const introducaoKeys = keys.filter((key) =>
+        key.startsWith("introducao_")
+      );
+      if (introducaoKeys.length > 0) {
+        await AsyncStorage.multiRemove(introducaoKeys);
+      }
+    } catch (erro) {
+      console.error("Erro ao limpar introduções:", erro);
+    }
   };
 
   return (

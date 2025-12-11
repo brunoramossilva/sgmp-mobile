@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Alert,
   View,
@@ -9,7 +9,7 @@ import {
   RefreshControl,
   StyleSheet,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { NavbarGlobal } from "../../components/navegacao";
@@ -53,25 +53,10 @@ const InicialMorador = () => {
   const { usuario, desautenticar } = useAutenticacao();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showCarrossel, setShowCarrossel] = useState(true);
-  const jaExibiuNaSessao = React.useRef(false);
 
   const cpf = usuario?.cpf || "";
   const { deveExibirIntroducao, marcarComoVisto, carregando } =
     useIntroducaoUsuario(cpf, "MORADOR");
-
-  const handleFecharCarrossel = () => {
-    setShowCarrossel(false);
-    jaExibiuNaSessao.current = true;
-    marcarComoVisto();
-  };
-
-  React.useEffect(() => {
-    // Se já exibiu nesta sessão, não mostrar novamente
-    if (jaExibiuNaSessao.current) {
-      setShowCarrossel(false);
-    }
-  }, []);
 
   const moradorName = usuario?.nome?.trim()
     ? usuario.nome.split(" ")[0]
@@ -300,10 +285,10 @@ const InicialMorador = () => {
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
       {/* Carrossel de Introdução */}
-      {showCarrossel && (
+      {!carregando && deveExibirIntroducao && (
         <CarrosselIntroducao
           slides={obterSlidesIntroducao("MORADOR")}
-          aoConcluir={handleFecharCarrossel}
+          aoConcluir={marcarComoVisto}
           nomePapel="MORADOR"
         />
       )}

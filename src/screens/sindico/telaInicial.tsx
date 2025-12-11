@@ -145,25 +145,10 @@ const TelaInicial = () => {
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
   const { data, loading, refreshing, refetch } = useDashboardData();
-  const [showCarrossel, setShowCarrossel] = useState(true);
-  const jaExibiuNaSessao = React.useRef(false);
 
   const cpf = usuario?.cpf || "";
   const { deveExibirIntroducao, marcarComoVisto, carregando } =
     useIntroducaoUsuario(cpf, "SINDICO");
-
-  const handleFecharCarrossel = () => {
-    setShowCarrossel(false);
-    jaExibiuNaSessao.current = true;
-    marcarComoVisto();
-  };
-
-  React.useEffect(() => {
-    // Se já exibiu nesta sessão, não mostrar novamente
-    if (jaExibiuNaSessao.current) {
-      setShowCarrossel(false);
-    }
-  }, []);
 
   const sindicoName = usuario?.nome?.trim()
     ? usuario.nome.split(" ")[0]
@@ -217,10 +202,10 @@ const TelaInicial = () => {
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
       {/* Carrossel de Introdução */}
-      {showCarrossel && (
+      {!carregando && deveExibirIntroducao && (
         <CarrosselIntroducao
           slides={obterSlidesIntroducao("SINDICO")}
-          aoConcluir={handleFecharCarrossel}
+          aoConcluir={marcarComoVisto}
           nomePapel="SINDICO"
         />
       )}

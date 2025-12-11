@@ -22,7 +22,7 @@ export default function ReservasSindico() {
     new Date().toLocaleDateString("pt-BR")
   );
 
-  //  GERADOR DE CALENDÁRIO 
+  //  GERADOR DE CALENDÁRIO
   const calendarioDias = useMemo(() => {
     const dias = [];
     const hoje = new Date();
@@ -122,7 +122,14 @@ export default function ReservasSindico() {
           <View className="flex-row gap-3 mt-1">
             <TouchableOpacity
               onPress={() =>
-                Alert.alert("Aprovar", "Deseja aprovar esta reserva?")
+                Alert.alert("Aprovar", "Deseja aprovar esta reserva?", [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Aprovar",
+                    style: "default",
+                    onPress: () => console.log("Reserva aprovada"),
+                  },
+                ])
               }
               className="flex-1 bg-green-600 py-2 rounded-lg items-center"
             >
@@ -130,7 +137,14 @@ export default function ReservasSindico() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
-                Alert.alert("Recusar", "Deseja recusar esta reserva?")
+                Alert.alert("Recusar", "Deseja recusar esta reserva?", [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Recusar",
+                    style: "destructive",
+                    onPress: () => console.log("Reserva recusada"),
+                  },
+                ])
               }
               className="flex-1 bg-red-50 py-2 rounded-lg items-center border border-red-100"
             >
@@ -150,13 +164,21 @@ export default function ReservasSindico() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
-            <Text className="text-white text-lg font-bold">
-              Gestão de Reservas
-            </Text>
-            <Text className="text-white/80 text-xs">
-              Calendário de ocupação
-            </Text>
+          <View className="flex-row items-center flex-1">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              className="mr-3"
+            >
+              <IconeLucide id="anterior" tamanho={24} cor="#fff" />
+            </TouchableOpacity>
+            <View>
+              <Text className="text-white text-lg font-bold">
+                Gestão de Reservas
+              </Text>
+              <Text className="text-white/80 text-xs">
+                Calendário de ocupação
+              </Text>
+            </View>
           </View>
           <View className="bg-red-700 p-2 rounded-lg opacity-80">
             <IconeLucide id="reservas" tamanho={20} cor="#fff" />

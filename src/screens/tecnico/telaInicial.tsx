@@ -85,25 +85,10 @@ export default function InicialTecnico() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
-  const [showCarrossel, setShowCarrossel] = useState(true);
-  const jaExibiuNaSessao = React.useRef(false);
 
   const cpf = usuario?.cpf || "";
   const { deveExibirIntroducao, marcarComoVisto, carregando } =
     useIntroducaoUsuario(cpf, "FUNCIONARIO");
-
-  const handleFecharCarrossel = () => {
-    setShowCarrossel(false);
-    jaExibiuNaSessao.current = true;
-    marcarComoVisto();
-  };
-
-  React.useEffect(() => {
-    // Se já exibiu nesta sessão, não mostrar novamente
-    if (jaExibiuNaSessao.current) {
-      setShowCarrossel(false);
-    }
-  }, []);
 
   // Estados de Dados
   const {
@@ -273,10 +258,10 @@ export default function InicialTecnico() {
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
       {/* Carrossel de Introdução */}
-      {showCarrossel && (
+      {!carregando && deveExibirIntroducao && (
         <CarrosselIntroducao
           slides={obterSlidesIntroducao("FUNCIONARIO")}
-          aoConcluir={handleFecharCarrossel}
+          aoConcluir={marcarComoVisto}
           nomePapel="FUNCIONARIO"
         />
       )}

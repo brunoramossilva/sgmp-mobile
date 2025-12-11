@@ -9,7 +9,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
-import { NavbarGlobal } from "../../components/navegacao"; 
+import { NavbarGlobal } from "../../components/navegacao";
 
 // IMPORTAÇÃO DOS DADOS MOCKADOS
 import {
@@ -64,7 +64,7 @@ export default function FinanceiroSindico() {
   const maxValor =
     Math.max(
       ...GRAFICO_FLUXO_MOCK.map((d) => Math.max(d.receita, d.despesa)),
-      1000 
+      1000
     ) * 1.1;
 
   const renderInadimplente = (item: Inadimplente) => (
@@ -102,13 +102,21 @@ export default function FinanceiroSindico() {
         style={{ paddingTop: (insets.top || 0) + 12 }}
       >
         <View className="flex-row justify-between items-center">
-          <View>
-            <Text className="text-white text-lg font-bold">
-              Gestão Financeira
-            </Text>
-            <Text className="text-white/80 text-xs">
-              Visão geral do condomínio
-            </Text>
+          <View className="flex-row items-center flex-1">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              className="mr-3"
+            >
+              <IconeLucide id="anterior" tamanho={24} cor="#fff" />
+            </TouchableOpacity>
+            <View>
+              <Text className="text-white text-lg font-bold">
+                Gestão Financeira
+              </Text>
+              <Text className="text-white/80 text-xs">
+                Visão geral do condomínio
+              </Text>
+            </View>
           </View>
           <View className="bg-red-700 p-2 rounded-lg opacity-80">
             <IconeLucide id="financeiro" tamanho={20} cor="#fff" />

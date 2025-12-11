@@ -22,7 +22,12 @@ import { OrdemServicoUI } from "../../utils/mapeadores";
 import SkeletonBloco from "../../components/SkeletonBloco";
 import { NavbarGlobal } from "../../components/navegacao";
 
-type FiltroStatus = "TODAS" | "PENDENTES" | "EM_EXECUCAO" | "FINALIZADAS";
+type FiltroStatus =
+  | "TODAS"
+  | "PENDENTES"
+  | "EM_EXECUCAO"
+  | "FINALIZADAS"
+  | "RECUSADAS";
 
 // Card unificado para exibir ordens de qualquer status
 const CardOrdemServico = ({
@@ -143,6 +148,8 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
         return ordensEmExecucao.filter(
           (o) => o.status === "Finalizada" || o.status === "Recusada"
         );
+      case "RECUSADAS":
+        return ordensEmExecucao.filter((o) => o.status === "Recusada");
       case "TODAS":
       default:
         return todasOrdens;
@@ -178,6 +185,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       finalizadas: ordensEmExecucao.filter(
         (o) => o.status === "Finalizada" || o.status === "Recusada"
       ).length,
+      recusadas: ordensEmExecucao.filter((o) => o.status === "Recusada").length,
     }),
     [ordensPendentes, ordensEmExecucao, todasOrdens]
   );
@@ -221,7 +229,12 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       {/* Header - padrão do design system */}
       <View className="bg-red-600 px-4 pb-4 pt-16">
         <View className="flex-row items-center justify-between mb-4">
-          <View className="w-10" />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="w-10"
+          >
+            <IconeLucide id="anterior" tamanho={24} cor="#fff" />
+          </TouchableOpacity>
           <Text className="text-white text-xl font-bold">
             Todos os Serviços
           </Text>
@@ -272,6 +285,17 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
               Finalizada
             </Text>
           </View>
+          <View className="bg-white/10 rounded-lg px-2 py-2 flex-1 items-center">
+            <Text className="text-red-300 text-2xl font-bold">
+              {stats.recusadas}
+            </Text>
+            <Text
+              className="text-[9px] text-white/90 font-semibold uppercase"
+              numberOfLines={1}
+            >
+              Recusadas
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -297,6 +321,11 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
             label="Finalizadas"
             valor="FINALIZADAS"
             count={stats.finalizadas}
+          />
+          <FiltroButton
+            label="Recusadas"
+            valor="RECUSADAS"
+            count={stats.recusadas}
           />
         </ScrollView>
       </View>
