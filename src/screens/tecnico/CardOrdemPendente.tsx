@@ -25,13 +25,15 @@ export default function CardOrdemPendente({
         <Text className="text-lg font-semibold text-slate-800 flex-1">
           {ordem.titulo}
         </Text>
-        <View
-          className={`px-2 py-1 rounded-full ${corPrioridade(
-            ordem.prioridade
-          )}`}
-        >
-          <Text className="text-xs font-medium">{ordem.prioridade}</Text>
-        </View>
+        {ordem.status !== "Finalizada" && (
+          <View
+            className={`px-2 py-1 rounded-full ${corPrioridade(
+              ordem.prioridade
+            )}`}
+          >
+            <Text className="text-xs font-medium">{ordem.prioridade}</Text>
+          </View>
+        )}
       </View>
 
       <Text className="text-slate-600 text-sm mb-2" numberOfLines={2}>

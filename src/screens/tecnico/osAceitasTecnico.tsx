@@ -111,7 +111,7 @@ export default function OsAceitasTecnico() {
     await atualizarStatus(
       ordemSelecionada,
       {
-        status: "FINALIZADA",
+        status: "CONCLUIDA",
         dataConclusao: new Date().toISOString(),
       },
       "Finalizada"

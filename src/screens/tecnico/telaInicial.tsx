@@ -200,7 +200,7 @@ export default function InicialTecnico() {
     if (!ordemSelecionada) return;
     try {
       await updateOrdem(ordemSelecionada.id, {
-        status: "FINALIZADA",
+        status: "CONCLUIDA",
         dataConclusao: new Date().toISOString(),
       });
       await carregarOrdens();
