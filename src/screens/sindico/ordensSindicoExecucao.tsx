@@ -16,6 +16,7 @@ import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
 import { OrdemServicoUI } from "../../utils/mapeadores";
 import { BotaoVoltar } from "../../components/navegacao";
+import SkeletonBloco from "../../components/SkeletonBloco";
 
 // Card alinhado ao design system (bordas 2xl, chips e CTA sólido)
 const CardOrdemAceita = ({
@@ -140,6 +141,32 @@ export default function OrdensSindicoExecucao({
 
     return { emExecucao, concluidas };
   }, [ordensEmExecucao]);
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-white">
+        <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
+        <View className="bg-red-600 px-4 pb-4 pt-5">
+          <View className="flex-row items-center justify-between">
+            <BotaoVoltar />
+            <Text className="text-white text-xl font-bold">
+              Ordens em Execução
+            </Text>
+            <View className="w-10" />
+          </View>
+        </View>
+        <View className="p-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonBloco
+              key={i}
+              height={140}
+              style={{ marginBottom: 12, borderRadius: 16 }}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1">

@@ -7,6 +7,7 @@ import {
   RefreshControl,
   StatusBar,
 } from "react-native";
+import SkeletonBloco from "../../components/SkeletonBloco";
 import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -142,6 +143,32 @@ export default function OrdensRecusadas({ navigation }: OrdensRecusadasProps) {
     ),
     [abrirDetalhes]
   );
+
+  if (loading && !refreshing) {
+    return (
+      <View className="flex-1 bg-white">
+        <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
+        <View className="bg-red-600 px-4 pb-4 pt-5">
+          <View className="flex-row items-center justify-between">
+            <BotaoVoltar />
+            <Text className="text-white text-xl font-bold">
+              Ordens Recusadas
+            </Text>
+            <View className="w-10" />
+          </View>
+        </View>
+        <View className="p-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonBloco
+              key={i}
+              height={140}
+              style={{ marginBottom: 12, borderRadius: 16 }}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  }
 
   const renderEmpty = useCallback(
     () => (

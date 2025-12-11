@@ -22,6 +22,7 @@ import { Morador } from "../../types/morador";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { IconeLucide } from "../../components/icones";
 import { BotaoVoltar } from "../../components/navegacao";
+import SkeletonBloco from "../../components/SkeletonBloco";
 
 type Props = NativeStackScreenProps<any, "MoradoresAtivos">;
 
@@ -317,9 +318,14 @@ const MoradoresAtivos: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
 
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#dc2626" />
-          <Text className="text-slate-500 mt-4">Carregando moradores...</Text>
+        <View className="p-4">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonBloco
+              key={i}
+              height={100}
+              style={{ marginBottom: 12, borderRadius: 16 }}
+            />
+          ))}
         </View>
       </SafeAreaView>
     );
