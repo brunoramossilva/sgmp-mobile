@@ -18,7 +18,7 @@ export interface OrdemServico {
 /**
  * Dados de entrada para criação de Ordem de Serviço
  * Baseado rigorosamente no schema Prisma - apenas descricao é obrigatório
- * Outros campos (dataAbertura, status, aprovado) são preenchidos automaticamente no backend
+ * Outros campos (dataAbertura, status) são preenchidos automaticamente no backend
  */
 export interface CriacaoOsDados {
   descricao: string;

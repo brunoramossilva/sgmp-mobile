@@ -21,7 +21,6 @@ export interface OrdemServicoUI {
   cpf_morador: string;
   cpf_funcionario?: string | null;
   cpf_sindico?: string | null;
-  aprovado: boolean;
   statusApi?: string; // status original da API
 }
 
@@ -65,48 +64,29 @@ export const calcularDiasEmAberto = (dataAbertura: string): number => {
 };
 
 /**
- * Calcula prioridade baseado em status e tempo
- * @param aprovado - boolean
+ * Calcula prioridade baseado no tempo
  * @param diasEmAberto - número de dias
  * @returns prioridade
  */
 export const calcularPrioridade = (
-  aprovado: boolean,
   diasEmAberto: number
 ): "Alta" | "Média" | "Baixa" => {
-  // Se não aprovado, prioridade baseada no tempo de espera
-  if (!aprovado) {
-    if (diasEmAberto > 7) return "Alta";
-    if (diasEmAberto > 3) return "Média";
-    return "Baixa";
-  }
-
-  // Se aprovado (aceita/em execução), prioridade baseada no tempo desde abertura
-  if (diasEmAberto > 7) {
-    return "Alta";
-  }
-
-  // 3 a 7 dias = Média
-  if (diasEmAberto > 3) {
-    return "Média";
-  }
-
-  // Menos de 3 dias = Baixa
+  // Prioridade baseada no tempo de espera
+  if (diasEmAberto > 7) return "Alta";
+  if (diasEmAberto > 3) return "Média";
   return "Baixa";
 };
 
 /**
  * Converte status da API para status UI
  * @param statusApi - status do banco de dados
- * @param aprovado - boolean
  * @returns status formatado
  */
 export const converterStatus = (
-  statusApi?: string | null,
-  aprovado?: boolean
+  statusApi?: string | null
 ): "Pendente" | "Aceita" | "Finalizada" | "Recusada" => {
   if (!statusApi) {
-    return aprovado ? "Aceita" : "Pendente";
+    return "Pendente";
   }
 
   const status = statusApi.toUpperCase();
@@ -119,11 +99,11 @@ export const converterStatus = (
     return "Recusada";
   }
 
-  if (["ABERTA", "ACEITA", "EM_EXECUCAO"].includes(status)) {
-    return aprovado ? "Aceita" : "Pendente";
+  if (["ACEITA", "EM_EXECUCAO"].includes(status)) {
+    return "Aceita";
   }
 
-  return aprovado ? "Aceita" : "Pendente";
+  return "Pendente";
 };
 
 /**
@@ -146,8 +126,8 @@ export const truncarTexto = (texto: string, max: number = 40): string => {
  */
 export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
   const diasEmAberto = calcularDiasEmAberto(ordem.dataAbertura);
-  const prioridade = calcularPrioridade(ordem.aprovado, diasEmAberto);
-  const status = converterStatus(ordem.status, ordem.aprovado);
+  const prioridade = calcularPrioridade(diasEmAberto);
+  const status = converterStatus(ordem.status);
   
   // Debug log
   if (ordem.status === "FINALIZADA") {
@@ -169,7 +149,6 @@ export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
     cpf_morador: ordem.cpf_morador,
     cpf_funcionario: ordem.cpf_funcionario,
     cpf_sindico: ordem.cpf_sindico,
-    aprovado: ordem.aprovado,
     statusApi: ordem.status,
   };
 };
@@ -185,7 +164,6 @@ export const mapUIToApi = (
   return {
     descricao: ordem.descricao,
     status: ordem.statusApi,
-    aprovado: ordem.aprovado,
     cpf_sindico: ordem.cpf_sindico,
     cpf_funcionario: ordem.cpf_funcionario,
   };

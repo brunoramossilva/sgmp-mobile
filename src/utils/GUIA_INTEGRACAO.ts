@@ -78,7 +78,6 @@ return {
     campos_automaticos_backend: {
       dataAbertura: "DateTime @default(now()) - preenchido automaticamente",
       status: "String @default('ABERTA') - preenchido automaticamente",
-      aprovado: "Boolean @default(false) - preenchido automaticamente",
       id: "Int @id @default(autoincrement()) - gerado pelo banco"
     },
     
