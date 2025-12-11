@@ -23,9 +23,11 @@ const ordemFallback: OrdemServicoUI = {
     "Há um vazamento na torneira do banheiro do apartamento 101. O morador relatou que o problema começou há cerca de 3 dias e está piorando progressivamente. A água está vazando mesmo com a torneira fechada.",
   solicitante: "João Silva",
   dataAbertura: "28/11/2024",
+  data: "28/11/2024",
   diasEmAberto: 3,
   prioridade: "Alta",
   status: "Aceita",
+  local: "Condomínio Vista Verde",
   cpf_morador: "00000000000",
 };
 

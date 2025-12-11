@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { OrdemServicoUI } from "./types";
-import { corPrioridade } from "./types";
+import { OrdemServicoUI, corPrioridade } from "../../utils/mapeadores";
 import { IconeLucide } from "../../components/icones";
 
 type Props = {

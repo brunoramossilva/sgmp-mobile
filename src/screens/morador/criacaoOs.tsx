@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { CriacaoOSFormulario, schemaCriacaoOS } from "../../types/ordemServico";
 import { BotaoCriar, MensagemErro } from "../../components/formulario";
-import { useCriacaoOS } from "../../../docs/morador/useCriacaoOS";
+import { useCriacaoOS } from "../../hooks/useCriacaoOS";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
 import { IconeLucide } from "../../components/icones"; // Para o ícone do botão novo
 import { BotaoVoltar } from "../../components/navegacao";

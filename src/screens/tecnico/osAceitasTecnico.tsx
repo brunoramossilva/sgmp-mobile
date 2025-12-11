@@ -16,7 +16,7 @@ import {
   updateOrdem,
   OrdemServicoApi,
 } from "../../services/ordemServico";
-import { OrdemServicoUI, mapApiToUI } from "./types";
+import { OrdemServicoUI, mapApiToUI } from "../../utils/mapeadores";
 import CardOrdemAceita from "./CardOrdemAceita";
 import { BotaoVoltar } from "../../components/navegacao";
 import ModalDetalhes from "./ModalDetalhes";

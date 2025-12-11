@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { OrdemServicoUI } from "./types";
+import { OrdemServicoUI } from "../../utils/mapeadores";
 import { IconeLucide } from "../../components/icones";
 
 type Props = {

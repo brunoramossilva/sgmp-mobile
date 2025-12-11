@@ -14,10 +14,12 @@ export interface OrdemServicoUI {
   descricao: string; // descrição completa
   solicitante: string; // nome do morador
   dataAbertura: string; // "DD/MM/YYYY"
+  data: string; // alias para dataAbertura (compatibilidade)
   dataConclusao?: string; // "DD/MM/YYYY" ou undefined
   diasEmAberto: number; // número de dias desde abertura
   prioridade: "Alta" | "Média" | "Baixa";
   status: "Pendente" | "Aceita" | "Em Execução" | "Finalizada" | "Recusada";
+  local: string; // local do serviço
   cpf_morador: string;
   cpf_funcionario?: string | null;
   cpf_sindico?: string | null;
@@ -143,23 +145,67 @@ export const mapApiToUI = (ordem: OrdemServicoApi): OrdemServicoUI => {
     });
   }
 
+  const dataFormatada = formatarData(ordem.dataAbertura);
+
   return {
     id: ordem.id,
     titulo: truncarTexto(ordem.descricao, 40),
     descricao: ordem.descricao,
     solicitante: ordem.morador?.nome ?? "Desconhecido",
-    dataAbertura: formatarData(ordem.dataAbertura),
+    dataAbertura: dataFormatada,
+    data: dataFormatada, // alias para compatibilidade
     dataConclusao: ordem.dataConclusao
       ? formatarData(ordem.dataConclusao)
       : undefined,
     diasEmAberto,
     prioridade,
     status,
+    local: ordem.local ?? "Condomínio Vista Verde",
     cpf_morador: ordem.cpf_morador,
     cpf_funcionario: ordem.cpf_funcionario,
     cpf_sindico: ordem.cpf_sindico,
     statusApi: ordem.status,
   };
+};
+
+/**
+ * Retorna classes de cores Tailwind para prioridade
+ * @param prioridade - prioridade da ordem
+ * @returns classes CSS Tailwind
+ */
+export const corPrioridade = (prioridade: string) => {
+  switch (prioridade) {
+    case "Alta":
+      return "bg-red-100 text-red-700";
+    case "Média":
+      return "bg-yellow-100 text-yellow-700";
+    case "Baixa":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
+};
+
+/**
+ * Retorna classes de cores Tailwind para status
+ * @param status - status da ordem
+ * @returns classes CSS Tailwind
+ */
+export const corStatus = (status: string) => {
+  switch (status) {
+    case "Pendente":
+      return "bg-orange-100 text-orange-700";
+    case "Aceita":
+      return "bg-blue-100 text-blue-700";
+    case "Em Execução":
+      return "bg-purple-100 text-purple-700";
+    case "Recusada":
+      return "bg-red-100 text-red-700";
+    case "Finalizada":
+      return "bg-green-100 text-green-700";
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
 };
 
 /**

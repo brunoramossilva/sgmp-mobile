@@ -23,7 +23,7 @@ import { useIntroducaoUsuario } from "../../hooks/useIntroducaoUsuario";
 
 // Services e Types
 import { getOrdens, updateOrdem } from "../../services/ordemServico";
-import { OrdemServicoUI, mapApiToUI } from "./types";
+import { OrdemServicoUI, mapApiToUI } from "../../utils/mapeadores";
 import CardOrdemPendente from "./CardOrdemPendente";
 import CardOrdemAceita from "./CardOrdemAceita";
 import ModalDetalhes from "./ModalDetalhes";
@@ -233,15 +233,15 @@ export default function InicialTecnico() {
 
     if (abaSelecionada === "Pendentes") {
       filtradas = ordens.filter(
-        (o) => o.raw?.status?.toUpperCase() === "AGUARDANDO_EXECUCAO"
+        (o) => o.statusApi?.toUpperCase() === "AGUARDANDO_EXECUCAO"
       );
     } else if (abaSelecionada === "Em Execução") {
       filtradas = ordens.filter(
-        (o) => o.raw?.status?.toUpperCase() === "EM_EXECUCAO"
+        (o) => o.statusApi?.toUpperCase() === "EM_EXECUCAO"
       );
     } else if (abaSelecionada === "Finalizadas") {
       filtradas = ordens.filter((o) => {
-        const statusUpper = o.raw?.status?.toUpperCase();
+        const statusUpper = o.statusApi?.toUpperCase();
         return statusUpper === "FINALIZADA" || statusUpper === "CONCLUIDA";
       });
     }
