@@ -127,13 +127,13 @@ export default function OrdensSindicoExecucao({
   // Statísticas
   const stats = useMemo(() => {
     const emExecucao = ordensEmExecucao.filter(
-      (o) => o.status === "Aceita"
+      (o) => o.statusApi?.toUpperCase() === "EM_EXECUCAO"
     ).length;
-    const finalizadas = ordensEmExecucao.filter(
-      (o) => o.status === "Finalizada"
+    const concluidas = ordensEmExecucao.filter(
+      (o) => o.statusApi?.toUpperCase() === "CONCLUIDA"
     ).length;
 
-    return { emExecucao, finalizadas };
+    return { emExecucao, concluidas };
   }, [ordensEmExecucao]);
 
   return (
@@ -168,10 +168,10 @@ export default function OrdensSindicoExecucao({
             </View>
             <View className="bg-white/10 rounded-lg px-3 py-2 min-w-[110] items-center">
               <Text className="text-[11px] text-white/80 font-semibold">
-                FINALIZADAS
+                CONCLUÍDAS
               </Text>
               <Text className="text-lg font-bold text-white">
-                {stats.finalizadas}
+                {stats.concluidas}
               </Text>
             </View>
           </View>

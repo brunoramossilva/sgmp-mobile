@@ -73,10 +73,10 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
         o.statusApi?.toUpperCase() === "PENDENTE_APROVACAO"
       );
 
-      // Filtra em execução (AGUARDANDO_EXECUCAO ou EM_EXECUCAO)
+      // Filtra em execução (AGUARDANDO_EXECUCAO, EM_EXECUCAO e CONCLUIDA)
       const emExecucao = ordensUI.filter((o) => {
         const statusUpper = o.statusApi?.toUpperCase();
-        return statusUpper === "AGUARDANDO_EXECUCAO" || statusUpper === "EM_EXECUCAO";
+        return statusUpper === "AGUARDANDO_EXECUCAO" || statusUpper === "EM_EXECUCAO" || statusUpper === "CONCLUIDA";
       });
 
       setOrdensPendentes(pendentes);

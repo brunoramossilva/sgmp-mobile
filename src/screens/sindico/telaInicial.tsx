@@ -107,7 +107,7 @@ const useDashboardData = () => {
       ).length;
       const ordensEmExecucao = ordens.filter((o) => {
         const statusUpper = o.status?.toUpperCase();
-        return statusUpper === "AGUARDANDO_EXECUCAO" || statusUpper === "EM_EXECUCAO";
+        return statusUpper === "EM_EXECUCAO";
       }).length;
       const moradoresAtivos = new Set(ordens.map((o) => o.cpf_morador)).size;
 
