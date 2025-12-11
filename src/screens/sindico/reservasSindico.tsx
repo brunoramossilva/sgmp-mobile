@@ -113,8 +113,16 @@ export default function ReservasSindico() {
             {item.area}
           </Text>
           <View className="flex-row gap-4">
-            <Text className="text-xs text-slate-500">📅 {item.data}</Text>
-            <Text className="text-xs text-slate-500">⏰ {item.horario}</Text>
+            <View className="flex-row items-center">
+              <IconeLucide id="calendario" tamanho={14} cor="#64748b" />
+              <Text className="text-xs text-slate-500 ml-1">{item.data}</Text>
+            </View>
+            <View className="flex-row items-center">
+              <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
+              <Text className="text-xs text-slate-500 ml-1">
+                {item.horario}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -259,8 +267,8 @@ export default function ReservasSindico() {
 
           {reservasFiltradas.length === 0 ? (
             <View className="bg-white p-8 rounded-2xl border border-slate-100 items-center justify-center border-dashed">
-              <Text className="text-4xl mb-2">📅</Text>
-              <Text className="text-slate-500 font-medium">
+              <IconeLucide id="calendario" tamanho={48} cor="#64748b" />
+              <Text className="text-slate-500 font-medium mt-2">
                 Nenhuma reserva para este dia
               </Text>
               <Text className="text-slate-400 text-xs text-center mt-1">

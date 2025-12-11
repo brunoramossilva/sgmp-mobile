@@ -291,17 +291,23 @@ export default function DetalhesOS() {
                     onPress={aceitarOS}
                     className="flex-1 bg-green-600 p-4 rounded-xl mr-2"
                   >
-                    <Text className="text-white text-center font-semibold">
-                      ✓ Aceitar OS
-                    </Text>
+                    <View className="flex-row items-center justify-center">
+                      <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                      <Text className="text-white text-center font-semibold ml-2">
+                        Aceitar OS
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={recusarOS}
                     className="flex-1 bg-red-600 p-4 rounded-xl"
                   >
-                    <Text className="text-white text-center font-semibold">
-                      ✕ Recusar OS
-                    </Text>
+                    <View className="flex-row items-center justify-center">
+                      <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
+                      <Text className="text-white text-center font-semibold ml-2">
+                        Recusar OS
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                 </View>
               )}
@@ -312,9 +318,12 @@ export default function DetalhesOS() {
                   onPress={() => setModalFinalizacaoVisivel(true)}
                   className="bg-green-600 p-4 rounded-xl mb-3"
                 >
-                  <Text className="text-white text-center font-semibold">
-                    ✓ Finalizar OS
-                  </Text>
+                  <View className="flex-row items-center justify-center">
+                    <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                    <Text className="text-white text-center font-semibold ml-2">
+                      Finalizar OS
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               )}
             </View>
@@ -339,9 +348,12 @@ export default function DetalhesOS() {
           >
             <View className="flex-1 justify-center items-center bg-black/50 px-4">
               <View className="bg-white w-full rounded-2xl p-6">
-                <Text className="text-2xl font-bold text-red-700 mb-4 text-center">
-                  ✓ Finalizar Ordem de Serviço
-                </Text>
+                <View className="flex-row items-center justify-center mb-4">
+                  <IconeLucide id="confirmar" tamanho={24} cor="#b91c1c" />
+                  <Text className="text-2xl font-bold text-red-700 ml-2 text-center">
+                    Finalizar Ordem de Serviço
+                  </Text>
+                </View>
                 <View className="bg-slate-100 p-3 rounded-xl mb-4">
                   <Text className="text-lg font-semibold text-slate-800">
                     {ordem.titulo}
@@ -370,9 +382,12 @@ export default function DetalhesOS() {
                   onPress={finalizarOS}
                   className="bg-green-600 p-4 rounded-xl mb-2"
                 >
-                  <Text className="text-white text-center font-semibold">
-                    ✓ Confirmar Finalização
-                  </Text>
+                  <View className="flex-row items-center justify-center">
+                    <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                    <Text className="text-white text-center font-semibold ml-2">
+                      Confirmar Finalização
+                    </Text>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {

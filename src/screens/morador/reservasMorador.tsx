@@ -69,7 +69,7 @@ export default function ReservasMorador() {
     setTimeout(() => {
       setLoading(false);
       Alert.alert(
-        "Reserva Confirmada! 🎉",
+        "Reserva Confirmada!",
         `Você reservou: ${areaSelecionada.titulo}\nData: ${diasCalendario[dataSelecionada].dataCompleta}\nHorário: ${horarioSelecionado}`,
         [
           {

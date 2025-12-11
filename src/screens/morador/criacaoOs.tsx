@@ -71,7 +71,7 @@ export default function CriacaoOS() {
 
   useEffect(() => {
     if (sucesso) {
-      Alert.alert("Sucesso! ✓", "Ordem de Serviço enviada para o síndico.", [
+      Alert.alert("Sucesso!", "Ordem de Serviço enviada para o síndico.", [
         {
           text: "OK",
           onPress: () => {
@@ -131,8 +131,8 @@ export default function CriacaoOS() {
         <View className="flex-1 px-4 pt-6 pb-36 justify-start">
           {/* DICA */}
           <View className="flex-row items-center bg-blue-50 p-3 rounded-xl border border-blue-100 mb-5 shadow-sm">
-            <Text style={{ marginRight: 10, fontSize: 18 }}>💡</Text>
-            <Text className="text-blue-700 text-xs ml-0 flex-1 leading-4">
+            <IconeLucide id="alerta" tamanho={20} cor="#1d4ed8" />
+            <Text className="text-blue-700 text-xs ml-2 flex-1 leading-4">
               Quanto mais detalhes você fornecer, mais rápida será a análise e
               aprovação do síndico.
             </Text>
@@ -178,7 +178,7 @@ export default function CriacaoOS() {
               >
                 {descricaoValue?.length < 10
                   ? `Mínimo de 10 caracteres`
-                  : "✓ Descrição válida"}
+                  : "Descrição válida"}
               </Text>
               <Text className="text-slate-400 text-[10px]">
                 {descricaoValue?.length || 0}/500
