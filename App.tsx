@@ -19,6 +19,7 @@ import FinanceiroMorador from "./src/screens/morador/financeiroMorador";
 import ReservasMorador from "./src/screens/morador/reservasMorador";
 import FinanceiroSindico from "./src/screens/sindico/financeiroSindico";
 import ReservasSindico from "./src/screens/sindico/reservasSindico";
+import MoradoresAtivos from "./src/screens/sindico/moradoresAtivos";
 
 const Stack = createNativeStackNavigator();
 
@@ -112,6 +113,11 @@ export default function App() {
           <Stack.Screen
             name="ReservasSindico"
             component={ReservasSindico}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MoradoresAtivos"
+            component={MoradoresAtivos}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

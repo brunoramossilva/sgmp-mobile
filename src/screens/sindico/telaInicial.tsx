@@ -305,7 +305,7 @@ const TelaInicial = () => {
               value={data?.moradoresAtivos || 0}
               icon="moradores"
               color="#6366f1"
-              onPress={() => Alert.alert("Moradores", "Lista de moradores")}
+              onPress={() => navigation.navigate("MoradoresAtivos" as never)}
             />
           </ScrollView>
         </View>
