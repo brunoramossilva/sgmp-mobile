@@ -103,19 +103,11 @@ export default function TelaLogin() {
   };
 
   return (
-    // MUDANÇA: A View principal agora tem fundo BRANCO (bg-white)
     <View className="flex-1 bg-white">
       <StatusBar style="light" />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        <View
-          // MUDANÇA: A View interna (que contém o logo e o início do card) agora tem o fundo VERMELHO (bg-red-600)
-          className="flex-1 justify-end bg-red-600"
-          style={{ paddingTop: insets.top }}
-        >
+      <View className="flex-1 bg-red-600" style={{ paddingTop: insets.top }}>
+        <View className="flex-1 justify-end">
           {/* ÁREA SUPERIOR (Logo) */}
           <View className="items-center justify-center flex-1 py-4">
             <View className="bg-red-50 rounded-full p-4 mb-2 shadow-md">
@@ -212,7 +204,7 @@ export default function TelaLogin() {
                     "Entre em contato com o síndico para recuperar sua senha."
                   )
                 }
-                className="self-end mt-2"
+                className="self-center mt-2"
                 activeOpacity={0.7}
               >
                 <Text className="text-red-600 text-sm font-semibold">
@@ -221,14 +213,16 @@ export default function TelaLogin() {
               </TouchableOpacity>
             </View>
 
-            {/* Mensagem de erro */}
-            {mensagemErro ? (
-              <View className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mt-4">
-                <Text className="text-red-700 text-sm text-center font-medium">
-                  {mensagemErro}
-                </Text>
-              </View>
-            ) : null}
+            {/* Mensagem de erro - Espaço fixo para evitar tremor */}
+            <View className="mt-4" style={{ minHeight: 20 }}>
+              {mensagemErro ? (
+                <View className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <Text className="text-red-700 text-sm text-center font-medium">
+                    {mensagemErro}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
 
             {/* Botão */}
             <TouchableOpacity
@@ -255,8 +249,7 @@ export default function TelaLogin() {
             </View>
           </View>
         </View>
-      </KeyboardAvoidingView>
-      {/* MUDANÇA: Adicionada uma View branca vazia no final para garantir que qualquer espaço extra na parte inferior seja branco */}
+      </View>
       <View className="bg-white" style={{ height: insets.bottom }} />
     </View>
   );
