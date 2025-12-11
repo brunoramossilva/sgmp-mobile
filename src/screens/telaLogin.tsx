@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAutenticacao } from "../contexto/ContextoAutenticacao";
 import { fazerLogin, buscarDadosUsuario } from "../services/autenticacao";
+import { IconeLucide } from "../components/icones";
 
 export default function TelaLogin() {
   const [cpf, setCpf] = useState("");
@@ -22,6 +23,8 @@ export default function TelaLogin() {
   const [carregando, setCarregando] = useState(false);
   const [focoCpf, setFocoCpf] = useState(false);
   const [focoSenha, setFocoSenha] = useState(false);
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const [mensagemErro, setMensagemErro] = useState("");
 
   const [tecladoVisivel, setTecladoVisivel] = useState(false);
 
@@ -63,13 +66,15 @@ export default function TelaLogin() {
 
   const handleLogin = async () => {
     Keyboard.dismiss();
+    setMensagemErro("");
+
     if (!cpf || !senha) {
-      Alert.alert("Validação", "Por favor, preencha todos os campos");
+      setMensagemErro("Por favor, preencha todos os campos");
       return;
     }
     const cpfLimpo = cpf.replace(/\D/g, "");
     if (cpfLimpo.length !== 11) {
-      Alert.alert("Validação", "CPF deve conter 11 dígitos");
+      setMensagemErro("CPF deve conter 11 dígitos");
       return;
     }
 
@@ -99,9 +104,17 @@ export default function TelaLogin() {
       navigation.navigate(rotaInicial as never);
     } catch (erro: any) {
       console.error("Erro ao realizar login:", erro);
-      const mensagemErro =
-        erro.response?.data?.error || "Verifique suas credenciais.";
-      Alert.alert("Erro de Login", mensagemErro);
+
+      // Tratamento de erros amigável
+      if (erro.response?.status === 401) {
+        setMensagemErro("CPF ou senha incorretos. Verifique seus dados.");
+      } else if (erro.response?.status === 404) {
+        setMensagemErro("Usuário não encontrado no sistema.");
+      } else if (erro.message === "Network Error" || !erro.response) {
+        setMensagemErro("Erro de conexão. Verifique sua internet.");
+      } else {
+        setMensagemErro("Erro ao fazer login. Tente novamente.");
+      }
     } finally {
       setCarregando(false);
     }
@@ -186,7 +199,7 @@ export default function TelaLogin() {
                   Senha
                 </Text>
                 <View
-                  className={`bg-slate-50 rounded-xl border-2 ${
+                  className={`bg-slate-50 rounded-xl border-2 flex-row items-center ${
                     focoSenha ? "border-red-600" : "border-slate-200"
                   }`}
                 >
@@ -195,15 +208,51 @@ export default function TelaLogin() {
                     onChangeText={setSenha}
                     placeholder="Senha"
                     placeholderTextColor="#94a3b8"
-                    secureTextEntry
+                    secureTextEntry={!senhaVisivel}
                     onFocus={() => setFocoSenha(true)}
                     onBlur={() => setFocoSenha(false)}
                     onSubmitEditing={handleLogin}
-                    className="px-4 py-3 text-slate-800 text-base"
+                    className="flex-1 px-4 py-3 text-slate-800 text-base"
                   />
+                  <TouchableOpacity
+                    onPress={() => setSenhaVisivel(!senhaVisivel)}
+                    className="pr-4"
+                    activeOpacity={0.7}
+                  >
+                    <IconeLucide
+                      id={senhaVisivel ? "olho" : "olho-fechado"}
+                      tamanho={20}
+                      cor="#64748b"
+                    />
+                  </TouchableOpacity>
                 </View>
               </View>
+
+              {/* Botão Esqueci minha senha */}
+              <TouchableOpacity
+                onPress={() =>
+                  Alert.alert(
+                    "Esqueci minha senha",
+                    "Entre em contato com o síndico para recuperar sua senha."
+                  )
+                }
+                className="self-end mt-2"
+                activeOpacity={0.7}
+              >
+                <Text className="text-red-600 text-sm font-semibold">
+                  Esqueci minha senha
+                </Text>
+              </TouchableOpacity>
             </View>
+
+            {/* Mensagem de erro */}
+            {mensagemErro ? (
+              <View className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mt-4">
+                <Text className="text-red-700 text-sm text-center font-medium">
+                  {mensagemErro}
+                </Text>
+              </View>
+            ) : null}
 
             {/* Botão */}
             <TouchableOpacity
