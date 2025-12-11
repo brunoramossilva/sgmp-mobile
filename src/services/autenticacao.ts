@@ -71,8 +71,8 @@ export const buscarDadosUsuario = async (
       nome = nome || m?.usuario?.nome || m?.nome || nome;
       telefone = telefone || m?.usuario?.telefone || m?.telefone || telefone;
     } catch (e) {
-      // Silencia fallback para evitar quebrar login
-      console.warn("Fallback morador para síndico falhou", e);
+      // Log apenas no terminal para debug
+      console.log("[AUTH] Fallback morador para síndico:", e);
     }
   }
 
