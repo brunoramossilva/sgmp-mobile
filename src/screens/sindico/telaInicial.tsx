@@ -17,6 +17,9 @@ import SkeletonBloco from "../../components/SkeletonBloco";
 import { NavbarGlobal } from "../../components/navegacao";
 import { IdIcone } from "../../utils/iconesLucide";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
+import { CarrosselIntroducao } from "../../components/introducao";
+import { obterSlidesIntroducao } from "../../utils/conteudoIntroducao";
+import { useIntroducaoUsuario } from "../../hooks/useIntroducaoUsuario";
 
 // --- Interfaces ---
 interface DashboardData {
@@ -142,6 +145,25 @@ const TelaInicial = () => {
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
   const { data, loading, refreshing, refetch } = useDashboardData();
+  const [showCarrossel, setShowCarrossel] = useState(true);
+  const jaExibiuNaSessao = React.useRef(false);
+
+  const cpf = usuario?.cpf || "";
+  const { deveExibirIntroducao, marcarComoVisto, carregando } =
+    useIntroducaoUsuario(cpf, "SINDICO");
+
+  const handleFecharCarrossel = () => {
+    setShowCarrossel(false);
+    jaExibiuNaSessao.current = true;
+    marcarComoVisto();
+  };
+
+  React.useEffect(() => {
+    // Se já exibiu nesta sessão, não mostrar novamente
+    if (jaExibiuNaSessao.current) {
+      setShowCarrossel(false);
+    }
+  }, []);
 
   const sindicoName = usuario?.nome?.trim()
     ? usuario.nome.split(" ")[0]
@@ -194,6 +216,15 @@ const TelaInicial = () => {
     <View className="flex-1 bg-slate-50">
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
+      {/* Carrossel de Introdução */}
+      {showCarrossel && (
+        <CarrosselIntroducao
+          slides={obterSlidesIntroducao("SINDICO")}
+          aoConcluir={handleFecharCarrossel}
+          nomePapel="SINDICO"
+        />
+      )}
+
       {/* HEADER UNIFICADO */}
       <View
         className="bg-red-600 px-6 pb-10 shadow-lg z-10"
@@ -223,9 +254,7 @@ const TelaInicial = () => {
         {/* SAUDAÇÃO + BADGE DE SÍNDICO */}
         <View>
           <View className="flex-row items-center gap-2 mb-1">
-            <Text className="text-red-100 text-base font-medium">
-              Olá,
-            </Text>
+            <Text className="text-red-100 text-base font-medium">Olá,</Text>
 
             {/* BADGE ESPECÍFICA DO SÍNDICO */}
             <View className="bg-white/20 px-2 py-0.5 rounded-md border border-white/10">

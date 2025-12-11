@@ -17,6 +17,9 @@ import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { IconeLucide } from "../../components/icones";
 import SkeletonBloco from "../../components/SkeletonBloco";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
+import { CarrosselIntroducao } from "../../components/introducao";
+import { obterSlidesIntroducao } from "../../utils/conteudoIntroducao";
+import { useIntroducaoUsuario } from "../../hooks/useIntroducaoUsuario";
 
 // Services e Types
 import { getOrdens, updateOrdem } from "../../services/ordemServico";
@@ -82,6 +85,25 @@ export default function InicialTecnico() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { usuario, desautenticar } = useAutenticacao();
+  const [showCarrossel, setShowCarrossel] = useState(true);
+  const jaExibiuNaSessao = React.useRef(false);
+
+  const cpf = usuario?.cpf || "";
+  const { deveExibirIntroducao, marcarComoVisto, carregando } =
+    useIntroducaoUsuario(cpf, "FUNCIONARIO");
+
+  const handleFecharCarrossel = () => {
+    setShowCarrossel(false);
+    jaExibiuNaSessao.current = true;
+    marcarComoVisto();
+  };
+
+  React.useEffect(() => {
+    // Se já exibiu nesta sessão, não mostrar novamente
+    if (jaExibiuNaSessao.current) {
+      setShowCarrossel(false);
+    }
+  }, []);
 
   // Estados de Dados
   const {
@@ -249,6 +271,15 @@ export default function InicialTecnico() {
   return (
     <View className="flex-1 bg-slate-50">
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
+
+      {/* Carrossel de Introdução */}
+      {showCarrossel && (
+        <CarrosselIntroducao
+          slides={obterSlidesIntroducao("FUNCIONARIO")}
+          aoConcluir={handleFecharCarrossel}
+          nomePapel="FUNCIONARIO"
+        />
+      )}
 
       {/* HEADER UNIFICADO (CURVO - CINOVA) */}
       <View
