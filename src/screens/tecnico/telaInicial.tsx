@@ -25,6 +25,7 @@ import { useIntroducaoUsuario } from "../../hooks/useIntroducaoUsuario";
 import { getOrdens, updateOrdem } from "../../services/ordemServico";
 import { OrdemServicoUI, mapApiToUI } from "./types";
 import CardOrdemPendente from "./CardOrdemPendente";
+import CardOrdemAceita from "./CardOrdemAceita";
 import ModalDetalhes from "./ModalDetalhes";
 import ModalFinalizacao from "./ModalFinalizacao";
 import SkeletonOrdem from "./SkeletonOrdem";
@@ -171,6 +172,7 @@ export default function InicialTecnico() {
     setOrdemSelecionada(ordem);
     setModalDetalhesVisivel(true);
   };
+
   const abrirFinalizacao = (ordem: OrdemServicoUI) => {
     setOrdemSelecionada(ordem);
     setModalFinalizacaoVisivel(true);
@@ -209,7 +211,7 @@ export default function InicialTecnico() {
     ]);
   };
 
-  const finalizarOS = async () => {
+  const finalizarOS = async (solucao: string) => {
     if (!ordemSelecionada) return;
     try {
       await updateOrdem(ordemSelecionada.id, {
@@ -466,23 +468,38 @@ export default function InicialTecnico() {
               </Text>
             </View>
           ) : (
-            ordensExibidas.map((ordem) => (
-              <CardOrdemPendente
-                key={ordem.id}
-                ordem={ordem}
-                onDetalhes={() => abrirDetalhes(ordem)}
-                onAceitar={
-                  abaSelecionada === "Pendentes"
-                    ? () => aceitarOS(ordem)
-                    : undefined
-                }
-                onRecusar={
-                  abaSelecionada === "Pendentes"
-                    ? () => recusarOS(ordem)
-                    : undefined
-                }
-              />
-            ))
+            ordensExibidas.map((ordem) => {
+              // Usar card diferente dependendo da aba
+              if (abaSelecionada === "Em Execução") {
+                return (
+                  <CardOrdemAceita
+                    key={ordem.id}
+                    ordem={ordem}
+                    onDetalhes={() => abrirDetalhes(ordem)}
+                    onFinalizar={() => abrirFinalizacao(ordem)}
+                  />
+                );
+              } else if (abaSelecionada === "Finalizadas") {
+                return (
+                  <CardOrdemPendente
+                    key={ordem.id}
+                    ordem={ordem}
+                    onDetalhes={() => abrirDetalhes(ordem)}
+                  />
+                );
+              } else {
+                // Pendentes
+                return (
+                  <CardOrdemPendente
+                    key={ordem.id}
+                    ordem={ordem}
+                    onDetalhes={() => abrirDetalhes(ordem)}
+                    onAceitar={() => aceitarOS(ordem)}
+                    onRecusar={() => recusarOS(ordem)}
+                  />
+                );
+              }
+            })
           )}
         </View>
       </ScrollView>

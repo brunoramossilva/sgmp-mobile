@@ -88,36 +88,59 @@ export default function CardOrdemPendente({
       </View>
 
       {/* Ações */}
-      {(onAceitar || onRecusar) && (
-        <View className="border-t border-slate-100 px-4 py-3">
-          <View className="flex-row gap-2">
-            {onRecusar && (
-              <TouchableOpacity
-                onPress={onRecusar}
-                className="flex-1 bg-slate-100 py-3 rounded-xl flex-row items-center justify-center"
-                activeOpacity={0.7}
-              >
-                <IconeLucide id="cancelar" tamanho={18} cor="#475569" />
-                <Text className="text-slate-700 font-bold text-sm ml-2">
-                  Recusar
-                </Text>
-              </TouchableOpacity>
-            )}
-            {onAceitar && (
-              <TouchableOpacity
-                onPress={onAceitar}
-                className="flex-1 bg-red-600 py-3 rounded-xl flex-row items-center justify-center shadow-sm"
-                activeOpacity={0.7}
-              >
-                <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
-                <Text className="text-white font-bold text-sm ml-2">
-                  Aceitar Tarefa
-                </Text>
-              </TouchableOpacity>
-            )}
+      <View className="border-t border-slate-100 px-4 py-3">
+        {onAceitar || onRecusar ? (
+          <View className="gap-2">
+            <TouchableOpacity
+              onPress={onDetalhes}
+              className="bg-slate-100 py-3 rounded-xl flex-row items-center justify-center"
+              activeOpacity={0.7}
+            >
+              <IconeLucide id="criar-os" tamanho={18} cor="#475569" />
+              <Text className="text-slate-700 font-bold text-sm ml-2">
+                Ver Detalhes
+              </Text>
+            </TouchableOpacity>
+            <View className="flex-row gap-2">
+              {onRecusar && (
+                <TouchableOpacity
+                  onPress={onRecusar}
+                  className="flex-1 bg-slate-100 py-3 rounded-xl flex-row items-center justify-center"
+                  activeOpacity={0.7}
+                >
+                  <IconeLucide id="cancelar" tamanho={18} cor="#475569" />
+                  <Text className="text-slate-700 font-bold text-sm ml-2">
+                    Recusar
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {onAceitar && (
+                <TouchableOpacity
+                  onPress={onAceitar}
+                  className="flex-1 bg-red-600 py-3 rounded-xl flex-row items-center justify-center shadow-sm"
+                  activeOpacity={0.7}
+                >
+                  <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
+                  <Text className="text-white font-bold text-sm ml-2">
+                    Aceitar Tarefa
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        </View>
-      )}
+        ) : (
+          <TouchableOpacity
+            onPress={onDetalhes}
+            className="bg-slate-100 py-3 rounded-xl flex-row items-center justify-center"
+            activeOpacity={0.7}
+          >
+            <IconeLucide id="criar-os" tamanho={18} cor="#475569" />
+            <Text className="text-slate-700 font-bold text-sm ml-2">
+              Ver Detalhes
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }

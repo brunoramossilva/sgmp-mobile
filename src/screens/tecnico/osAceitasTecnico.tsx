@@ -111,7 +111,7 @@ export default function OsAceitasTecnico() {
     setModalFinalizacaoVisivel(true);
   };
 
-  const finalizarOS = async () => {
+  const finalizarOS = async (solucao: string) => {
     if (!ordemSelecionada) return;
 
     await atualizarStatus(
@@ -125,6 +125,8 @@ export default function OsAceitasTecnico() {
 
     setModalFinalizacaoVisivel(false);
     setOrdemSelecionada(null);
+    Alert.alert("Sucesso", "Ordem finalizada!");
+    fetchOrdens();
   };
 
   return (
