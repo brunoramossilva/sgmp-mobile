@@ -303,18 +303,17 @@ const MoradoresAtivos: React.FC<Props> = ({ navigation }) => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-        <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+      <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+        <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
         {/* Header fixo */}
-        <View className="bg-white border-b border-slate-200 px-6 py-4">
+        <View className="bg-red-600 px-4 pb-4 pt-5">
           <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-3">
-              <BotaoVoltar />
-              <Text className="text-xl font-bold text-slate-900">
-                Moradores Ativos
-              </Text>
-            </View>
+            <BotaoVoltar />
+            <Text className="text-white text-xl font-bold">
+              Moradores Ativos
+            </Text>
+            <View className="w-10" />
           </View>
         </View>
 
@@ -327,43 +326,42 @@ const MoradoresAtivos: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+      <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
       {/* Header fixo */}
-      <View className="bg-white border-b border-slate-200 px-6 py-4">
+      <View className="bg-red-600 px-4 pb-4 pt-5">
         <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center gap-3">
-            <BotaoVoltar />
-            <Text className="text-xl font-bold text-slate-900">
-              Moradores Ativos
-            </Text>
-          </View>
+          <BotaoVoltar />
+          <Text className="text-white text-xl font-bold">Moradores Ativos</Text>
+          <View className="w-10" />
         </View>
       </View>
 
       {/* Lista */}
-      <FlatList
-        data={moradoresFiltrados}
-        keyExtractor={(item) => item.cpf}
-        renderItem={({ item }) => <CardMorador morador={item} />}
-        ListHeaderComponent={renderHeader}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingTop: 20,
-          paddingBottom: NAVBAR_HEIGHT + 20,
-        }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#dc2626"
-            colors={["#dc2626"]}
-          />
-        }
-      />
+      <View className="flex-1 bg-slate-50">
+        <FlatList
+          data={moradoresFiltrados}
+          keyExtractor={(item) => item.cpf}
+          renderItem={({ item }) => <CardMorador morador={item} />}
+          ListHeaderComponent={renderHeader}
+          ListEmptyComponent={renderEmpty}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingTop: 20,
+            paddingBottom: NAVBAR_HEIGHT + 20,
+          }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#dc2626"
+              colors={["#dc2626"]}
+            />
+          }
+        />
+      </View>
     </SafeAreaView>
   );
 };

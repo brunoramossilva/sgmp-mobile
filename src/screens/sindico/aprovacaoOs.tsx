@@ -59,25 +59,19 @@ const CardOrdemPendente = ({
         </View>
       </View>
 
-      {/* Título + descrição curta */}
-      <Text className="text-sm font-semibold text-slate-800" numberOfLines={1}>
-        {ordem.titulo}
-      </Text>
-      <Text className="text-xs text-slate-600 mt-1" numberOfLines={2}>
+      {/* Descrição do serviço */}
+      <Text className="text-sm font-semibold text-slate-800" numberOfLines={2}>
         {ordem.descricao}
       </Text>
+      <Text className="text-xs text-slate-500 mt-1">
+        Aguardando aprovação há {ordem.diasEmAberto}d
+      </Text>
 
-      {/* Datas */}
+      {/* Data de abertura */}
       <View className="flex-row gap-3 mt-3 mb-3">
         <View className="flex-row items-center gap-1">
           <IconeLucide id="calendario" tamanho={14} cor="#64748b" />
           <Text className="text-xs text-slate-600">{ordem.dataAbertura}</Text>
-        </View>
-        <View className="flex-row items-center gap-1">
-          <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
-          <Text className="text-xs text-slate-600">
-            {ordem.diasEmAberto}d em aberto
-          </Text>
         </View>
       </View>
 

@@ -50,12 +50,12 @@ const CardOrdemAceita = ({
         </View>
       </View>
 
-      {/* Título + descrição */}
-      <Text className="text-sm font-semibold text-slate-800" numberOfLines={1}>
-        {ordem.titulo}
-      </Text>
-      <Text className="text-xs text-slate-600 mt-1" numberOfLines={2}>
+      {/* Descrição do serviço */}
+      <Text className="text-sm font-semibold text-slate-800" numberOfLines={2}>
         {ordem.descricao}
+      </Text>
+      <Text className="text-xs text-slate-500 mt-1">
+        Em execução há {ordem.diasEmAberto}d
       </Text>
 
       {/* Informações: Data + Dias em aberto */}

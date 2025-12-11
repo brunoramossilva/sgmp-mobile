@@ -168,8 +168,11 @@ export default function DetalhesOS() {
         >
           {/* Cabeçalho com Prioridade e Status */}
           <View className="bg-white p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm">
-            <Text className="text-2xl font-bold text-red-700 mb-3 flex-1">
-              {ordem.titulo}
+            <Text className="text-xl font-bold text-slate-800 mb-1">
+              Ordem de Serviço #{ordem.id}
+            </Text>
+            <Text className="text-sm text-slate-500 mb-3">
+              Solicitado por {ordem.solicitante} em {ordem.data}
             </Text>
             <View className="flex-row gap-2 flex-wrap">
               <View

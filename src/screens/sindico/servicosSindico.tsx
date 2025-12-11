@@ -81,20 +81,16 @@ const CardOrdemServico = ({
         </View>
       </View>
 
-      {/* Título + descrição */}
-      <Text className="text-sm font-semibold text-slate-800" numberOfLines={1}>
-        {ordem.titulo}
-      </Text>
-      <Text className="text-xs text-slate-600 mt-1" numberOfLines={2}>
+      {/* Descrição do serviço */}
+      <Text className="text-sm font-semibold text-slate-800" numberOfLines={2}>
         {ordem.descricao}
       </Text>
+      <Text className="text-xs text-slate-500 mt-1">
+        Solicitado em {ordem.dataAbertura}
+      </Text>
 
-      {/* Informações: Data + Prioridade */}
+      {/* Informações: Prioridade */}
       <View className="flex-row gap-3 mt-3 mb-3">
-        <View className="flex-row items-center gap-1">
-          <IconeLucide id="calendario" tamanho={14} cor="#64748b" />
-          <Text className="text-xs text-slate-600">{ordem.dataAbertura}</Text>
-        </View>
         <View className="flex-row items-center gap-1">
           <IconeLucide
             id="alerta"
