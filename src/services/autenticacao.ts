@@ -53,32 +53,45 @@ export const buscarDadosUsuario = async (
       break;
   }
 
-  const response = await api.get<any>(endpoint);
+  try {
+    const response = await api.get<Record<string, unknown>>(endpoint);
+    // Normalizar resposta: o backend retorna cpf_sindico para síndico
+    const dados = response.data as Record<string, any>;
 
-  // Normalizar resposta: o backend retorna cpf_sindico para síndico
-  const dados = response.data;
+    let nome = dados.usuario?.nome || dados.nome || dados.morador?.nome || "";
 
-  let nome = dados.usuario?.nome || dados.nome || dados.morador?.nome || "";
+    let telefone =
+      dados.usuario?.telefone ||
+      dados.telefone ||
+      dados.morador?.telefone ||
+      "";
 
-  let telefone =
-    dados.usuario?.telefone || dados.telefone || dados.morador?.telefone || "";
-
-  // Fallback extra: síndico sem nome/telefone -> busca em /moradores/{cpf}
-  if (papel === "SINDICO" && (!nome || !telefone)) {
-    try {
-      const moradorResp = await api.get<any>(`/moradores/${cpf}`);
-      const m = moradorResp.data;
-      nome = nome || m?.usuario?.nome || m?.nome || nome;
-      telefone = telefone || m?.usuario?.telefone || m?.telefone || telefone;
-    } catch (e) {
-      // Log apenas no terminal para debug
-      console.log("[AUTH] Fallback morador para síndico:", e);
+    // Fallback extra: síndico sem nome/telefone -> busca em /moradores/{cpf}
+    if (papel === "SINDICO" && (!nome || !telefone)) {
+      try {
+        const moradorResp = await api.get<Record<string, unknown>>(
+          `/moradores/${cpf}`
+        );
+        const m = moradorResp.data as Record<string, any>;
+        nome = nome || m?.usuario?.nome || m?.nome || nome;
+        telefone = telefone || m?.usuario?.telefone || m?.telefone || telefone;
+      } catch (e: any) {
+        // Log apenas no terminal para debug
+        console.error("[AUTH] Fallback morador para síndico:", e);
+      }
     }
-  }
 
-  return {
-    cpf: dados.cpf || dados.cpf_sindico || cpf, // Fallback para cpf_sindico do backend
-    nome: nome || "",
-    telefone: telefone || "",
-  };
+    return {
+      cpf: (dados.cpf as string) || (dados.cpf_sindico as string) || cpf,
+      nome: nome || "",
+      telefone: telefone || "",
+    };
+  } catch (error: any) {
+    console.error("Erro ao buscar dados do usuário:", error);
+    throw new Error(
+      error?.response?.data?.mensagem ||
+        error?.message ||
+        "Erro ao buscar dados do usuário"
+    );
+  }
 };

@@ -1,8 +1,3 @@
-/**
- * Tela de aprovação de ordens de serviço
- * Síndico visualiza e aprova/recusa ordens pendentes
- */
-
 import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
@@ -145,7 +140,7 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
   // Abre detalhes da ordem
   const abrirDetalhes = useCallback(
     (ordem: OrdemServicoUI) => {
-      navigation.navigate("DetalhesOs", { ordem, readOnly: true });
+      navigation.navigate("DetalhesOs", { ordem, readOnly: false });
     },
     [navigation]
   );
@@ -295,7 +290,7 @@ export default function AprovacaoOs({ navigation }: AprovacaoOsProps) {
           </View>
         ) : (
           <FlatList
-            data={ordensPendentes}
+            data={ordensOrdenadas}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             scrollEnabled

@@ -8,28 +8,15 @@ import {
   TextInput,
   Alert,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IconeLucide } from "../components/icones";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { BotaoVoltar } from "../components/navegacao";
+import { useAutenticacao } from "../contexto/ContextoAutenticacao";
+import { updateOrdem } from "../services/ordemServico";
 import { OrdemServicoUI } from "../utils/mapeadores";
-
-// Fallback local para uso offline/demonstrativo
-const ordemFallback: OrdemServicoUI = {
-  id: 1,
-  titulo: "Vazamento no Banheiro",
-  descricao:
-    "Há um vazamento na torneira do banheiro do apartamento 101. O morador relatou que o problema começou há cerca de 3 dias e está piorando progressivamente. A água está vazando mesmo com a torneira fechada.",
-  solicitante: "João Silva",
-  dataAbertura: "28/11/2024",
-  data: "28/11/2024",
-  diasEmAberto: 3,
-  prioridade: "Alta",
-  status: "Aceita",
-  local: "Condomínio Vista Verde",
-  cpf_morador: "00000000000",
-};
 
 type RouteParams = {
   ordem?: OrdemServicoUI;
@@ -55,7 +42,10 @@ export default function DetalhesOS() {
   const route = useRoute();
   const { ordem: ordemParam, readOnly } = (route.params as RouteParams) || {};
 
-  const ordemInicial = useMemo(() => ordemParam ?? ordemFallback, [ordemParam]);
+  const ordemInicial = useMemo(
+    () => ordemParam as OrdemServicoUI,
+    [ordemParam]
+  );
 
   const [ordem, setOrdem] = useState<OrdemDetalheView>(() => {
     let dataConclusao = ordemInicial.dataConclusao;
@@ -84,15 +74,45 @@ export default function DetalhesOS() {
   const [comentarioFinalizacao, setComentarioFinalizacao] = useState("");
 
   // Função para aceitar a OS
-  const aceitarOS = () => {
+  const { usuario } = useAutenticacao();
+  const [carregandoAcao, setCarregandoAcao] = useState(false);
+
+  const aceitarOS = async () => {
     if (readOnly) return;
-    setOrdem((prev) => ({ ...prev, status: "Aceita" }));
+    try {
+      setCarregandoAcao(true);
+      // Chamada para API — síndico aprovando a OS
+      await updateOrdem(ordem.id, {
+        status: "AGUARDANDO_EXECUCAO",
+        cpf_sindico: usuario?.cpf || "",
+      });
+      setOrdem((prev) => ({ ...prev, status: "Aceita" }));
+    } catch (erro) {
+      const mensagem =
+        erro instanceof Error ? erro.message : "Erro ao aceitar OS";
+      Alert.alert("Erro", mensagem.toString());
+    } finally {
+      setCarregandoAcao(false);
+    }
   };
 
   // Função para recusar a OS
-  const recusarOS = () => {
+  const recusarOS = async () => {
     if (readOnly) return;
-    setOrdem((prev) => ({ ...prev, status: "Recusada" }));
+    try {
+      setCarregandoAcao(true);
+      await updateOrdem(ordem.id, {
+        status: "RECUSADA",
+        cpf_sindico: usuario?.cpf || "",
+      });
+      setOrdem((prev) => ({ ...prev, status: "Recusada" }));
+    } catch (erro) {
+      const mensagem =
+        erro instanceof Error ? erro.message : "Erro ao recusar OS";
+      Alert.alert("Erro", mensagem.toString());
+    } finally {
+      setCarregandoAcao(false);
+    }
   };
 
   // Mapper para enviar para API (quando técnico/síndico atualizar status)
@@ -185,7 +205,7 @@ export default function DetalhesOS() {
 
         <ScrollView
           className="flex-1 px-4 pt-4"
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
         >
           {/* Cabeçalho com Prioridade e Status */}
           <View className="bg-white p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm">
@@ -305,24 +325,34 @@ export default function DetalhesOS() {
                 <View className="flex-row space-x-2 mb-3">
                   <TouchableOpacity
                     onPress={aceitarOS}
+                    disabled={carregandoAcao}
                     className="flex-1 bg-green-600 p-4 rounded-xl mr-2"
                   >
                     <View className="flex-row items-center justify-center">
                       <IconeLucide id="confirmar" tamanho={18} cor="#ffffff" />
-                      <Text className="text-white text-center font-semibold ml-2">
-                        Aceitar OS
-                      </Text>
+                      {carregandoAcao ? (
+                        <ActivityIndicator color="#fff" className="ml-2" />
+                      ) : (
+                        <Text className="text-white text-center font-semibold ml-2">
+                          Aceitar OS
+                        </Text>
+                      )}
                     </View>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={recusarOS}
+                    disabled={carregandoAcao}
                     className="flex-1 bg-red-600 p-4 rounded-xl"
                   >
                     <View className="flex-row items-center justify-center">
                       <IconeLucide id="cancelar" tamanho={18} cor="#ffffff" />
-                      <Text className="text-white text-center font-semibold ml-2">
-                        Recusar OS
-                      </Text>
+                      {carregandoAcao ? (
+                        <ActivityIndicator color="#fff" className="ml-2" />
+                      ) : (
+                        <Text className="text-white text-center font-semibold ml-2">
+                          Recusar OS
+                        </Text>
+                      )}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -344,15 +374,19 @@ export default function DetalhesOS() {
               )}
             </View>
           )}
+        </ScrollView>
 
-          {/* Botão Voltar */}
+        <View
+          style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}
+          className="px-4 pb-6 bg-white"
+        >
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            className="bg-red-600 p-4 rounded-2xl mb-6"
+            className="bg-red-600 p-4 rounded-2xl"
           >
             <Text className="text-white text-center font-semibold">Voltar</Text>
           </TouchableOpacity>
-        </ScrollView>
+        </View>
 
         {/* Modal de Finalização */}
         {!readOnly && (

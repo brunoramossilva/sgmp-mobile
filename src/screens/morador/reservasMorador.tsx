@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
+import { IdIcone } from "../../utils/iconesLucide";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
 import { BotaoVoltar } from "../../components/navegacao";
 import { BotaoCriar } from "../../components/formulario";
@@ -86,9 +87,9 @@ export default function ReservasMorador() {
   };
 
   // Renderiza ícone baseado no tipo
-  const getIconeArea = (tipo: string) => {
-    if (tipo === "piscina") return "servicos"; // autalizar para ícone de água/sol se tiver
-    if (tipo === "churrasqueira") return "financeiro"; // autalizar para fogo/comida se tiver
+  const getIconeArea = (tipo: string): IdIcone => {
+    if (tipo === "piscina") return "servicos"; // atualizar para ícone de água/sol se tiver
+    if (tipo === "churrasqueira") return "financeiro"; // atualizar para fogo/comida se tiver
     return "home"; // Salão
   };
 
@@ -150,7 +151,7 @@ export default function ReservasMorador() {
                     }`}
                   >
                     <IconeLucide
-                      id={getIconeArea(item.tipo) as any}
+                      id={getIconeArea(item.tipo)}
                       tamanho={18}
                       cor={isSelected ? "#fff" : "#64748b"}
                     />

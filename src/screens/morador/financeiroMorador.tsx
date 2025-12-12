@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { IconeLucide } from "../../components/icones";
+import { IdIcone } from "../../utils/iconesLucide";
 import NavbarGlobal from "../../components/navegacao/NavbarGlobal";
 import { BotaoVoltar } from "../../components/navegacao";
 
@@ -28,7 +29,7 @@ export default function FinanceiroMorador() {
     // Definição de cores e ícones baseados no status
     let corStatus = "bg-gray-100 text-gray-600";
     let textoStatus = "Desconhecido";
-    let icone = "financeiro";
+    let icone: IdIcone = "financeiro";
 
     switch (item.status) {
       case "pago":
@@ -70,7 +71,7 @@ export default function FinanceiroMorador() {
       >
         {/* Ícone Lateral */}
         <View className="w-10 h-10 bg-slate-50 rounded-full items-center justify-center mr-3 border border-slate-200">
-          <IconeLucide id={icone as any} tamanho={20} cor="#64748b" />
+          <IconeLucide id={icone} tamanho={20} cor="#64748b" />
         </View>
 
         {/* Informações Centrais */}

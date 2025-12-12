@@ -16,6 +16,7 @@ import {
   Platform,
 } from "react-native";
 import { IconeLucide } from "./icones";
+import { IdIcone } from "../utils/iconesLucide";
 
 export type AcaoConfirmacao = "aprovar" | "recusar" | "finalizar";
 
@@ -33,24 +34,32 @@ interface ConfirmacaoModalProps {
 /**
  * Retorna configurações de cor e ícone baseado na ação
  */
-const getConfiguracaoAcao = (acao: AcaoConfirmacao) => {
-  const configs = {
+type ConfigAcao = {
+  icone: IdIcone;
+  cor: string;
+  corBotao: string;
+  textoBotao: string;
+  textoConfirmacao: string;
+};
+
+const getConfiguracaoAcao = (acao: AcaoConfirmacao): ConfigAcao => {
+  const configs: Record<AcaoConfirmacao, ConfigAcao> = {
     aprovar: {
-      icone: "confirmar" as const,
+      icone: "confirmar",
       cor: "bg-green-600",
       corBotao: "bg-green-600",
       textoBotao: "Aprovar",
       textoConfirmacao: "Esta ação não pode ser desfeita.",
     },
     recusar: {
-      icone: "cancelar" as const,
+      icone: "cancelar",
       cor: "bg-red-600",
       corBotao: "bg-red-600",
       textoBotao: "Recusar",
       textoConfirmacao: "Esta ação não pode ser desfeita.",
     },
     finalizar: {
-      icone: "verificado" as const,
+      icone: "verificado",
       cor: "bg-blue-600",
       corBotao: "bg-blue-600",
       textoBotao: "Finalizar",
@@ -119,11 +128,7 @@ export const ConfirmacaoModal = React.memo(
             {/* Cabeçalho com ícone */}
             <View className="items-center pt-6 pb-4">
               <View className={`${config.cor} rounded-full p-4 mb-3`}>
-                <IconeLucide
-                  id={config.icone as any}
-                  tamanho={32}
-                  cor="white"
-                />
+                <IconeLucide id={config.icone} tamanho={32} cor="white" />
               </View>
             </View>
 

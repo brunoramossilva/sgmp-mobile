@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAutenticacao } from "../../contexto/ContextoAutenticacao";
 import { NavbarGlobal } from "../../components/navegacao";
 import { IconeLucide } from "../../components/icones";
+import { IdIcone } from "../../utils/iconesLucide";
 import SkeletonBloco from "../../components/SkeletonBloco";
 import { NAVBAR_HEIGHT } from "../../utils/responsividade";
 import { CarrosselIntroducao } from "../../components/introducao";
@@ -87,7 +88,7 @@ const InicialMorador = () => {
     let bgIcone = "bg-slate-100";
     let statusColor = "text-slate-500";
     let statusBg = "bg-slate-100";
-    let iconeId = "financeiro";
+    let iconeId: IdIcone = "financeiro";
 
     switch (fatura.status) {
       case "pago":
@@ -123,7 +124,7 @@ const InicialMorador = () => {
           <View
             className={`w-10 h-10 ${bgIcone} rounded-full items-center justify-center`}
           >
-            <IconeLucide id={iconeId as any} tamanho={20} cor={corIcone} />
+            <IconeLucide id={iconeId} tamanho={20} cor={corIcone} />
           </View>
           <View className={`${statusBg} px-2 py-1 rounded-lg`}>
             <Text className={`text-[9px] font-bold uppercase ${statusColor}`}>

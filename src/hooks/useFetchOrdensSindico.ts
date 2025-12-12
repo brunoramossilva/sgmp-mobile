@@ -107,6 +107,9 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
   const atualizar = useCallback(
     async (ordemId: number, dados: Partial<OrdemServicoApi>) => {
       if (!isMountedRef.current) return;
+      // Snapshot dos estados antes da atualização otimista
+      const prevPendentes = ordensPendentes;
+      const prevExecucao = ordensEmExecucao;
 
       try {
         // Update otimista: remove da lista de pendentes se atualizou status
@@ -146,9 +149,9 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
       } catch (erro) {
         if (!isMountedRef.current) return;
 
-        // Erro - restaura estados anteriores
-        setOrdensPendentes((prev) => (prev.length === 0 ? [] : prev));
-        setOrdensEmExecucao((prev) => (prev.length === 0 ? [] : prev));
+        // Erro - restaura estados anteriores usando snapshot
+        setOrdensPendentes(prevPendentes);
+        setOrdensEmExecucao(prevExecucao);
 
         // Força refetch para sincronizar com servidor
         setTimeout(() => {

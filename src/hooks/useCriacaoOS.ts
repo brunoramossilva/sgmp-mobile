@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { CriacaoOsDados } from "../../src/types/ordemServico";
-import { criarOrdemServico } from "../../src/services/ordemServico";
+import { CriacaoOsDados } from "../types/ordemServico";
+import { criarOrdemServico } from "../services/ordemServico";
 
 interface ResultadoCriacaoOS {
   sucesso: boolean;
@@ -82,7 +82,7 @@ export const useCriacaoOS = () => {
       return {
         sucesso: true,
         mensagem: "Ordem de Serviço criada com sucesso!",
-        payload: resposta as any,
+        payload: payload,
       };
     } catch (erro: any) {
       const mensagemErro =
