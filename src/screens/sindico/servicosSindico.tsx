@@ -54,7 +54,7 @@ const CardOrdemServico = ({
     Finalizada: {
       bg: "bg-green-100",
       text: "text-green-700",
-      label: "Finalizada",
+      label: "Concluída",
     },
     Recusada: {
       bg: "bg-red-100",
@@ -94,21 +94,26 @@ const CardOrdemServico = ({
         Solicitado em {ordem.dataAbertura}
       </Text>
 
-      {/* Informações: Prioridade */}
-      <View className="flex-row gap-3 mt-3 mb-3">
-        <View className="flex-row items-center gap-1">
-          <IconeLucide
-            id="alerta"
-            tamanho={14}
-            cor={ordem.prioridade === "Alta" ? "#ef4444" : "#64748b"}
-          />
-          <Text className="text-xs text-slate-600">{ordem.prioridade}</Text>
+      {ordem.status !== "Finalizada" && ordem.status !== "Recusada" ? (
+        <View className="flex-row gap-3 mt-3 mb-3">
+          <View className="flex-row items-center gap-1">
+            <IconeLucide
+              id="alerta"
+              tamanho={14}
+              cor={ordem.prioridade === "Alta" ? "#ef4444" : "#64748b"}
+            />
+            <Text className="text-xs text-slate-600">{ordem.prioridade}</Text>
+          </View>
+          <View className="flex-row items-center gap-1">
+            <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
+            <Text className="text-xs text-slate-600">
+              {ordem.diasEmAberto}d
+            </Text>
+          </View>
         </View>
-        <View className="flex-row items-center gap-1">
-          <IconeLucide id="relogio" tamanho={14} cor="#64748b" />
-          <Text className="text-xs text-slate-600">{ordem.diasEmAberto}d</Text>
-        </View>
-      </View>
+      ) : (
+        <View style={{ marginBottom: 16 }} />
+      )}
 
       {/* Botão de detalhes */}
       <TouchableOpacity
@@ -154,9 +159,7 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
         ordens = ordensEmExecucao.filter((o) => o.status === "Em Execução");
         break;
       case "FINALIZADAS":
-        ordens = ordensEmExecucao.filter(
-          (o) => o.status === "Finalizada" || o.status === "Recusada"
-        );
+        ordens = ordensEmExecucao.filter((o) => o.status === "Finalizada");
         break;
       case "RECUSADAS":
         ordens = ordensEmExecucao.filter((o) => o.status === "Recusada");
@@ -201,9 +204,8 @@ export default function ServicosSindico({ navigation }: ServicosSindicoProps) {
       aceitas: ordensEmExecucao.filter((o) => o.status === "Aceita").length,
       emExecucao: ordensEmExecucao.filter((o) => o.status === "Em Execução")
         .length,
-      finalizadas: ordensEmExecucao.filter(
-        (o) => o.status === "Finalizada" || o.status === "Recusada"
-      ).length,
+      finalizadas: ordensEmExecucao.filter((o) => o.status === "Finalizada")
+        .length,
       recusadas: ordensEmExecucao.filter((o) => o.status === "Recusada").length,
     }),
     [ordensPendentes, ordensEmExecucao, todasOrdens]

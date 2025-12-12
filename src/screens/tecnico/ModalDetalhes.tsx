@@ -127,10 +127,19 @@ export default function ModalDetalhes({
                 <Text className="text-xs font-semibold text-red-900 mb-1 uppercase">
                   Status
                 </Text>
-                <View className="bg-red-100 px-3 py-1.5 rounded-xl self-start mt-1.5">
-                  <Text className="text-sm font-bold text-red-900">
-                    {ordem.status}
-                  </Text>
+                <View className="flex-row items-center gap-2 mt-1.5">
+                  <View className="bg-red-100 px-3 py-1.5 rounded-xl">
+                    <Text className="text-sm font-bold text-red-900">
+                      {ordem.status}
+                    </Text>
+                  </View>
+                  {ordem.status === "Finalizada" && ordem.dataConclusao && (
+                    <View className="bg-red-100 px-3 py-1.5 rounded-xl ml-2">
+                      <Text className="text-xs font-bold text-red-900">
+                        Concluída em {ordem.dataConclusao}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>

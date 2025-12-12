@@ -47,6 +47,7 @@ type OrdemDetalheView = {
   prioridade: OrdemServicoUI["prioridade"];
   status: OrdemServicoUI["status"];
   comentarioResolucao?: string;
+  dataConclusao?: string;
 };
 
 export default function DetalhesOS() {
@@ -56,17 +57,29 @@ export default function DetalhesOS() {
 
   const ordemInicial = useMemo(() => ordemParam ?? ordemFallback, [ordemParam]);
 
-  const [ordem, setOrdem] = useState<OrdemDetalheView>(() => ({
-    id: ordemInicial.id,
-    titulo: ordemInicial.titulo,
-    descricao: ordemInicial.descricao,
-    local: "Condomínio Vista Verde",
-    solicitante: ordemInicial.solicitante,
-    data: ordemInicial.dataAbertura,
-    prioridade: ordemInicial.prioridade,
-    status: ordemInicial.status,
-    comentarioResolucao: undefined,
-  }));
+  const [ordem, setOrdem] = useState<OrdemDetalheView>(() => {
+    let dataConclusao = ordemInicial.dataConclusao;
+    // Se a ordem já está finalizada mas não tem dataConclusao, usa a data atual como fallback
+    if (ordemInicial.status === "Finalizada" && !dataConclusao) {
+      const hoje = new Date();
+      const dia = String(hoje.getDate()).padStart(2, "0");
+      const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+      const ano = hoje.getFullYear();
+      dataConclusao = `${dia}/${mes}/${ano}`;
+    }
+    return {
+      id: ordemInicial.id,
+      titulo: ordemInicial.titulo,
+      descricao: ordemInicial.descricao,
+      local: "Condomínio Vista Verde",
+      solicitante: ordemInicial.solicitante,
+      data: ordemInicial.dataAbertura,
+      prioridade: ordemInicial.prioridade,
+      status: ordemInicial.status,
+      // comentarioResolucao só é preenchido ao finalizar na tela
+      dataConclusao,
+    };
+  });
   const [modalFinalizacaoVisivel, setModalFinalizacaoVisivel] = useState(false);
   const [comentarioFinalizacao, setComentarioFinalizacao] = useState("");
 
@@ -109,10 +122,16 @@ export default function DetalhesOS() {
       );
       return;
     }
+    const hoje = new Date();
+    const dia = String(hoje.getDate()).padStart(2, "0");
+    const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+    const ano = hoje.getFullYear();
+    const dataConclusao = `${dia}/${mes}/${ano}`;
     setOrdem((prev) => ({
       ...prev,
       status: "Finalizada",
       comentarioResolucao: comentarioFinalizacao,
+      dataConclusao,
     }));
     setModalFinalizacaoVisivel(false);
     setComentarioFinalizacao("");
@@ -176,7 +195,7 @@ export default function DetalhesOS() {
             <Text className="text-sm text-slate-500 mb-3">
               Solicitado por {ordem.solicitante} em {ordem.data}
             </Text>
-            <View className="flex-row gap-2 flex-wrap">
+            <View className="flex-row gap-2 items-center">
               <View
                 className={`px-3 py-1.5 rounded-full ${
                   corPrioridade(ordem.prioridade).bg
@@ -268,17 +287,12 @@ export default function DetalhesOS() {
             </View>
           </View>
 
-          {/* Comentário de Resolução (se finalizada) */}
-          {ordem.status === "Finalizada" && ordem.comentarioResolucao && (
-            <View className="bg-green-50 p-4 rounded-2xl mb-4 border border-green-200 shadow-sm">
-              <View className="flex-row items-center gap-2 mb-3">
-                <IconeLucide id="confirmar" tamanho={24} cor="#15803d" />
-                <Text className="text-lg font-bold text-green-700">
-                  Resolução
-                </Text>
-              </View>
-              <Text className="text-base text-green-800 leading-6">
-                {ordem.comentarioResolucao}
+          {/* Data de conclusão (se finalizada) - acima do botão Voltar */}
+          {ordem.status === "Finalizada" && ordem.dataConclusao && (
+            <View className="flex-row items-center justify-center mb-4 mt-2">
+              <IconeLucide id="calendario" tamanho={16} cor="#15803d" />
+              <Text className="text-green-700 text-xs font-semibold ml-1">
+                Concluída em {ordem.dataConclusao}
               </Text>
             </View>
           )}

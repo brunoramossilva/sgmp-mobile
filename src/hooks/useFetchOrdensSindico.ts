@@ -69,14 +69,19 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
       const ordensUI = ordens.map(mapApiToUI);
 
       // Filtra pendentes (status PENDENTE_APROVACAO)
-      const pendentes = ordensUI.filter((o) => 
-        o.statusApi?.toUpperCase() === "PENDENTE_APROVACAO"
+      const pendentes = ordensUI.filter(
+        (o) => o.statusApi?.toUpperCase() === "PENDENTE_APROVACAO"
       );
 
-      // Filtra em execução (AGUARDANDO_EXECUCAO, EM_EXECUCAO e CONCLUIDA)
+      // Filtra em execução (AGUARDANDO_EXECUCAO, EM_EXECUCAO, CONCLUIDA e RECUSADA)
       const emExecucao = ordensUI.filter((o) => {
         const statusUpper = o.statusApi?.toUpperCase();
-        return statusUpper === "AGUARDANDO_EXECUCAO" || statusUpper === "EM_EXECUCAO" || statusUpper === "CONCLUIDA";
+        return (
+          statusUpper === "AGUARDANDO_EXECUCAO" ||
+          statusUpper === "EM_EXECUCAO" ||
+          statusUpper === "CONCLUIDA" ||
+          statusUpper === "RECUSADA"
+        );
       });
 
       setOrdensPendentes(pendentes);
@@ -107,13 +112,18 @@ export const useFetchOrdensSindico = (): FetchOrdensSindicoResult => {
         // Update otimista: remove da lista de pendentes se atualizou status
         if (dados.status) {
           const statusUpper = dados.status.toUpperCase();
-          
+
           if (statusUpper === "AGUARDANDO_EXECUCAO") {
             // Aprovado: remove de pendentes e adiciona em execução
             const ordem = ordensPendentes.find((o) => o.id === ordemId);
             if (ordem) {
-              setOrdensPendentes(ordensPendentes.filter((o) => o.id !== ordemId));
-              setOrdensEmExecucao([...ordensEmExecucao, { ...ordem, statusApi: dados.status }]);
+              setOrdensPendentes(
+                ordensPendentes.filter((o) => o.id !== ordemId)
+              );
+              setOrdensEmExecucao([
+                ...ordensEmExecucao,
+                { ...ordem, statusApi: dados.status },
+              ]);
             }
           } else if (statusUpper === "RECUSADA") {
             // Recusado: apenas remove de pendentes
