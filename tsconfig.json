@@ -11,7 +11,8 @@
     ],
     "types": [
       "react",
-      "react-native"
+      "react-native",
+      "jest"
     ]
   }
 }
