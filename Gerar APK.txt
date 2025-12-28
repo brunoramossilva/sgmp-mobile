@@ -1,0 +1,1 @@
+npx eas-cli build -p android --profile production
